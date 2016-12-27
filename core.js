@@ -4,6 +4,14 @@ var Core = {
 	init: function() {
 		Core.load.json("game.json").then(function(data){
 			Core.data = data;
+
+			//parse colors
+			Core.color = {};
+			Object.keys(Core.data.colors).forEach(function(key){
+				Core.color[key] = parseInt(Core.data.colors[key], 16);
+			});
+
+			//load resources
 			var scripts = data.scripts.sources.map(s => Core.load.script(s));
 			var images = Object.keys(data.images).map(n => Core.load.image(data.images[n], n));
 			var promises = scripts.concat(images);

@@ -10,6 +10,7 @@ var Game = {
 
 		//initialize scenes
 		TitleScene.init();
+		GameScene.init();
 		Game.setScene(TitleScene);
 
 		//start game loop
@@ -31,12 +32,20 @@ var Game = {
 	 * Performs deactivation of old scene and activation of new scene.
 	 */
 	setScene: function(scene) {
-		if (Game.activeScene !== null)
+		if (Game.activeScene !== null) {
 			Game.activeScene.deactivate();
-		
+			Game.activeScene.stage.removeChild(Display.gfx);
+		}
+
 		scene.activate();
 		Display.stage = scene.stage;
+		Display.stage.addChildAt(Display.gfx, Display.stage.children.length);
 		Game.activeScene = scene;
+	},
+
+	start: function() {
+		Game.setScene(GameScene);
+		//do stuff
 	},
 
 	frame: function(timescale) {

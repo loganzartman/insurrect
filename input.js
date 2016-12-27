@@ -12,9 +12,11 @@ var Input = {
 		//register event listeners
 		document.addEventListener("keydown", Input.handleKeydown, false);
 		document.addEventListener("keyup", Input.handleKeyup, false);
-		document.addEventListener("mousemove", Input.handleMousemove.bind(this, displayElement), false);
+		document.addEventListener("mousemove", Input.handleMousemove, false);
 		displayElement.addEventListener("mousedown", Input.handleMousedown, false);
 		document.addEventListener("mouseup", Input.handleMouseup, false);
+		document.addEventListener("contextmenu", function(e){e.preventDefault();}, false);
+		Input.displayElement = displayElement;
 
 		//load keybindings
 		Input.loadBindings(bindingMap);
@@ -44,26 +46,28 @@ var Input = {
 		Input.keys[event.keyCode] = false;
 	},
 
-	handleMousemove: function(displayElement, event){
-		var x = event.pageX - displayElement.offsetLeft;
-		var y = event.pageY - displayElement.offsetTop;
-		Input.mouse.x = Math.max(0, Math.min(displayElement.offsetWidth, x)) / Display.scale;
-		Input.mouse.y = Math.max(0, Math.min(displayElement.offsetHeight, y)) / Display.scale;
+	handleMousemove: function(event){
+		var x = event.pageX - Input.displayElement.offsetLeft;
+		var y = event.pageY - Input.displayElement.offsetTop;
+		Input.mouse.x = Math.max(0, Math.min(Input.displayElement.offsetWidth, x)) / Display.scale;
+		Input.mouse.y = Math.max(0, Math.min(Input.displayElement.offsetHeight, y)) / Display.scale;
 	},
 
 	handleMousedown: function(event){
-		if (event.which === 2)
+		if (event.which === 3)
 			Input.mouse.right = true;
 		else if (event.which === 1)
 			Input.mouse.left = true;
-		event.preventDefault();
+		if (event.target === Input.displayElement)
+			event.preventDefault();
 	},
 
 	handleMouseup: function(event){
-		if (event.which === 2)
+		if (event.which === 3)
 			Input.mouse.right = false;
 		else if (event.which === 1)
 			Input.mouse.left = false;
-		event.preventDefault();
+		if (event.target === Input.displayElement)
+			event.preventDefault();
 	}
 };

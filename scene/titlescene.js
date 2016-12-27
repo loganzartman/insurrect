@@ -8,6 +8,14 @@ var TitleScene = {
 		TitleScene.title = PIXI.Sprite.from(Core.image.title);
 		TitleScene.stage.addChild(TitleScene.gfx);
 		TitleScene.stage.addChild(TitleScene.title);
+
+		//create buttons
+		var playbtn = Display.makeButton("let's go", Core.color.acc3, Core.color.acc1, function(){
+			Game.start();
+		});
+		Display.centerObj(playbtn, true, false);
+		playbtn.position.y = 180;
+		TitleScene.stage.addChild(playbtn);
 	},
 	
 	/**
@@ -33,14 +41,8 @@ var TitleScene = {
 
 		//draw background
 		TitleScene.gfx.clear();
-		TitleScene.gfx.beginFill(0xD9CEBA, 1);
+		TitleScene.gfx.beginFill(Core.color.bg1, 1);
 		TitleScene.gfx.drawRect(0, 0, Display.w, Display.h);
 		TitleScene.gfx.endFill();
-
-		TitleScene.gfx.lineStyle(1, 0xAA0000, 1);
-		TitleScene.gfx.drawCircle(
-			Input.mouse.x, Input.mouse.y,
-			Input.mouse.left ? 9 : 4
-		);
 	}
 };

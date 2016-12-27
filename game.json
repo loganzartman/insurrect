@@ -5,13 +5,22 @@
 			"game.js",
 			"display.js",
 			"input.js",
-			"scene/titlescene.js"
+			"scene/titlescene.js",
+			"scene/gamescene.js"
 		],
 		"init": "Game.init"
 	},
 
 	"images": {
 		"title": "image/title.png"
+	},
+
+	"colors": {
+		"bg1": "0xD9CEBA",
+		"bg2": "0x263145",
+		"acc1": "0xD9559D",
+		"acc2": "0x465D8C",
+		"acc3": "0xD9A404"
 	},
 
 	"inputBindings": {
