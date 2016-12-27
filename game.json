@@ -4,9 +4,14 @@
 			"pixi.js",
 			"game.js",
 			"display.js",
-			"input.js"
+			"input.js",
+			"scene/titlescene.js"
 		],
 		"init": "Game.init"
+	},
+
+	"images": {
+		"title": "image/title.png"
 	},
 
 	"inputBindings": {

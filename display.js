@@ -1,6 +1,7 @@
 var Display = {
 	w: 320,
 	h: 240,
+	stage: null,
 	init: function(scale, element) {
 		Display.scale = scale;
 
@@ -14,10 +15,6 @@ var Display = {
 			view: Display.buffer,
 			antialias: false
 		});
-		Display.stage = new PIXI.Container();
-
-		Display.testgfx = new PIXI.Graphics();
-		Display.stage.addChild(Display.testgfx);
 
 		//create output canvas
 		Display.canvas = document.createElement("canvas");
@@ -29,14 +26,6 @@ var Display = {
 	},
 
 	frame: function(timescale) {
-		//do pixi stuff
-		Display.testgfx.clear();
-		Display.testgfx.lineStyle(1, 0x00FFFF, 1);
-		Display.testgfx.drawCircle(
-			Display.w/2, Display.h/2,
-			(0.5*Math.sin(Game.time*2) + 0.5)*50+50
-		);
-
 		//render to screen
 		Display.renderer.render(Display.stage);
 		Display.cctx.drawImage(

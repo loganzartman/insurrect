@@ -47,8 +47,8 @@ var Input = {
 	handleMousemove: function(displayElement, event){
 		var x = event.pageX - displayElement.offsetLeft;
 		var y = event.pageY - displayElement.offsetTop;
-		Input.mouse.x = Math.max(0, Math.min(displayElement.offsetWidth, x));
-		Input.mouse.y = Math.max(0, Math.min(displayElement.offsetHeight, y));
+		Input.mouse.x = Math.max(0, Math.min(displayElement.offsetWidth, x)) / Display.scale;
+		Input.mouse.y = Math.max(0, Math.min(displayElement.offsetHeight, y)) / Display.scale;
 	},
 
 	handleMousedown: function(event){
@@ -56,6 +56,7 @@ var Input = {
 			Input.mouse.right = true;
 		else if (event.which === 1)
 			Input.mouse.left = true;
+		event.preventDefault();
 	},
 
 	handleMouseup: function(event){
@@ -63,5 +64,6 @@ var Input = {
 			Input.mouse.right = false;
 		else if (event.which === 1)
 			Input.mouse.left = false;
+		event.preventDefault();
 	}
 };

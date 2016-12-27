@@ -1,9 +1,12 @@
 var Core = {
 	data: null,
+	image: {},
 	init: function() {
 		Core.load.json("game.json").then(function(data){
 			Core.data = data;
-			var promises = data.scripts.sources.map(s => Core.load.script(s));
+			var scripts = data.scripts.sources.map(s => Core.load.script(s));
+			var images = Object.keys(data.images).map(n => Core.load.image(data.images[n], n));
+			var promises = scripts.concat(images);
 			Promise.all(promises).then(function(){
 				//call main entrypoint function
 				var f = window;
@@ -66,6 +69,20 @@ var Core = {
 				};
 				script.src = src;
 				document.body.appendChild(script);
+			});
+		},
+
+		image: function(src, name) {
+			return new Promise(function(resolve, reject){
+				var img = new Image();
+				img.onload = function(){
+					Core.image[name] = img;
+					resolve(true);
+				};
+				img.onerror = function(err){
+					reject(err);
+				};
+				img.src = src;
 			});
 		}
 	}
