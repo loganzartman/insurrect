@@ -1,6 +1,7 @@
 {
 	"scripts": {
 		"sources": [
+			"pixi.js",
 			"game.js",
 			"display.js",
 			"input.js"

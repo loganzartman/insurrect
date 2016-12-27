@@ -1,7 +1,6 @@
 var Display = {
 	w: 320,
 	h: 240,
-	scale: 1,
 	init: function(scale, element) {
 		Display.scale = scale;
 
@@ -11,6 +10,14 @@ var Display = {
 		Display.buffer.height = Display.h;
 		
 		//create pixi renderer
+		Display.renderer = PIXI.autoDetectRenderer(Display.w, Display.h, {
+			view: Display.buffer,
+			antialias: false
+		});
+		Display.stage = new PIXI.Container();
+
+		Display.testgfx = new PIXI.Graphics();
+		Display.stage.addChild(Display.testgfx);
 
 		//create output canvas
 		Display.canvas = document.createElement("canvas");
@@ -23,14 +30,15 @@ var Display = {
 
 	frame: function(timescale) {
 		//do pixi stuff
-		with (Display.buffer.getContext("2d")) {
-			//todo: remove this
-			fillStyle = "black";
-			fillRect(0,0,Display.w,Display.h);
-			fillStyle = "red";
-			fillRect(16, 16, 16, 16);
-		}
+		Display.testgfx.clear();
+		Display.testgfx.lineStyle(1, 0x00FFFF, 1);
+		Display.testgfx.drawCircle(
+			Display.w/2, Display.h/2,
+			(0.5*Math.sin(Game.time*2) + 0.5)*50+50
+		);
 
+		//render to screen
+		Display.renderer.render(Display.stage);
 		Display.cctx.drawImage(
 			Display.buffer, 
 			0, 0, 
