@@ -5,8 +5,10 @@
 			"game.js",
 			"display.js",
 			"input.js",
+			"vector.js",
 			"scene/titlescene.js",
-			"scene/gamescene.js"
+			"scene/gamescene.js",
+			"game/obstacle.js"
 		],
 		"init": "Game.init"
 	},
@@ -19,8 +21,11 @@
 		"bg1": "0xD9CEBA",
 		"bg2": "0x263145",
 		"acc1": "0xD9559D",
+		"acc1b": "0xFF8DD4",
 		"acc2": "0x465D8C",
-		"acc3": "0xD9A404"
+		"acc2b": "0x8EA2D6",
+		"acc3": "0xD9A404",
+		"acc3b": "0xFFE559"
 	},
 
 	"inputBindings": {
@@ -28,5 +33,32 @@
 		"RIGHT": 68,
 		"UP": 87,
 		"DOWN": 83
+	},
+
+	"prefabs": {
+		"cell": [
+			{
+				"type": "obstacle",
+				"vertices": [
+					[0,0], [96,0], [96,18], [92,18], [92,4], [4,4], [4,52],
+					[92,52], [92,40], [96,40], [96,56], [0,56]
+				]
+			}
+		]
+	},
+
+	"levels": {
+		"demo": {
+			"prefabs": [
+				{
+					"name": "cell",
+					"position": [0,0]
+				},
+				{
+					"name": "cell",
+					"position": [0,56]
+				}
+			]
+		}
 	}
 }

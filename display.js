@@ -56,10 +56,10 @@ var Display = {
 	frame: function(timescale) {
 		//draw stuff
 		Display.gfx.clear();
-		Display.gfx.lineStyle(1, 0xAA0000, 1);
+		Display.gfx.lineStyle(1, Core.color.acc1, 1);
 		Display.gfx.drawCircle(
 			Input.mouse.x, Input.mouse.y,
-			Input.mouse.left || Input.mouse.right ? 9 : 4
+			Input.mouse.left || Input.mouse.right ? 5 + Math.random() : 3
 		);
 
 		//render to screen

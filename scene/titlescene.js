@@ -10,12 +10,12 @@ var TitleScene = {
 		TitleScene.stage.addChild(TitleScene.title);
 
 		//create buttons
-		var playbtn = Display.makeButton("let's go", Core.color.acc3, Core.color.acc1, function(){
+		TitleScene.playbtn = Display.makeButton("let's go", Core.color.acc3, Core.color.acc1, function(){
 			Game.start();
 		});
-		Display.centerObj(playbtn, true, false);
-		playbtn.position.y = 180;
-		TitleScene.stage.addChild(playbtn);
+		Display.centerObj(TitleScene.playbtn, true, false);
+		TitleScene.playbtn.position.y = 180;
+		TitleScene.stage.addChild(TitleScene.playbtn);
 	},
 	
 	/**
@@ -35,9 +35,12 @@ var TitleScene = {
 	frame: function(timescale) {
 		var t = Game.time - TitleScene.t0;
 		TitleScene.title.position.x = (Display.w-TitleScene.title.width)/2;
-		var f = 1 - Math.pow(Math.max(0, 1-t/2), 2);
-		TitleScene.title.position.y = Math.floor(f * 40 - 30);
+		var f = 1 - Math.pow(Math.max(0, 1-t/1.5), 2);
+		TitleScene.title.position.y = Math.floor(-f * 30 + 40);
 		TitleScene.title.alpha = f;
+
+		TitleScene.playbtn.position.y = Math.floor(Display.h - 80 + f*20);
+		TitleScene.playbtn.alpha = f;
 
 		//draw background
 		TitleScene.gfx.clear();

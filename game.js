@@ -2,6 +2,7 @@ var Game = {
 	targetFps: 60,
 	time: 0,
 	activeScene: null,
+	objects: null,
 
 	init: function() {
 		//initialize core functionality
@@ -44,13 +45,38 @@ var Game = {
 	},
 
 	start: function() {
-		Game.setScene(GameScene);
 		//do stuff
+		Game.objects = [];
+		Game.buildLevel("demo");
+
+		Game.setScene(GameScene);
+	},
+
+	buildLevel: function(name) {
+		var data = Core.data.levels[name];
+		data.prefabs.forEach(function(prefab){
+			Game.buildPrefab(prefab.name, V(prefab.position));
+		});
+	},
+
+	buildPrefab: function(name, position) {
+		var data = Core.data.prefabs[name];
+		data.forEach(function(prefab){
+			var type = prefab.type;
+			var vertices = prefab.vertices;
+			if (type === "obstacle") {
+				vertices = vertices.map(v => V(v));
+				Game.objects.push(new Obstacle({
+					vertices: vertices,
+					position: position
+				}));
+			}
+		});
 	},
 
 	frame: function(timescale) {
 		if (Game.activeScene === null) {
-			console.log("scene is null; skipping frame.");
+			console.log("scene is null; skipping frame. (this is a problem)");
 			return;
 		}
 		Game.activeScene.frame(timescale);
