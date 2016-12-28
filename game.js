@@ -44,14 +44,29 @@ var Game = {
 		Game.activeScene = scene;
 	},
 
+	/**
+	 * Restarts the game.
+	 */
 	start: function() {
 		//do stuff
 		Game.objects = [];
 		Game.buildLevel("demo");
+		// Game.objects.push(new Obstacle({
+		// 	vertices: [V(0,0), V(64,0), V(64,16), V(0,16)],
+		// 	position: V(0,0)
+		// }));
+		// Game.objects.push(new Obstacle({
+		// 	vertices: [V(0,64), V(64,64), V(64,64+16), V(0,64+16)],
+		// 	position: V(0,0)
+		// }));
 
 		Game.setScene(GameScene);
 	},
 
+	/**
+	 * Constructs an entire level and adds it to the game world.
+	 * @param name name of the level as defined in game.json
+	 */
 	buildLevel: function(name) {
 		var data = Core.data.levels[name];
 		data.prefabs.forEach(function(prefab){
@@ -59,6 +74,11 @@ var Game = {
 		});
 	},
 
+	/**
+	 * Constructs a prefab at a given position and inserts it into the game.
+	 * @param name the type of prefab as defined in game.json
+	 * @param position a vector at which to insert the prefab
+	 */
 	buildPrefab: function(name, position) {
 		var data = Core.data.prefabs[name];
 		data.forEach(function(prefab){
@@ -74,6 +94,11 @@ var Game = {
 		});
 	},
 
+	/**
+	 * Called every frame by the game loop
+	 * @param timescale time elapsed as a fraction of the time per frame at
+	 *        the target framerate.
+	 */
 	frame: function(timescale) {
 		if (Game.activeScene === null) {
 			console.log("scene is null; skipping frame. (this is a problem)");
