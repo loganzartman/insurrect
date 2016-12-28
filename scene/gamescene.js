@@ -6,15 +6,16 @@ var GameScene = {
 
 	init: function() {
 		GameScene.stage = new PIXI.Container();
-		
+
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();
 		GameScene.stage.addChild(GameScene.unmaskedBg);
 
 		//contains anything that is masked by player sight
 		GameScene.maskedContainer = new PIXI.Container();
-		GameScene.mask = new PIXI.Graphics();
-		GameScene.mask.cacheAsBitmap = true;
+		GameScene.maskGfx = new PIXI.Graphics();
+		GameScene.maskTexture = PIXI.RenderTexture.create(Display.w, Display.h);
+		GameScene.mask = new PIXI.Sprite(GameScene.maskTexture);
 		GameScene.maskedContainer.mask = GameScene.mask;
 		GameScene.stage.addChild(GameScene.maskedContainer);
 
@@ -53,17 +54,19 @@ var GameScene = {
 	 * Generates a polygon representing visible areas from a given position.
 	 * @param position where from?
 	 */
-	calculateVision: function(position) {
+	calculateVision: function(position, includeObjects) {
 		// return new PIXI.Polygon([position]);
 		//collect visible polygons
-		var polygons = [GameScene.getViewRect()];
+		viewRect = GameScene.getViewRect();
+		viewRect.noDisplay = true;
+		var polygons = [viewRect];
 		Game.objects.forEach(function(object){
 			if (object instanceof Obstacle)
 				//TODO: visibility check
 				polygons.push(object.poly);
 		});
 
-		//cast ray from position to each vertex
+		//cast ray from position to each vertexa
 		var intersections = [];
 		var vertices = [];
 		polygons.forEach(function(p){
@@ -79,28 +82,37 @@ var GameScene = {
 			angles.push(a + 0.00001);
 		});
 
+		var visiblePolys = [];
 		angles.forEach(function(dir){
 			var min = null;
+			var minPoly = null;
 			polygons.forEach(function(polygon){
 				for (var i=0,j=polygon.points.length; i<j; i++) {
 					var pointA = polygon.points[i];
 					var pointB = polygon.points[(i+1)%j];
 					var result = GameScene.rayLineIntersect(
 						position, Vector.fromDir(dir), pointA, pointB);
-					if (result !== null)
-						if (min === null || result.param < min.param)
+					if (result !== null) { 
+						if (min === null || result.param < min.param) {
 							min = result;
+							minPoly = polygon;
+						}
+					}
 				}
 			});
-			if (min !== null)
+			if (min !== null) {
 				intersections.push(V(min.x, min.y));
+				if (includeObjects && !minPoly.noDisplay && !visiblePolys.includes(minPoly))
+					visiblePolys.push(minPoly);
+			}
 		});
 		
 		//sort intersections by angle
 		intersections.sort((a,b) => a.sub(position).dir() - b.sub(position).dir());
 
 		//construct polygon representing vision
-		return new PIXI.Polygon(intersections);
+		visiblePolys.push(new PIXI.Polygon(intersections));
+		return visiblePolys;
 	},
 
 	rayLineIntersect: function(rayPoint, rayDir, pointA, pointB) {
@@ -155,8 +167,6 @@ var GameScene = {
 
 		//update mask
 		var dummyMaskPos = V(Input.mouse.x, Input.mouse.y);
-		GameScene.mask.clear();
-		GameScene.mask.beginFill(1, 0xFFFFFF);
 		// GameScene.mask.drawCircle(dummyMaskPos.x, dummyMaskPos.y, 320);
 		//TODO: remove
 		if (Input.keys[Input.key.UP])
@@ -167,27 +177,29 @@ var GameScene = {
 			GameScene.view.y += 5;
 		if (Input.keys[Input.key.RIGHT])
 			GameScene.view.x += 5;
-		var poly = GameScene.calculateVision(dummyMaskPos.add(GameScene.view).add(GameScene.viewOffset));
-		// GameScene.mask.lineStyle(1, 0x00FF00, 1);
-		var points = poly.points.map(p => p.sub(GameScene.view).sub(GameScene.viewOffset));
-		GameScene.mask.moveTo(points[points.length-1].x, points[points.length-1].y);
-		for (var i=0; i<points.length; i++)
-			// GameScene.mask.drawCircle(points[i].x, points[i].y, 3);
-			GameScene.mask.lineTo(points[i].x, points[i].y);
-		// poly.points.map(p => p.sub(GameScene.view).sub(GameScene.viewOffset))
-		// points.forEach(p => GameScene.mask.drawRect(
-		// 	p.x - 3, p.y - 3, 6, 6
-		// ));
-		// GameScene.mask.drawShape();
-		GameScene.mask.endFill();
 
+		//draw player vision
+		GameScene.maskGfx.clear();
+		GameScene.maskGfx.beginFill(0x000000, 1);
+		GameScene.maskGfx.drawRect(0,0,Display.w,Display.h);
+		GameScene.maskGfx.endFill();
+		var polys = GameScene.calculateVision(dummyMaskPos.add(GameScene.view).add(GameScene.viewOffset).add(V(0.0001,0.0001)), true);
+		polys.forEach(function(poly){
+			var points = poly.points.map(p => p.sub(GameScene.view).sub(GameScene.viewOffset));
+			GameScene.maskGfx.beginFill(0xFFFFFF, 1);
+			GameScene.maskGfx.moveTo(points[points.length-1].x, points[points.length-1].y);
+			for (var i=0; i<points.length; i++)
+				GameScene.maskGfx.lineTo(points[i].x, points[i].y);
+			GameScene.maskGfx.endFill();
+		});
+
+		Display.renderer.render(GameScene.maskGfx, GameScene.maskTexture);
 
 		//draw background
 		GameScene.bg.clear();
 		GameScene.bg.beginFill(Core.color.bg1, 1);
 		GameScene.bg.drawRect(0, 0, Display.w, Display.h);
 		GameScene.bg.endFill();
-		
 
 		GameScene.unmaskedBg.clear();
 		GameScene.unmaskedBg.beginFill(Core.color.bg2, 1);

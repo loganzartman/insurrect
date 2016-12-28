@@ -51,15 +51,6 @@ var Game = {
 		//do stuff
 		Game.objects = [];
 		Game.buildLevel("demo");
-		// Game.objects.push(new Obstacle({
-		// 	vertices: [V(0,0), V(64,0), V(64,16), V(0,16)],
-		// 	position: V(0,0)
-		// }));
-		// Game.objects.push(new Obstacle({
-		// 	vertices: [V(0,64), V(64,64), V(64,64+16), V(0,64+16)],
-		// 	position: V(0,0)
-		// }));
-
 		Game.setScene(GameScene);
 	},
 
@@ -72,6 +63,10 @@ var Game = {
 		data.prefabs.forEach(function(prefab){
 			Game.buildPrefab(prefab.name, V(prefab.position));
 		});
+		data.objects.forEach(function(object){
+			if (object.type === "obstacle")
+				Game.buildObstacle(object, V(object.position));
+		});
 	},
 
 	/**
@@ -81,17 +76,23 @@ var Game = {
 	 */
 	buildPrefab: function(name, position) {
 		var data = Core.data.prefabs[name];
-		data.forEach(function(prefab){
-			var type = prefab.type;
-			var vertices = prefab.vertices;
+		data.forEach(function(item){
+			var type = item.type;
 			if (type === "obstacle") {
-				vertices = vertices.map(v => V(v));
-				Game.objects.push(new Obstacle({
-					vertices: vertices,
-					position: position
-				}));
+				Game.buildObstacle(item, position);
 			}
 		});
+	},
+
+	/**
+	 *
+	 */
+	buildObstacle: function(data, position) {
+		var vertices = data.vertices.map(v => V(v));
+		Game.objects.push(new Obstacle({
+			vertices: vertices,
+			position: position
+		}));
 	},
 
 	/**

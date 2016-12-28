@@ -57,6 +57,17 @@
 				{
 					"name": "cell",
 					"position": [0,56]
+				},
+				{
+					"name": "cell",
+					"position": [0,112]
+				}
+			],
+			"objects": [
+				{
+					"type": "obstacle",
+					"vertices": [[0,0], [4,0], [4,168], [0,168]],
+					"position": [144,0]
 				}
 			]
 		}
