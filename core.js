@@ -28,6 +28,25 @@ var Core = {
 		});
 	},
 
+	mixin: function(target, from) {
+		if (typeof from !== "function") {
+			if (typeof from === "undefined")
+				from = {};
+			else
+				throw new Error("Cannot mixin something of type: " + (typeof from));
+		}
+		var proto = Object.create(target);
+		for (prop in from.prototype)
+			if (from.prototype.hasOwnProperty(prop))
+				proto[prop] = from.prototype[prop];
+		var f = function(){
+			from.apply(this, arguments);
+			target.apply(this, arguments);
+		};
+		f.prototype = proto;
+		return f;
+	},
+
 	/**
 	 * Utilities for loading files
 	 */

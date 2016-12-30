@@ -3,6 +3,7 @@ var GameScene = {
 	t0: 0,
 	view: V(0,0),
 	viewOffset: V(-Display.w/2, - Display.h/2),
+	viewTarget: {position: V(0,0)},
 
 	init: function() {
 		GameScene.stage = new PIXI.Container();
@@ -10,6 +11,9 @@ var GameScene = {
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();
 		GameScene.stage.addChild(GameScene.unmaskedBg);
+		GameScene.bgtex = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage("image/qmtex.png"), Display.w, Display.h);
+		GameScene.bgtex.tint = Core.color.bg2;
+		GameScene.stage.addChild(GameScene.bgtex);
 
 		//contains anything that is masked by player sight
 		GameScene.maskedContainer = new PIXI.Container();
@@ -40,6 +44,9 @@ var GameScene = {
 		GameScene.objectContainer.removeChildren();
 		Game.objects.forEach(function(object){
 			GameScene.objectContainer.addChild(object.gfx);
+		});
+		Game.entities.forEach(function(entity){
+			GameScene.objectContainer.addChild(entity.gfx);
 		});
 	},
 
@@ -90,7 +97,7 @@ var GameScene = {
 				for (var i=0,j=polygon.points.length; i<j; i++) {
 					var pointA = polygon.points[i];
 					var pointB = polygon.points[(i+1)%j];
-					var result = GameScene.rayLineIntersect(
+					var result = Util.geom.rayLineIntersect(
 						position, Vector.fromDir(dir), pointA, pointB);
 					if (result !== null) { 
 						if (min === null || result.param < min.param) {
@@ -113,30 +120,6 @@ var GameScene = {
 		//construct polygon representing vision
 		visiblePolys.push(new PIXI.Polygon(intersections));
 		return visiblePolys;
-	},
-
-	rayLineIntersect: function(rayPoint, rayDir, pointA, pointB) {
-		var segDx = pointB.sub(pointA);
-		if (rayDir.dir() === segDx.dir())
-			return null;
-
-		//do math
-		var T2 = (rayDir.x * (pointA.y - rayPoint.y) + rayDir.y * (rayPoint.x - pointA.x));
-		T2 /= (segDx.x*rayDir.y - segDx.y*rayDir.x);
-		var T1 = (pointA.x + segDx.x * T2 - rayPoint.x) / rayDir.x;
-
-		//determine intersection
-		if (T1<0)
-			return null;
-		if (T2<0 || T2>1)
-			return null;
-
-		// Return the POINT OF INTERSECTION
-		return {
-			x: rayPoint.x+rayDir.x*T1,
-			y: rayPoint.y+rayDir.y*T1,
-			param: T1
-		};
 	},
 
 	getViewRect: function() {
@@ -164,32 +147,26 @@ var GameScene = {
 		Game.objects.forEach(function(object){
 			object.draw();
 		});
+		Game.entities.forEach(function(entity){
+			entity.frame(timescale);
+			entity.draw();
+		});
 
 		//update mask
 		var dummyMaskPos = V(Input.mouse.x, Input.mouse.y);
-		// GameScene.mask.drawCircle(dummyMaskPos.x, dummyMaskPos.y, 320);
-		//TODO: remove
-		if (Input.keys[Input.key.UP])
-			GameScene.view.y -= 5;
-		if (Input.keys[Input.key.LEFT])
-			GameScene.view.x -= 5;
-		if (Input.keys[Input.key.DOWN])
-			GameScene.view.y += 5;
-		if (Input.keys[Input.key.RIGHT])
-			GameScene.view.x += 5;
 
 		//draw player vision
 		GameScene.maskGfx.clear();
 		GameScene.maskGfx.beginFill(0x000000, 1);
 		GameScene.maskGfx.drawRect(0,0,Display.w,Display.h);
 		GameScene.maskGfx.endFill();
-		var polys = GameScene.calculateVision(dummyMaskPos.add(GameScene.view).add(GameScene.viewOffset).add(V(0.0001,0.0001)), true);
+		var polys = GameScene.calculateVision(Game.player.position.add(V(0.0001,0.0001)), true);
 		polys.forEach(function(poly){
 			var points = poly.points.map(p => p.sub(GameScene.view).sub(GameScene.viewOffset));
 			GameScene.maskGfx.beginFill(0xFFFFFF, 1);
-			GameScene.maskGfx.moveTo(points[points.length-1].x, points[points.length-1].y);
+			GameScene.maskGfx.moveTo(~~points[points.length-1].x, ~~points[points.length-1].y);
 			for (var i=0; i<points.length; i++)
-				GameScene.maskGfx.lineTo(points[i].x, points[i].y);
+				GameScene.maskGfx.lineTo(~~points[i].x, ~~points[i].y);
 			GameScene.maskGfx.endFill();
 		});
 

@@ -3,6 +3,7 @@ var Game = {
 	time: 0,
 	activeScene: null,
 	objects: null,
+	entities: null,
 
 	init: function() {
 		//initialize core functionality
@@ -50,8 +51,35 @@ var Game = {
 	start: function() {
 		//do stuff
 		Game.objects = [];
+		Game.entities = [];
+		
+		Game.player = new Entity({
+			position: V(-10,-10)
+		});
+		Game.player.listen("frameStart", function(){
+			this.velocity = V(0,0);
+			if (Input.keys[Input.key.UP])
+				this.velocity.y = -2;
+			if (Input.keys[Input.key.LEFT])
+				this.velocity.x = -2;
+			if (Input.keys[Input.key.DOWN])
+				this.velocity.y = 2;
+			if (Input.keys[Input.key.RIGHT])
+				this.velocity.x = 2;
+		});
+		Game.player.listen("frameEnd", function(){
+			GameScene.view.x = this.position.x;
+			GameScene.view.y = this.position.y;
+		});
+		Game.addEntity(Game.player);
+
 		Game.buildLevel("demo");
 		Game.setScene(GameScene);
+	},
+
+	addEntity: function(ent) {
+		Game.entities.push(ent);
+		GameScene.objectContainer.addChild(ent.gfx);
 	},
 
 	/**

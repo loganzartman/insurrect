@@ -53,6 +53,10 @@ Vector.prototype.div = function(a) {
 Vector.prototype.dot = function(v) {
 	return this.x*v.x + this.y*v.y;
 };
+Vector.prototype.project = function(v) {
+	var l = this.len();
+	return this.mult(this.dot(v) / (l*l));
+};
 Vector.prototype.len = function() {
 	return Math.sqrt(this.x*this.x + this.y*this.y);
 };

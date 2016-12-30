@@ -3,12 +3,15 @@
 		"sources": [
 			"pixi.js",
 			"game.js",
+			"util.js",
 			"display.js",
 			"input.js",
 			"vector.js",
+			"emitter.js",
 			"scene/titlescene.js",
 			"scene/gamescene.js",
-			"game/obstacle.js"
+			"game/obstacle.js",
+			"game/entity.js"
 		],
 		"init": "Game.init"
 	},
@@ -44,6 +47,29 @@
 					[92,52], [92,40], [96,40], [96,56], [0,56]
 				]
 			}
+		],
+		"circle": [
+			{
+				"type": "obstacle",
+				"vertices": [[30.68323447, 56.16528396], [53.85414303, 34.57934758], [63.83967914, 4.527180907], [58.19503532, -26.63339754], [38.30221722, -51.2731914], [9.031680516, -63.35951978], [-22.45012657, -59.93322799], [-48.4353597, -41.83319174], [-62.56192753, -13.49093116], [-61.37115358, 18.15437987], [-45.15458084, 45.35486555], [-17.88259188, 61.45089835]]
+			}
+		],
+		"cellblock-sm-left": [
+			{
+				"type": "prefab",
+				"name": "cell",
+				"position": [0,0]
+			},
+			{
+				"type": "prefab",
+				"name": "cell",
+				"position": [0,56]
+			},
+			{
+				"type": "prefab",
+				"name": "cell",
+				"position": [0,112]
+			}
 		]
 	},
 
@@ -61,6 +87,10 @@
 				{
 					"name": "cell",
 					"position": [0,112]
+				},
+				{
+					"name": "circle",
+					"position": [250, 10]
 				}
 			],
 			"objects": [
@@ -68,6 +98,11 @@
 					"type": "obstacle",
 					"vertices": [[0,0], [4,0], [4,168], [0,168]],
 					"position": [144,0]
+				},
+				{
+					"type": "obstacle",
+					"vertices": [[60,0], [120,90], [0,90]],
+					"position": [250,100]
 				}
 			]
 		}

@@ -11,10 +11,26 @@ var Obstacle = function(params) {
 	});
 
 	this.gfx = new PIXI.Graphics();
+	this.gfx.hitArea = this.poly;
+	this.gfx.interactive = true;
+	this.gfx.on("mouseover", function(){
+		this.gfx.tint = 0xFF0000;
+	});
+	this.gfx.on("mouseout", function(){
+		this.gfx.tint = 0xFFFFFF;
+	});
 	this.gfxDirty = true;
 };
 Obstacle.prototype.contains = function(point) {
 	return this.poly.contains(point.x, point.y);
+};
+Obstacle.prototype.getSegments = function() {
+	if (!this.hasOwnProperty("segments")) {
+		this.segments = [];
+		for (var i=0,j=this.vertices.length; i<j; i++)
+			this.segments.push([this.vertices[i], this.vertices[(i+1)%j]]);
+	}
+	return this.segments;
 };
 Obstacle.prototype.draw = function() {
 	if (!this.gfxDirty)
