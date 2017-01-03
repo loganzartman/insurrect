@@ -3,7 +3,7 @@ var GameScene = {
 	t0: 0,
 	view: V(0,0),
 	viewOffset: V(-Display.w/2, - Display.h/2),
-	viewTarget: {position: V(0,0)},
+	viewTarget: V(0,0),
 	VIEW_SPEED: 0.2,
 
 	init: function() {
@@ -26,7 +26,9 @@ var GameScene = {
 
 		//background
 		GameScene.bg = new PIXI.Graphics();
-		GameScene.maskedContainer.addChild(GameScene.bg);
+		GameScene.bgtex2 = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage("image/floor.png"), Display.w, Display.h);
+		GameScene.bgtex2.tint = Core.color.bg1;
+		GameScene.maskedContainer.addChild(GameScene.bgtex2);
 
 		//contains anything that should pan with view
  		GameScene.viewContainer = new PIXI.Container();
@@ -157,9 +159,11 @@ var GameScene = {
 	frame: function(timescale) {
 		var t = Game.time - GameScene.t0;
 
+		GameScene.viewTarget = Game.player.position.add(V(Input.mouse.x, Input.mouse.y).add(GameScene.viewOffset).mult(0.4));
+
 		//update view
 		GameScene.view = GameScene.view.mult(1-GameScene.VIEW_SPEED)
-			.add(GameScene.viewTarget.position.mult(GameScene.VIEW_SPEED));
+			.add(GameScene.viewTarget.mult(GameScene.VIEW_SPEED));
 		GameScene.viewContainer.position = GameScene.view.negate().sub(GameScene.viewOffset);
 
 		//draw objects
@@ -194,24 +198,8 @@ var GameScene = {
 
 		Display.renderer.render(GameScene.maskGfx, GameScene.maskTexture);
 
-		//draw background
-		GameScene.bg.clear();
-		GameScene.bg.beginFill(Core.color.bg1, 1);
-		GameScene.bg.drawRect(0, 0, Display.w, Display.h);
-		GameScene.bg.endFill();
-
-		// Util.geom.segIntersections(_.viewRect.getSegments(), _.segments)
-		// 	.forEach(i => {
-		// 		i = i.sub(GameScene.view).sub(GameScene.viewOffset);
-		// 		GameScene.bg.beginFill(0x00FF00, 1);
-		// 		GameScene.bg.drawRect(i.x, i.y, 2, 2);
-		// 		GameScene.bg.endFill();
-		// 	});
-
-		//draw unmasked background
-		GameScene.unmaskedBg.clear();
-		GameScene.unmaskedBg.beginFill(Core.color.bg2, 1);
-		GameScene.unmaskedBg.drawRect(0, 0, Display.w, Display.h);
-		GameScene.unmaskedBg.endFill();
+		//update masked background
+		GameScene.bgtex2.tilePosition.x = -GameScene.view.x;
+		GameScene.bgtex2.tilePosition.y = -GameScene.view.y;
 	}
 };

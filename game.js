@@ -66,8 +66,24 @@ var Game = {
 				this.velocity.y = 2;
 			if (Input.keys[Input.key.RIGHT])
 				this.velocity.x = 2;
+			if (Input.mouse.left) {
+				var ent = new Entity({
+					position: Game.player.position.clone(),
+					velocity: Vector.fromDir(
+						V(Input.mouse.x, Input.mouse.y).add(GameScene.viewOffset).dir() + Math.random()*0.2 - 0.1,
+						4+Math.random()*3),
+					radius: 2
+				});
+				ent.listen("frameEnd", function(){
+					if (ent.age > 1)
+						Game.removeEntity(ent);
+				});
+				ent.listen("collision", function(){
+					Game.removeEntity(ent);
+				});
+				Game.addEntity(ent); 
+			}
 		});
-		GameScene.viewTarget = Game.player;
 		Game.addEntity(Game.player);
 
 		Game.buildLevel("demo");
@@ -77,6 +93,14 @@ var Game = {
 	addEntity: function(ent) {
 		Game.entities.push(ent);
 		GameScene.objectContainer.addChild(ent.gfx);
+	},
+
+	removeEntity: function(ent) {
+		var idx = Game.entities.indexOf(ent);
+		if (idx < 0)
+			return false;
+		Game.entities.splice(idx, 1);
+		GameScene.objectContainer.removeChild(ent.gfx);
 	},
 
 	/**

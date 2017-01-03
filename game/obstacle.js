@@ -2,22 +2,21 @@ var Obstacle = function(params) {
 	if (!params.hasOwnProperty("vertices"))
 		throw new Error("Obstacle must have vertices!");
 	this.position = params.position;
-	this.vertices = params.vertices.map(
-		v => V(v.x + this.position.x, v.y + this.position.y)
-	);
+	this.vertices = params.vertices.map(v => v.add(this.position));
 	this.poly = new Polygon(this.vertices);
 	Object.keys(params).forEach(function(key){
 		this[key] = params[key];
 	});
 
 	this.gfx = new PIXI.Graphics();
-	this.gfx.hitArea = this.poly;
+	this.gfx.hitArea = this.poly.toPixiPolygon();
 	this.gfx.interactive = true;
+	var that = this;
 	this.gfx.on("mouseover", function(){
-		this.gfx.tint = 0xFF0000;
+		that.gfx.tint = 0xFF0000;
 	});
 	this.gfx.on("mouseout", function(){
-		this.gfx.tint = 0xFFFFFF;
+		that.gfx.tint = 0xFFFFFF;
 	});
 	this.gfxDirty = true;
 };

@@ -10,6 +10,13 @@ var Entity = function(params) {
 	this.radius = params.radius;
 	this.listen("collision", this.handleCollision);
 
+	var t0 = Game.time;
+	Object.defineProperty(this, "age", {
+		get: function() {
+			return Game.time - t0;
+		}
+	});
+
 	this.gfx = new PIXI.Graphics();
 	this.gfxDirty = true;
 };
@@ -45,7 +52,7 @@ Entity.prototype.draw = function() {
 	if (!this.gfxDirty)
 		return;
 	this.gfx.clear();
-	this.gfx.lineStyle(1, Core.color.acc3, 1);
+	this.gfx.lineStyle(1, Core.color.acc2, 1);
 	this.gfx.drawCircle(0, 0, this.radius);
 	this.gfxDirty = false;
 };
