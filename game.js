@@ -25,7 +25,7 @@ var Game = {
 			requestAnimationFrame(frameFunc);
 		};
 		frameFunc();
-		
+
 		console.log("Initialized.");
 	},
 
@@ -52,7 +52,7 @@ var Game = {
 		//do stuff
 		Game.objects = [];
 		Game.entities = [];
-		
+
 		Game.player = new Entity({
 			position: V(-10,-10)
 		});
@@ -67,10 +67,7 @@ var Game = {
 			if (Input.keys[Input.key.RIGHT])
 				this.velocity.x = 2;
 		});
-		Game.player.listen("frameEnd", function(){
-			GameScene.view.x = this.position.x;
-			GameScene.view.y = this.position.y;
-		});
+		GameScene.viewTarget = Game.player;
 		Game.addEntity(Game.player);
 
 		Game.buildLevel("demo");

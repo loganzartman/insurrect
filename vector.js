@@ -72,3 +72,11 @@ Vector.prototype.normalize = function() {
 	return new Vector(this.x / len, this.y / len);
 };
 Vector.prototype.unit = Vector.prototype.normalize;
+Vector.prototype.equals = function(v) {
+	if (v.x !== this.x || v.y !== this.y)
+		return false;
+	return true;
+};
+Vector.prototype.toPixiPoint = function() {
+	return new PIXI.Point(this.x, this.y);
+};

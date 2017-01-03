@@ -22,7 +22,13 @@ Entity.prototype.move = function(dx) {
 		var others = this.getAllCollisions();
 		if (others.length > 0) {
 			this.position = this.position.sub(step);
-			step = others[0][1].sub(others[0][0]).project(step);
+			var minstep = others[0][1].sub(others[0][0]).project(step);
+			others.forEach(function(coll){
+				var nstep = coll[1].sub(coll[0]).project(step);
+				if (nstep.len() < minstep.len())
+					minstep = nstep;
+			});
+			step = minstep.unit().mult(step.len());
 			this.emit("collision", others);
 		}
 	}
@@ -57,6 +63,5 @@ Entity.prototype.getAllCollisions = function() {
 	return collisions;
 };
 Entity.prototype.handleCollision = function(others) {
-	console.log("did a collision: ");
-	console.log(others);
+	//
 };

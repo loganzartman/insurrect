@@ -7,6 +7,7 @@
 			"display.js",
 			"input.js",
 			"vector.js",
+			"polygon.js",
 			"emitter.js",
 			"scene/titlescene.js",
 			"scene/gamescene.js",

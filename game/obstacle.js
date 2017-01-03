@@ -5,7 +5,7 @@ var Obstacle = function(params) {
 	this.vertices = params.vertices.map(
 		v => V(v.x + this.position.x, v.y + this.position.y)
 	);
-	this.poly = new PIXI.Polygon(this.vertices);
+	this.poly = new Polygon(this.vertices);
 	Object.keys(params).forEach(function(key){
 		this[key] = params[key];
 	});
@@ -26,9 +26,7 @@ Obstacle.prototype.contains = function(point) {
 };
 Obstacle.prototype.getSegments = function() {
 	if (!this.hasOwnProperty("segments")) {
-		this.segments = [];
-		for (var i=0,j=this.vertices.length; i<j; i++)
-			this.segments.push([this.vertices[i], this.vertices[(i+1)%j]]);
+		this.segments = this.poly.getSegments();
 	}
 	return this.segments;
 };

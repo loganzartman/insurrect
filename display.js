@@ -35,7 +35,7 @@ var Display = {
 		
 		//create pixi renderer
 		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-		Display.renderer = PIXI.autoDetectRenderer(Display.w, Display.h, {
+		Display.renderer = new PIXI.WebGLRenderer(Display.w, Display.h, {
 			view: Display.buffer,
 			antialias: false
 		});
