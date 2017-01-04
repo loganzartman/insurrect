@@ -1,82 +1,100 @@
-var Vector = function(x,y) {
-	if (arguments.length === 0) {
-		this.x = 0;
-		this.y = 0;
+class Vector {
+	constructor(x,y) {
+		if (arguments.length === 0) {
+			this.x = 0;
+			this.y = 0;
+		}
+		else if (x instanceof Array) {
+			this.x = x[0];
+			this.y = x[1];
+		}
+		else {
+			this.x = x;
+			this.y = y;
+		}
 	}
-	else if (x instanceof Array) {
-		this.x = x[0];
-		this.y = x[1];
+
+	static fromDir(angle, mag) {
+		mag = typeof mag === "number" ? mag : 1;
+		return new Vector(
+			Math.cos(angle) * mag,
+			Math.sin(angle) * mag
+		);
 	}
-	else {
-		this.x = x;
-		this.y = y;
+
+	static random(lo, hi) {
+		if (typeof lo === "undefined") {
+			lo = 0;
+			hi = 1;
+		}
+		else if (typeof hi === "undefined") {
+			hi = lo;
+			lo = 0;
+		}
+		return new Vector(
+			Math.random()*(hi-lo)+lo,
+			Math.random()*(hi-lo)+lo
+		);
 	}
-};
+
+	add(v) {
+		return new Vector(this.x + v.x, this.y + v.y);
+	}
+
+	sub(v) {
+		return new Vector(this.x - v.x, this.y - v.y);
+	}
+
+	negate() {
+		return new Vector(-this.x, -this.y);
+	}
+
+	mult(a,b) {
+		if (typeof b === "undefined") b = a;
+		return new Vector(this.x * a, this.y * b);
+	}
+
+	div(a) {
+		return new Vector(this.x / a, this.y / a);
+	}
+
+	dot(v) {
+		return this.x*v.x + this.y*v.y;
+	}
+
+	project(v) {
+		var l = this.len();
+		return this.mult(this.dot(v) / (l*l));
+	}
+
+	len() {
+		return Math.sqrt(this.x*this.x + this.y*this.y);
+	}
+
+	dir() {
+		return Math.atan2(this.y, this.x);
+	}
+
+	clone() {
+		return new Vector(this.x, this.y);
+	}
+
+	normalize() {
+		var len = this.len();
+		if (len === 0) return new Vector(0,0);
+		return new Vector(this.x / len, this.y / len);
+	}
+
+	equals(v) {
+		if (v.x !== this.x || v.y !== this.y)
+			return false;
+		return true;
+	}
+
+	toPixiPoint() {
+		return new PIXI.Point(this.x, this.y);
+	}
+}
+
 var V = function(x,y){return new Vector(x,y);};
-Vector.fromDir = function(angle, mag) {
-	mag = typeof mag === "number" ? mag : 1;
-	return new Vector(
-		Math.cos(angle) * mag,
-		Math.sin(angle) * mag
-	);
-};
-Vector.random = function(lo, hi) {
-	if (typeof lo === "undefined") {
-		lo = 0;
-		hi = 1;
-	}
-	else if (typeof hi === "undefined") {
-		hi = lo;
-		lo = 0;
-	}
-	return new Vector(
-		Math.random()*(hi-lo)+lo,
-		Math.random()*(hi-lo)+lo
-	);
-};
-Vector.prototype.add = function(v) {
-	return new Vector(this.x + v.x, this.y + v.y);
-};
-Vector.prototype.sub = function(v) {
-	return new Vector(this.x - v.x, this.y - v.y);
-};
-Vector.prototype.negate = function() {
-	return new Vector(-this.x, -this.y);
-};
-Vector.prototype.mult = function(a,b) {
-	if (typeof b === "undefined") b = a;
-	return new Vector(this.x * a, this.y * b);
-};
-Vector.prototype.div = function(a) {
-	return new Vector(this.x / a, this.y / a);
-};
-Vector.prototype.dot = function(v) {
-	return this.x*v.x + this.y*v.y;
-};
-Vector.prototype.project = function(v) {
-	var l = this.len();
-	return this.mult(this.dot(v) / (l*l));
-};
-Vector.prototype.len = function() {
-	return Math.sqrt(this.x*this.x + this.y*this.y);
-};
-Vector.prototype.dir = function() {
-	return Math.atan2(this.y, this.x);
-};
-Vector.prototype.clone = function() {
-	return new Vector(this.x, this.y);
-};
-Vector.prototype.normalize = function() {
-	var len = this.len();
-	if (len === 0) return new Vector(0,0);
-	return new Vector(this.x / len, this.y / len);
-};
 Vector.prototype.unit = Vector.prototype.normalize;
-Vector.prototype.equals = function(v) {
-	if (v.x !== this.x || v.y !== this.y)
-		return false;
-	return true;
-};
-Vector.prototype.toPixiPoint = function() {
-	return new PIXI.Point(this.x, this.y);
-};

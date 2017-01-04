@@ -18,10 +18,16 @@ var Game = {
 		//start game loop
 		var t0 = Date.now();
 		var frameFunc = function() {
+			//calculate time changes
 			var dt = -t0 + (t0 = Date.now());
 			Game.time += dt * 0.001;
 			var timescale = dt * Game.targetFps * 0.001;
-			Game.frame(timescale);
+
+			//discard frames that take too long
+			if (dt < 500)
+				Game.frame(timescale);
+			
+			//request another update
 			requestAnimationFrame(frameFunc);
 		};
 		frameFunc();
@@ -53,36 +59,8 @@ var Game = {
 		Game.objects = [];
 		Game.entities = [];
 
-		Game.player = new Entity({
+		Game.player = new Player({
 			position: V(-10,-10)
-		});
-		Game.player.listen("frameStart", function(){
-			this.velocity = V(0,0);
-			if (Input.keys[Input.key.UP])
-				this.velocity.y = -2;
-			if (Input.keys[Input.key.LEFT])
-				this.velocity.x = -2;
-			if (Input.keys[Input.key.DOWN])
-				this.velocity.y = 2;
-			if (Input.keys[Input.key.RIGHT])
-				this.velocity.x = 2;
-			if (Input.mouse.left) {
-				var ent = new Entity({
-					position: Game.player.position.clone(),
-					velocity: Vector.fromDir(
-						V(Input.mouse.x, Input.mouse.y).add(GameScene.viewOffset).dir() + Math.random()*0.2 - 0.1,
-						4+Math.random()*3),
-					radius: 2
-				});
-				ent.listen("frameEnd", function(){
-					if (ent.age > 1)
-						Game.removeEntity(ent);
-				});
-				ent.listen("collision", function(){
-					Game.removeEntity(ent);
-				});
-				Game.addEntity(ent); 
-			}
 		});
 		Game.addEntity(Game.player);
 

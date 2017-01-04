@@ -12,7 +12,8 @@
 			"scene/titlescene.js",
 			"scene/gamescene.js",
 			"game/obstacle.js",
-			"game/entity.js"
+			"game/entity.js",
+			"game/player.js"
 		],
 		"init": "Game.init"
 	},

@@ -1,5 +1,15 @@
 var Util = {
 	geom: {
+		/**
+		 * Checks for an intersection between a circle of given radius and
+		 * a line segment.
+		 * Returns true if there is an intersection, false otherwise.
+		 * @param circlePos Vector position of the circle
+		 * @param radius radius of the cirlce
+		 * @param pointA first point in the line segment
+		 * @param pointB second point in the line segment
+		 * @return whether an intersection exists.
+		 */
 		circleSegIntersect: function(circlePos,radius,pointA,pointB) {
 			//todo: check parallel things to avoid doing this
 			pointB = pointB.add(V(0.0001,0.0001));
@@ -41,17 +51,28 @@ var Util = {
 			return false;
 		},
 
+		/**
+		 * Find the intersection, if any, between a ray of infinite length and
+		 * a line segment.
+		 * Returns null if no intersection exists, or an object with position
+		 * and the line parameter.
+		 * @param rayPoint start point of the ray
+		 * @param rayDir direction of the ray
+		 * @param pointA first point in the segment
+		 * @param pointB second point in the segment
+		 * @return intersection, if any
+		 */
 		raySegIntersect: function(rayPoint, rayDir, pointA, pointB) {
 			var segDx = pointB.sub(pointA);
 			if (rayDir.dir() === segDx.dir())
 				return null;
 
-			//do math
+			//solve for line parameters
 			var T2 = (rayDir.x * (pointA.y - rayPoint.y) + rayDir.y * (rayPoint.x - pointA.x));
 			T2 /= (segDx.x*rayDir.y - segDx.y*rayDir.x);
 			var T1 = (pointA.x + segDx.x * T2 - rayPoint.x) / rayDir.x;
 
-			//determine intersection
+			//parameters out of bounds indicates no intersection
 			if (T1<0)
 				return null;
 			if (T2<0 || T2>1)
