@@ -1,9 +1,6 @@
 var Game = {
 	targetFps: 60,
-	time: 0,
 	activeScene: null,
-	objects: null,
-	entities: null,
 
 	init: function() {
 		//initialize core functionality
@@ -12,7 +9,8 @@ var Game = {
 
 		//initialize scenes
 		TitleScene.init();
-		GameScene.init();
+		var world = new World({levelName: "demo"});
+		GameScene.init({world: world});
 		Game.setScene(TitleScene);
 
 		//start game loop
@@ -20,13 +18,12 @@ var Game = {
 		var frameFunc = function() {
 			//calculate time changes
 			var dt = -t0 + (t0 = Date.now());
-			Game.time += dt * 0.001;
-			var timescale = dt * Game.targetFps * 0.001;
+			var timescale = dt / (1000 / Game.targetFps);
 
 			//discard frames that take too long
 			if (dt < 500)
 				Game.frame(timescale);
-			
+
 			//request another update
 			requestAnimationFrame(frameFunc);
 		};
@@ -55,71 +52,8 @@ var Game = {
 	 * Restarts the game.
 	 */
 	start: function() {
-		//do stuff
-		Game.objects = [];
-		Game.entities = [];
-
-		Game.player = new Player({
-			position: V(-10,-10)
-		});
-		Game.addEntity(Game.player);
-
-		Game.buildLevel("demo");
+		//TODO: possibly move world reset etc. back here
 		Game.setScene(GameScene);
-	},
-
-	addEntity: function(ent) {
-		Game.entities.push(ent);
-		GameScene.objectContainer.addChild(ent.gfx);
-	},
-
-	removeEntity: function(ent) {
-		var idx = Game.entities.indexOf(ent);
-		if (idx < 0)
-			return false;
-		Game.entities.splice(idx, 1);
-		GameScene.objectContainer.removeChild(ent.gfx);
-	},
-
-	/**
-	 * Constructs an entire level and adds it to the game world.
-	 * @param name name of the level as defined in game.json
-	 */
-	buildLevel: function(name) {
-		var data = Core.data.levels[name];
-		data.prefabs.forEach(function(prefab){
-			Game.buildPrefab(prefab.name, V(prefab.position));
-		});
-		data.objects.forEach(function(object){
-			if (object.type === "obstacle")
-				Game.buildObstacle(object, V(object.position));
-		});
-	},
-
-	/**
-	 * Constructs a prefab at a given position and inserts it into the game.
-	 * @param name the type of prefab as defined in game.json
-	 * @param position a vector at which to insert the prefab
-	 */
-	buildPrefab: function(name, position) {
-		var data = Core.data.prefabs[name];
-		data.forEach(function(item){
-			var type = item.type;
-			if (type === "obstacle") {
-				Game.buildObstacle(item, position);
-			}
-		});
-	},
-
-	/**
-	 *
-	 */
-	buildObstacle: function(data, position) {
-		var vertices = data.vertices.map(v => V(v));
-		Game.objects.push(new Obstacle({
-			vertices: vertices,
-			position: position
-		}));
 	},
 
 	/**
@@ -128,10 +62,6 @@ var Game = {
 	 *        the target framerate.
 	 */
 	frame: function(timescale) {
-		if (Game.activeScene === null) {
-			console.log("scene is null; skipping frame. (this is a problem)");
-			return;
-		}
 		Game.activeScene.frame(timescale);
 		Display.frame(timescale);
 	}

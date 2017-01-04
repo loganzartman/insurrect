@@ -17,12 +17,12 @@ var TitleScene = {
 		TitleScene.playbtn.position.y = 180;
 		TitleScene.stage.addChild(TitleScene.playbtn);
 	},
-	
+
 	/**
 	 * Called when a scene regains focus.
 	 */
 	activate: function() {
-		TitleScene.t0 = Game.time;
+		TitleScene.time = 0;
 	},
 
 	/**
@@ -33,7 +33,7 @@ var TitleScene = {
 	},
 
 	frame: function(timescale) {
-		var t = Game.time - TitleScene.t0;
+		var t = TitleScene.time += timescale / Game.targetFps;
 		TitleScene.title.position.x = (Display.w-TitleScene.title.width)/2;
 		var f = 1 - Math.pow(Math.max(0, 1-t/1.5), 2);
 		TitleScene.title.position.y = Math.floor(-f * 30 + 40);

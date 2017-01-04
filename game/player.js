@@ -21,21 +21,22 @@ class Player extends Entity {
 				 frame(timescale) {
 					 super.frame(timescale);
 					 if (this.age > 1)
-					 	Game.removeEntity(this);
+					 	this.world.removeEntity(this);
 				 }
 
 				 handleCollision(other) {
 					 super.handleCollision(other);
-					 Game.removeEntity(this);
+					 this.world.removeEntity(this);
 				 }
 			})({
-				position: Game.player.position.clone(),
+				position: this.position.clone(),
 				velocity: Vector.fromDir(
 					V(Input.mouse.x, Input.mouse.y).add(GameScene.viewOffset).dir() + Math.random()*0.2 - 0.1,
 					4+Math.random()*3),
-				radius: 2
+				radius: 2,
+				world: this.world
 			});
-			Game.addEntity(ent);
+			this.world.addEntity(ent);
 		}
 
 		super.frame(timescale);

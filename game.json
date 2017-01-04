@@ -11,6 +11,7 @@
 			"emitter.js",
 			"scene/titlescene.js",
 			"scene/gamescene.js",
+			"game/world.js",
 			"game/obstacle.js",
 			"game/entity.js",
 			"game/player.js"
@@ -77,24 +78,6 @@
 
 	"levels": {
 		"demo": {
-			"prefabs": [
-				{
-					"name": "cell",
-					"position": [0,0]
-				},
-				{
-					"name": "cell",
-					"position": [0,56]
-				},
-				{
-					"name": "cell",
-					"position": [0,112]
-				},
-				{
-					"name": "circle",
-					"position": [250, 10]
-				}
-			],
 			"objects": [
 				{
 					"type": "obstacle",
@@ -105,6 +88,26 @@
 					"type": "obstacle",
 					"vertices": [[60,0], [120,90], [0,90]],
 					"position": [250,100]
+				},
+				{
+					"type": "prefab",
+					"name": "cell",
+					"position": [0,0]
+				},
+				{
+					"type": "prefab",
+					"name": "cell",
+					"position": [0,56]
+				},
+				{
+					"type": "prefab",
+					"name": "cell",
+					"position": [0,112]
+				},
+				{
+					"type": "prefab",
+					"name": "circle",
+					"position": [250, 10]
 				}
 			]
 		}

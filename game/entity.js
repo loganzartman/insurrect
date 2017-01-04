@@ -10,15 +10,16 @@ class Entity extends Emitter {
 		this.position = params.position;
 		this.velocity = params.velocity;
 		this.radius = params.radius;
+		this.world = params.world;
 		this.listen("collision", this.handleCollision);
 
-		this.t0 = Game.time;
+		this.t0 = this.world.time;
 		this.gfx = new PIXI.Graphics();
 		this.gfxDirty = true;
 	}
 
 	get age() {
-		return Game.time - this.t0;
+		return this.world.time - this.t0;
 	}
 
 	move(dx) {
@@ -62,7 +63,7 @@ class Entity extends Emitter {
 	getAllCollisions() {
 		var entity = this;
 		var collisions = [];
-		Game.objects.forEach(function(object) {
+		this.world.obstacles.forEach(function(object) {
 			if (object instanceof Obstacle) {
 				object.getSegments().forEach(function(segment){
 					if (Util.geom.circleSegIntersect(entity.position, entity.radius, segment[0], segment[1]))

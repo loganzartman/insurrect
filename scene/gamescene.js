@@ -6,7 +6,17 @@ var GameScene = {
 	viewTarget: V(0,0),
 	VIEW_SPEED: 0.2,
 
-	init: function() {
+	init: function(params) {
+		//world setup
+		GameScene.world = params.world;
+		GameScene.world.listen("addEntity", ent => {
+			GameScene.objectContainer.addChild(ent.gfx);
+		});
+		GameScene.world.listen("removeEntity", ent => {
+			GameScene.objectContainer.removeChild(ent.gfx);
+		});
+
+		//graphics setup
 		GameScene.stage = new PIXI.Container();
 
 		//unmasked things
@@ -43,14 +53,19 @@ var GameScene = {
 	 * Called when a scene regains focus.
 	 */
 	activate: function() {
-		GameScene.t0 = Game.time;
+		GameScene.world.reset(); //TODO: maybe reactivation will occur without
+		                         //resetting the game?
+
+		//cleanup graphics
 		GameScene.objectContainer.removeChildren();
-		Game.objects.forEach(function(object){
-			GameScene.objectContainer.addChild(object.gfx);
-		});
-		Game.entities.forEach(function(entity){
-			GameScene.objectContainer.addChild(entity.gfx);
-		});
+
+		//readd graphics
+ 		GameScene.world.obstacles.forEach(function(obstacle){
+ 			GameScene.objectContainer.addChild(obstacle.gfx);
+ 		});
+ 		GameScene.world.entities.forEach(function(entity){
+ 			GameScene.objectContainer.addChild(entity.gfx);
+ 		});
 	},
 
 	/**
@@ -71,7 +86,7 @@ var GameScene = {
 		viewRect.noDisplay = true;
 		var polygons = [];
 		var segments = [];
-		Game.objects.forEach(function(object){
+		GameScene.world.obstacles.forEach(function(object){
 			if (object instanceof Obstacle && GameScene.inView(object.poly)) {
 				polygons.push(object.poly);
 				object.poly.getSegments().forEach(s => segments.push(s));
@@ -156,49 +171,55 @@ var GameScene = {
 			return rect.contains(thing);
 	},
 
-	frame: function(timescale) {
-		var t = Game.time - GameScene.t0;
+	updateView: function(timescale) {
+		//update target position
+		GameScene.viewTarget = GameScene.world.player.position
+			.add(V(Input.mouse.x, Input.mouse.y)
+			.add(GameScene.viewOffset).mult(0.4));
 
-		GameScene.viewTarget = Game.player.position.add(V(Input.mouse.x, Input.mouse.y).add(GameScene.viewOffset).mult(0.4));
-
-		//update view
+		//move view toward target
 		GameScene.view = GameScene.view.mult(1-GameScene.VIEW_SPEED)
 			.add(GameScene.viewTarget.mult(GameScene.VIEW_SPEED));
+
+		//move container to apply view position
 		GameScene.viewContainer.position = GameScene.view.negate().sub(GameScene.viewOffset);
+	},
 
-		//draw objects
-		Game.objects.forEach(function(object){
-			object.draw();
-		});
-
-		//draw entities
-		Game.entities.forEach(function(entity){
-			entity.frame(timescale);
-			entity.draw();
-		});
-
-		//update mask
-		var dummyMaskPos = V(Input.mouse.x, Input.mouse.y);
+	frame: function(timescale) {
+		//update
+		GameScene.updateView(timescale);
+		GameScene.world.frame(timescale);
 
 		//draw player vision
+		//clear buffer
 		GameScene.maskGfx.clear();
 		GameScene.maskGfx.beginFill(0x000000, 1);
 		GameScene.maskGfx.drawRect(0,0,Display.w,Display.h);
 		GameScene.maskGfx.endFill();
-		var polys = GameScene.calculateVision(Game.player.position.add(V(0.0001,0.0001)), true);
+
+		//calculate visible polygons
+		var polys = GameScene.calculateVision(
+			GameScene.world.player.position.add(V(0.0001,0.0001)), true);
+
+		//render each visible polygon to mask graphics
 		polys.forEach(function(poly){
-			var points = poly.points.map(p => p.sub(GameScene.view).sub(GameScene.viewOffset));
+			var points = poly.points.map(p =>
+				p.sub(GameScene.view).sub(GameScene.viewOffset));
 			GameScene.maskGfx.lineStyle(1, 0xFFFFFF, 1);
 			GameScene.maskGfx.beginFill(0xFFFFFF, 1);
-			GameScene.maskGfx.moveTo((points[points.length-1].x), (points[points.length-1].y));
+			GameScene.maskGfx.moveTo(
+				(points[points.length-1].x),
+				(points[points.length-1].y)
+			);
 			for (var i=0; i<points.length; i++)
 				GameScene.maskGfx.lineTo((points[i].x), (points[i].y));
 			GameScene.maskGfx.endFill();
 		});
 
+		//copy mask graphics buffer to the mask texture
 		Display.renderer.render(GameScene.maskGfx, GameScene.maskTexture);
 
-		//update masked background
+		//update masked background position
 		GameScene.bgtex2.tilePosition.x = -GameScene.view.x;
 		GameScene.bgtex2.tilePosition.y = -GameScene.view.y;
 	}
