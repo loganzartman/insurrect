@@ -1,6 +1,10 @@
 class Vector {
 	constructor(x,y) {
-		if (arguments.length === 0) {
+		if (arguments.length === 2) {
+			this.x = x;
+			this.y = y;
+		}
+		else if (arguments.length === 0) {
 			this.x = 0;
 			this.y = 0;
 		}
@@ -8,9 +12,12 @@ class Vector {
 			this.x = x[0];
 			this.y = x[1];
 		}
+		else if (x.hasOwnProperty("x") && x.hasOwnProperty("y")) {
+			this.x = x.x;
+			this.y = x.y;
+		}
 		else {
-			this.x = x;
-			this.y = y;
+			throw new Error();
 		}
 	}
 
@@ -96,5 +103,5 @@ class Vector {
 	}
 }
 
-var V = function(x,y){return new Vector(x,y);};
+var V = function(){return new Vector(...arguments);};
 Vector.prototype.unit = Vector.prototype.normalize;

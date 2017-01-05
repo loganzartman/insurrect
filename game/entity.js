@@ -1,12 +1,13 @@
 class Entity extends Emitter {
 	constructor(params) {
-		super(params);
+		params = Object.assign({
+			velocity: V(0,0),
+			radius: 4
+		}, params);
 		if (!params.hasOwnProperty("position"))
 			throw new Error("Entity must have position");
-		if (!params.hasOwnProperty("velocity"))
-			params.velocity = V(0,0);
-		if (!params.hasOwnProperty("radius"))
-			params.radius = 4;
+		super(params);
+
 		this.position = params.position;
 		this.velocity = params.velocity;
 		this.radius = params.radius;

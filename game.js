@@ -11,13 +11,28 @@ var Game = {
 		TitleScene.init();
 		var world = new World({levelName: "demo"});
 		GameScene.init({world: world});
+		EditScene.init();
 		Game.setScene(TitleScene);
+
+		//fps monitoring
+		var frametimes = [];
+		Object.defineProperty(Game, "frametime", {
+			set: function(val) {
+				frametimes.push(val);
+				if (frametimes.length > 60)
+					frametimes.shift();
+			},
+			get: function() {
+				return frametimes.reduce((t,s) => t+s, 0) / frametimes.length;
+			}
+		});
 
 		//start game loop
 		var t0 = Date.now();
 		var frameFunc = function() {
 			//calculate time changes
 			var dt = -t0 + (t0 = Date.now());
+			Game.frametime = dt;
 			var timescale = dt / (1000 / Game.targetFps);
 
 			//discard frames that take too long
@@ -52,8 +67,8 @@ var Game = {
 	 * Restarts the game.
 	 */
 	start: function() {
-		//TODO: possibly move world reset etc. back here
-		Game.setScene(GameScene);
+		GameScene.world.reset(); //TODO: maybe reactivation will occur without
+		                         //resetting the game?
 	},
 
 	/**

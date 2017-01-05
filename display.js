@@ -32,7 +32,7 @@ var Display = {
 	        point.x = (x - rect.left) * (this.interactionDOMElement.width / rect.width) * resolutionMultiplier;
 	        point.y = (y - rect.top) * (this.interactionDOMElement.height / rect.height) * resolutionMultiplier;
 	    };
-		
+
 		//create pixi renderer
 		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 		Display.renderer = new PIXI.WebGLRenderer(Display.w, Display.h, {
@@ -65,18 +65,18 @@ var Display = {
 		//render to screen
 		Display.renderer.render(Display.stage);
 		Display.cctx.drawImage(
-			Display.buffer, 
-			0, 0, 
+			Display.buffer,
+			0, 0,
 			Display.canvas.width, Display.canvas.height
 		);
 	},
 
 	makeButton: function(text, color1, color2, action) {
 		var cont = new PIXI.Container();
-		
+
 		//create text
 		var txt = new PIXI.Text(text, {
-			fontFamily: "monospace",
+			fontFamily: "Karla",
 			fontSize: 14,
 			fill: 0xFFFFFF
 		});

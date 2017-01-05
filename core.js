@@ -21,7 +21,7 @@ var Core = {
 				data.scripts.init.split(".").forEach(v => f = f[v]);
 				f();
 			}).catch(function(err){
-				alert("Error loading scripts: \n"+err);
+				alert("Error loading resources: \n"+err);
 			});
 		}).catch(function(err){
 			alert("Could not load game data:\n"+err);

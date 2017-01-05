@@ -39,6 +39,21 @@ class World extends Emitter {
         return true;
 	}
 
+    addObstacle(obs) {
+        this.obstacles.push(obs);
+        this.emit("addObstacle", obs);
+    }
+
+    removeObstacle(obs) {
+        var idx = this.obstacles.indexOf(obs);
+        if (idx < 0)
+            return false;
+        this.obstacles.splice(idx, 1);
+        obs.gfx.destroy();
+        this.emit("removeObstacle", obs);
+        return true;
+    }
+
     /**
 	 * Constructs an entire level and adds it to the game world.
 	 * @param name name of the level as defined in game.json
@@ -67,12 +82,18 @@ class World extends Emitter {
 		});
 	}
 
+	/**
+	 * Constructs an obstacle at a given position and inserts it into the world.
+	 * @param data the data for this obstacle
+	 * @param position a vector at which to insert the obstacle
+	 */
     buildObstacle(data, position) {
 		var vertices = data.vertices.map(v => V(v));
-		this.obstacles.push(new Obstacle({
+		var obstacle = new Obstacle({
 			vertices: vertices,
 			position: position
-		}));
+		});
+        this.addObstacle(obstacle);
 	}
 
     frame(timescale) {

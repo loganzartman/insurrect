@@ -9,11 +9,19 @@ var GameScene = {
 	init: function(params) {
 		//world setup
 		GameScene.world = params.world;
+
 		GameScene.world.listen("addEntity", ent => {
 			GameScene.objectContainer.addChild(ent.gfx);
 		});
 		GameScene.world.listen("removeEntity", ent => {
 			GameScene.objectContainer.removeChild(ent.gfx);
+		});
+
+		GameScene.world.listen("addObstacle", obs => {
+			GameScene.objectContainer.addChild(obs.gfx);
+		});
+		GameScene.world.listen("removeObstacle", obs => {
+			GameScene.objectContainer.removeChild(obs.gfx);
 		});
 
 		//graphics setup
@@ -53,9 +61,6 @@ var GameScene = {
 	 * Called when a scene regains focus.
 	 */
 	activate: function() {
-		GameScene.world.reset(); //TODO: maybe reactivation will occur without
-		                         //resetting the game?
-
 		//cleanup graphics
 		GameScene.objectContainer.removeChildren();
 

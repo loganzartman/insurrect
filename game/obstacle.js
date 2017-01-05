@@ -11,13 +11,6 @@ var Obstacle = function(params) {
 	this.gfx = new PIXI.Graphics();
 	this.gfx.hitArea = this.poly.toPixiPolygon();
 	this.gfx.interactive = true;
-	var that = this;
-	this.gfx.on("mouseover", function(){
-		that.gfx.tint = 0xFF0000;
-	});
-	this.gfx.on("mouseout", function(){
-		that.gfx.tint = 0xFFFFFF;
-	});
 	this.gfxDirty = true;
 };
 Obstacle.prototype.contains = function(point) {

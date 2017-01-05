@@ -5,7 +5,7 @@ class Player extends Entity {
 
 	frame(timescale) {
 		//handle movement input
-		this.velocity = V(0,0);
+		this.velocity.x = this.velocity.y = 0;
 		if (Input.keys[Input.key.UP])
 			this.velocity.y = -2;
 		if (Input.keys[Input.key.LEFT])

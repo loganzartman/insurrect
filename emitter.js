@@ -9,6 +9,15 @@ class Emitter {
 		this.listeners[event].push(callback);
 	}
 
+	unlisten(event, callback) {
+		if (this.listeners.hasOwnProperty(event)
+			&& this.listeners[event].includes(callback)) {
+			this.listeners.splice(this.listeners[event].indexOf(callback), 1);
+			return true;
+		}
+		return false;
+	}
+
 	removeAllListeners(event) {
 		if (typeof event === "undefined")
 			this.listeners = {};
