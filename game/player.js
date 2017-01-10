@@ -31,7 +31,7 @@ class Player extends Entity {
 			})({
 				position: this.position.clone(),
 				velocity: Vector.fromDir(
-					V(Input.mouse.x, Input.mouse.y).add(GameScene.viewOffset).dir() + Math.random()*0.2 - 0.1,
+					new Vector(Input.mouse.x, Input.mouse.y).add(GameScene.viewOffset).dir() + Math.random()*0.2 - 0.1,
 					4+Math.random()*3),
 				radius: 2,
 				world: this.world

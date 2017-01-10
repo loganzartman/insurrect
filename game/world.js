@@ -19,7 +19,7 @@ class World extends Emitter {
 
         //create player
         this.player = new Player({
-			position: V(-10,-10),
+			position: new Vector(-10,-10),
             world: this
 		});
 		this.addEntity(this.player);
@@ -62,9 +62,9 @@ class World extends Emitter {
         var data = Core.data.levels[name];
 		data.objects.forEach(object => {
 			if (object.type === "obstacle")
-				this.buildObstacle(object, V(object.position));
+				this.buildObstacle(object, new Vector(object.position));
             else if (object.type === "prefab")
-                this.buildPrefab(object.name, V(object.position));
+                this.buildPrefab(object.name, new Vector(object.position));
 		});
     }
 
@@ -88,7 +88,7 @@ class World extends Emitter {
 	 * @param position a vector at which to insert the obstacle
 	 */
     buildObstacle(data, position) {
-		var vertices = data.vertices.map(v => V(v));
+		var vertices = data.vertices.map(v => new Vector(v));
 		var obstacle = new Obstacle({
 			vertices: vertices,
 			position: position

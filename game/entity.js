@@ -1,7 +1,7 @@
 class Entity extends Emitter {
 	constructor(params) {
 		params = Object.assign({
-			velocity: V(0,0),
+			velocity: new Vector(0,0),
 			radius: 4
 		}, params);
 		if (!params.hasOwnProperty("position"))

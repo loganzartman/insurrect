@@ -103,5 +103,4 @@ class Vector {
 	}
 }
 
-var V = function(){return new Vector(...arguments);};
 Vector.prototype.unit = Vector.prototype.normalize;

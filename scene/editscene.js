@@ -1,10 +1,13 @@
 var EditScene = {
     stage: null,
+    selectedObstacle: null,
+
     init: function(params) {
         EditScene.stage = new PIXI.Container();
     },
 
     activate: function() {
+        EditScene.selectedObstacle =
         GameScene.activate();
         GameScene.world.listen("addObstacle", this.handleAddObstacle);
         GameScene.world.obstacles.forEach(this.handleAddObstacle);
@@ -13,8 +16,8 @@ var EditScene = {
         GameScene.stage.interactive = true;
         GameScene.stage.on("click", function(){
             GameScene.world.addObstacle(new Obstacle({
-                vertices: [V(-8,-8), V(8,-8), V(8,8), V(-8,8)],
-                position: V(Input.mouse).add(GameScene.view).add(GameScene.viewOffset)
+                vertices: [new Vector(-8,-8), new Vector(8,-8), new Vector(8,8), new Vector(-8,8)],
+                position: new Vector(Input.mouse).add(GameScene.view).add(GameScene.viewOffset)
             }));
         });
 

@@ -1,9 +1,9 @@
 var GameScene = {
 	stage: null,
 	t0: 0,
-	view: V(0,0),
-	viewOffset: V(-Display.w/2, - Display.h/2),
-	viewTarget: V(0,0),
+	view: new Vector(0,0),
+	viewOffset: new Vector(-Display.w/2, - Display.h/2),
+	viewTarget: new Vector(0,0),
 	VIEW_SPEED: 0.2,
 
 	init: function(params) {
@@ -137,7 +137,7 @@ var GameScene = {
 				}
 			});
 			if (min !== null) {
-				intersections.push(V(min.x, min.y));
+				intersections.push(new Vector(min.x, min.y));
 				if (includeObjects && !minPoly.noDisplay && !visiblePolys.includes(minPoly))
 					visiblePolys.push(minPoly);
 			}
@@ -157,10 +157,10 @@ var GameScene = {
 		var top = GameScene.view.y - Display.h/2;
 		var bottom = GameScene.view.y + Display.h/2;
 		return new Polygon([
-			V(left, top),
-			V(right, top),
-			V(right, bottom),
-			V(left, bottom),
+			new Vector(left, top),
+			new Vector(right, top),
+			new Vector(right, bottom),
+			new Vector(left, bottom),
 		]);
 	},
 
@@ -179,7 +179,7 @@ var GameScene = {
 	updateView: function(timescale) {
 		//update target position
 		GameScene.viewTarget = GameScene.world.player.position
-			.add(V(Input.mouse.x, Input.mouse.y)
+			.add(new Vector(Input.mouse)
 			.add(GameScene.viewOffset).mult(0.4));
 
 		//move view toward target
@@ -204,7 +204,7 @@ var GameScene = {
 
 		//calculate visible polygons
 		var polys = GameScene.calculateVision(
-			GameScene.world.player.position.add(V(0.0001,0.0001)), true);
+			GameScene.world.player.position.add(new Vector(0.0001,0.0001)), true);
 
 		//render each visible polygon to mask graphics
 		polys.forEach(function(poly){

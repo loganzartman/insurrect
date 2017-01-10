@@ -4,7 +4,7 @@ class Polygon {
         this.points = points.map(function(point){
             if (point instanceof Vector)
                 return point
-            return V(point.x, point.y);
+            return new Vector(point.x, point.y);
         });
     }
 
@@ -45,7 +45,7 @@ class Polygon {
             segments.push([this.points[i], this.points[(i+1)%j]]);
         return segments;
     }
-    
+
     toPixiPolygon() {
         return new PIXI.Polygon(this.points.map(v => v.toPixiPoint()));
     }

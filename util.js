@@ -12,7 +12,7 @@ var Util = {
 		 */
 		circleSegIntersect: function(circlePos,radius,pointA,pointB) {
 			//todo: check parallel things to avoid doing this
-			pointB = pointB.add(V(0.0001,0.0001));
+			pointB = pointB.add(new Vector(0.0001,0.0001));
 
 			var d1 = circlePos.sub(pointA).len();
 			var d2 = circlePos.sub(pointB).len();
@@ -46,7 +46,7 @@ var Util = {
 					onSegment = false;
 			}
 
-			if (onSegment && circlePos.sub(V(xx,yy)).len() < radius)
+			if (onSegment && circlePos.sub(new Vector(xx,yy)).len() < radius)
 					return true;
 			return false;
 		},
@@ -115,7 +115,7 @@ var Util = {
 				return null;
 
 			//calculate intersection position using parametric forms
-			return V(
+			return new Vector(
 				x0 + t*(x2 - x0),
 				y0 + t*(y2 - y0)
 			);
