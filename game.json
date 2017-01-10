@@ -15,6 +15,7 @@
 			"game/world.js",
 			"game/obstacle.js",
 			"game/entity.js",
+			"game/projectile.js",
 			"game/player.js"
 		],
 		"init": "Game.init"
