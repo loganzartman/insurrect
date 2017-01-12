@@ -221,6 +221,13 @@ var GameScene = {
 			GameScene.maskGfx.endFill();
 		});
 
+		if (Game.WALLHACKS) {
+			GameScene.maskGfx.beginFill(0xFFFFFF, 0.7);
+			GameScene.maskGfx.lineStyle(0);
+			GameScene.maskGfx.drawRect(0,0,Display.w,Display.h);
+			GameScene.maskGfx.endFill();
+		}
+
 		//copy mask graphics buffer to the mask texture
 		Display.renderer.render(GameScene.maskGfx, GameScene.maskTexture);
 

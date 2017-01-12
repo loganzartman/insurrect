@@ -86,10 +86,19 @@ class Vector {
 		return new Vector(this.x, this.y);
 	}
 
+	/**
+	 * A note about normalization:
+	 * Normalizing a zero vector results in a zero vector, which does not have
+	 * len === 1. Be careful and check isZero() when dividing by length.
+	 */
 	normalize() {
 		var len = this.len();
 		if (len === 0) return new Vector(0,0);
 		return new Vector(this.x / len, this.y / len);
+	}
+
+	isZero() {
+		return this.x === 0 && this.y === 0;
 	}
 
 	equals(v) {

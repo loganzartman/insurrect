@@ -1,6 +1,7 @@
 var Game = {
 	targetFps: 60,
 	activeScene: null,
+	WALLHACKS: false,
 
 	init: function() {
 		//initialize core functionality

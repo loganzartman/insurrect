@@ -75,18 +75,19 @@ var Display = {
 		var cont = new PIXI.Container();
 
 		//create text
-		var txt = new PIXI.Text(text, {
-			fontFamily: "Karla",
-			fontSize: 14,
-			fill: 0xFFFFFF
+		var txt = new PIXI.extras.BitmapText(text, {
+			font: "Andina",
+			align: "left",
+			tint: 0xFFFFFF
 		});
+		txt.updateText();
 		txt.position.x = Display.padding;
 		txt.position.y = Display.padding;
 
 		//create button
 		var gfx = new PIXI.Graphics();
 		gfx.lineStyle(1, 0xFFFFFF);
-		gfx.drawRect(0, 0, txt.width + Display.padding * 2, 14 + Display.padding * 2);
+		gfx.drawRect(0, 0, txt.width + Display.padding * 2, 10 + Display.padding * 2);
 		txt.tint = gfx.tint = color1;
 
 		//add interactivity
@@ -107,8 +108,8 @@ var Display = {
 
 	centerObj: function(displayObj, h, v) {
 		if (h)
-			displayObj.position.x = (Display.w - displayObj.width) / 2;
+			displayObj.position.x = Math.floor((Display.w - displayObj.width) / 2);
 		if (v)
-			displayObj.position.y = (Display.h - displayObj.height) / 2;
+			displayObj.position.y = Math.floor((Display.h - displayObj.height) / 2);
 	}
 }

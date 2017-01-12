@@ -7,25 +7,35 @@ var Core = {
 
 			//parse colors
 			Core.color = {};
-			Object.keys(Core.data.colors).forEach(function(key){
+			Object.keys(Core.data.colors).forEach(key => {
 				Core.color[key] = parseInt(Core.data.colors[key], 16);
 			});
 
-			//load resources
+			//load scripts
 			var scripts = data.scripts.sources.map(s => Core.load.script(s));
-			var images = Object.keys(data.images).map(n => Core.load.image(data.images[n], n));
-			var promises = scripts.concat(images);
-			Promise.all(promises).then(function(){
-				//call main entrypoint function
-				var f = window;
-				data.scripts.init.split(".").forEach(v => f = f[v]);
-				f();
-			}).catch(function(err){
-				alert("Error loading resources: \n"+err);
+			Promise.all(scripts).then(() => {
+				Core.scriptsLoaded();
+			}).catch(err => {
+				console.error("Error loading scripts: \n"+err);
 			});
-		}).catch(function(err){
-			alert("Could not load game data:\n"+err);
+		}).catch(err => {
+			console.error("Could not load game data:\n"+err);
 		});
+	},
+
+	scriptsLoaded: function() {
+		var loader = PIXI.loader;
+		Object.keys(Core.data.resources).forEach(n => loader.add(n, Core.data.resources[n]));
+		loader.on("complete", () => {
+			//alias
+			Core.resource = loader.resources;
+
+			//call main entrypoint function
+			var f = window;
+			Core.data.scripts.init.split(".").forEach(v => f = f[v]);
+			f();
+		});
+		loader.load();
 	},
 
 	/**

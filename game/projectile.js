@@ -2,7 +2,7 @@ class Projectile extends Entity {
     frame(timescale) {
         super.frame(timescale);
         if (this.age > 1)
-        this.world.removeEntity(this);
+            this.world.removeEntity(this);
     }
 
     move(dx) {
@@ -21,9 +21,9 @@ class Projectile extends Entity {
 
         //if there is a collision, limit movement
         if (nearest === null)
-        this.position = this.position.add(dx);
+            this.position = this.position.add(dx);
         else {
-            dx = nearest.sub(this.position).unit().mult(dx.len());
+            dx = dx.unit().mult(nearest.sub(this.position).len() - this.radius*2);
             this.position = this.position.add(dx);
             this.emit("collision", [nearest]);
         }
@@ -59,6 +59,8 @@ class Projectile extends Entity {
 
     handleCollision(other) {
         super.handleCollision(other);
-        this.world.removeEntity(this);
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+        // this.world.removeEntity(this);
     }
 }

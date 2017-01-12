@@ -21,18 +21,22 @@ var EditScene = {
             }));
         });
 
-        EditScene.debugText = new PIXI.Text("debug: ", {
-            fontFamily: "Karla",
-			fontSize: 14,
-			fill: 0xFFFFFF,
-            dropShadow: true,
-            dropShadowColor: 0x000000,
-            dropShadowBlur: 0,
-            dropShadowAngle: Math.PI/2,
-            dropShadowDistance: 1
+        EditScene.debugText = new PIXI.extras.BitmapText("debug: ", {
+            font: "AndinaBold",
+			tint: 0xFFFFFF
         });
         EditScene.debugText.position = new PIXI.Point(8,8);
-        EditScene.stage.addChild(EditScene.debugText);
+        
+        //create text shadow
+        EditScene.debugTextTexture = new PIXI.RenderTexture(Display.w, Display.h);
+        var dbtDisplayFore = new PIXI.Sprite(EditScene.debugTextTexture);
+        dbtDisplayFore.tint = Core.color.acc1;
+        var dbtDisplayShadow = new PIXI.Sprite(EditScene.debugTextTexture);
+        dbtDisplayShadow.position.y = 1;
+        dbtDisplayShadow.tint = Core.color.bg2;
+
+        EditScene.stage.addChild(dbtDisplayShadow);
+        EditScene.stage.addChild(dbtDisplayFore);
     },
 
     handleAddObstacle: function(obs) {
@@ -55,6 +59,8 @@ var EditScene = {
 
     frame: function(timescale) {
         GameScene.frame(timescale);
+        
+        //update debug text
         EditScene.debugText.text = "Editor: " + GameScene.world.levelName;
         var vertices = GameScene.world.obstacles.reduce(
             (val,o) => o.vertices.length + val, 0
@@ -65,5 +71,6 @@ var EditScene = {
         EditScene.debugText.text += "\nFPS (avg): " + (1000 / Game.frametime).toFixed(0);
         EditScene.debugText.text += "\n#Vertices: " + vertices;
         EditScene.debugText.text += "\n#Visible: " + onscreen;
+        Display.renderer.render(EditScene.debugText, EditScene.debugTextTexture);
     }
 }

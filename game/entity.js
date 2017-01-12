@@ -1,17 +1,19 @@
 class Entity extends Emitter {
 	constructor(params) {
-		params = Object.assign({
-			velocity: new Vector(0,0),
-			radius: 4
-		}, params);
 		if (!params.hasOwnProperty("position"))
 			throw new Error("Entity must have position");
+		params = Object.assign({
+			velocity: new Vector(0,0),
+			radius: 4,
+			color: Core.color.acc2
+		}, params);
 		super(params);
 
 		this.position = params.position;
 		this.velocity = params.velocity;
 		this.radius = params.radius;
 		this.world = params.world;
+		this.color = params.color;
 		this.listen("collision", this.handleCollision);
 
 		this.t0 = this.world.time;
@@ -45,7 +47,8 @@ class Entity extends Emitter {
 
 	frame(timescale) {
 		this.emit("frameStart");
-		this.move(this.velocity.mult(timescale));
+		if (!this.velocity.isZero())
+			this.move(this.velocity.mult(timescale));
 		this.emit("frameEnd");
 	}
 
@@ -56,7 +59,7 @@ class Entity extends Emitter {
 		if (!this.gfxDirty)
 			return;
 		this.gfx.clear();
-		this.gfx.lineStyle(1, Core.color.acc2, 1);
+		this.gfx.lineStyle(1, this.color, 1);
 		this.gfx.drawCircle(0, 0, this.radius);
 		this.gfxDirty = false;
 	}

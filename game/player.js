@@ -27,7 +27,8 @@ class Player extends Entity {
 						4 + Math.random()*3
 					),
 					radius: 2,
-					world: this.world
+					world: this.world,
+					color: Core.color.acc1
 				});
 				this.world.addEntity(ent);
 			}

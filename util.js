@@ -102,11 +102,11 @@ var Util = {
 			//solve for parameters t and u
 			//where t and u are the parameters of the parametric forms of lines
 			//A and B respectively
-			var divisor = x0*(y1-y3) - x1*(y0-y2) - x2*(y1-y3) + x3*(y0-y2);
+			var fraction = 1/(x0*(y1-y3) - x1*(y0-y2) - x2*(y1-y3) + x3*(y0-y2));
 			var t = x0*(y1-y3) - x1*(y0-y3) + x3*(y0-y1);
-			t /= divisor;
+			t *= fraction;
 			var u = x0*(y1-y2) - x1*(y0-y2) + x2*(y0-y1);
-			u /= divisor;
+			u *= fraction;
 
 			//parameters out of the bounds [0,1] indicates no intersection
 			if (t < 0 || t > 1)
