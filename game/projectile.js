@@ -11,10 +11,12 @@ class Projectile extends Entity {
         //find nearest collision
         var nearest = null;
         var nearestDist = 0;
-        collisions.forEach(point => {
-            var dist = point.sub(this.position).len();
+        collisions.forEach(collision => {
+            if (collision.point === null)
+                return;
+            var dist = collision.point.sub(this.position).len();
             if (nearest === null || dist < nearestDist) {
-                nearest = point;
+                nearest = collision.point;
                 nearestDist = dist;
             }
         });
@@ -50,7 +52,12 @@ class Projectile extends Entity {
                 object.getSegments().forEach(segment => {
                     var point = Util.geom.segSegIntersect(pointA, pointB, segment[0], segment[1]);
                     if (point)
-                        collisions.push(point);
+                        collisions.push(new Collision({
+                            self: this,
+                            type: Collision.SEGMENT,
+                            object: segment,
+                            point: point
+                        }));
                 });
             }
         });
