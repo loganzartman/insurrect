@@ -232,7 +232,7 @@ var GameScene = {
 		Display.renderer.render(GameScene.maskGfx, GameScene.maskTexture);
 
 		//update masked background position
-		GameScene.bgtex2.tilePosition.x = -GameScene.view.x;
-		GameScene.bgtex2.tilePosition.y = -GameScene.view.y;
+		GameScene.bgtex2.tilePosition.x = Math.floor(-GameScene.view.x);
+		GameScene.bgtex2.tilePosition.y = Math.floor(-GameScene.view.y);
 	}
 };

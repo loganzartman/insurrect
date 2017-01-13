@@ -2,6 +2,8 @@ var Core = {
 	data: null,
 	image: {},
 	init: function() {
+		if (!Core.sanityCheck())
+			return;
 		Core.loaderGfx.init();
 		Core.load.json("game.json").then(function(data){
 			Core.loaderGfx.progress(0.1);
@@ -9,7 +11,7 @@ var Core = {
 
 			//parse colors
 			Core.color = {};
-			Object.keys(Core.data.colors).forEach(key => {
+			Object.keys(Core.data.colors).forEach(function(key){
 				Core.color[key] = parseInt(Core.data.colors[key], 16);
 			});
 
@@ -18,24 +20,36 @@ var Core = {
 				if (i === data.scripts.sources.length)
 					Core.scriptsLoaded();
 				else {
-					Core.load.script(data.scripts.sources[i]).then(() => {
+					Core.load.script(data.scripts.sources[i]).then(function(){
 						Core.loaderGfx.progress(0.1 + i/data.scripts.sources.length*0.7);
 						loadScript(i+1);
-					}).catch(err => {
+					}).catch(function(err){
 						console.error("Error loading scripts: \n"+err);
 					});
 				}
 			};
 			loadScript(0);
-		}).catch(err => {
+		}).catch(function(err){
 			console.error("Could not load game data:\n"+err);
 		});
 	},
 
+	sanityCheck: function() {
+		var cont = document.getElementById("container");
+		if (typeof Map === "undefined" || typeof Promise === "undefined") {
+			document.documentElement.style.cursor = "default";
+			cont.innerHTML += "<h2>Whoops!</h2>";
+			cont.innerHTML += "It looks like your web browser doesn't support this game.<br>";
+			cont.innerHTML += "You should try again with a modern web browser such as Google Chrome, Firefox, or Microsoft Edge.";
+			return false;
+		}
+		return true;
+	},
+
 	scriptsLoaded: function() {
 		var loader = PIXI.loader;
-		Object.keys(Core.data.resources).forEach(n => loader.add(n, Core.data.resources[n]));
-		loader.on("complete", () => {
+		Object.keys(Core.data.resources).forEach(function(n){loader.add(n, Core.data.resources[n])});
+		loader.on("complete", function(){
 			Core.loaderGfx.progress(1);
 
 			//alias
@@ -44,7 +58,7 @@ var Core = {
 			Core.loaderGfx.destroy();
 			//call main entrypoint function
 			var f = window;
-			Core.data.scripts.init.split(".").forEach(v => f = f[v]);
+			Core.data.scripts.init.split(".").forEach(function(v){f = f[v]});
 			f();
 		});
 		loader.load();
@@ -59,6 +73,9 @@ var Core = {
 			Core.loaderGfx.canv.height = 240*3;
 			Core.loaderGfx.ctx = Core.loaderGfx.canv.getContext("2d");
 			document.getElementById("container").appendChild(Core.loaderGfx.canv);
+		},
+		color: function(packed) {
+			return "#" + packed.toString(16);
 		},
 		progress: function(val) {
 			var c = Core.loaderGfx.ctx;
