@@ -1,11 +1,20 @@
 class Entity extends Emitter {
+	/**
+	 * Params:
+	 * position: (required) the position of this Entity in the world
+	 * velocity: the current velocity of this Entity
+	 * radius: the radius of this Entity for collision checks
+	 * world: reference to the World in which this Entity currently exists
+	 * color: color used to tint this Entity
+	 */
 	constructor(params) {
 		if (!params.hasOwnProperty("position"))
 			throw new Error("Entity must have position");
 		params = Object.assign({
 			velocity: new Vector(0,0),
 			radius: 4,
-			color: Core.color.acc2
+			color: Core.color.acc2,
+			world: null
 		}, params);
 		super(params);
 

@@ -30,7 +30,7 @@ var GameScene = {
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();
 		GameScene.stage.addChild(GameScene.unmaskedBg);
-		GameScene.bgtex = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage("image/qmtex.png"), Display.w, Display.h);
+		GameScene.bgtex = new PIXI.extras.TilingSprite(Core.resource.qmtex.texture, Display.w, Display.h);
 		GameScene.bgtex.tint = Core.color.bg2;
 		GameScene.stage.addChild(GameScene.bgtex);
 
@@ -44,7 +44,7 @@ var GameScene = {
 
 		//background
 		GameScene.bg = new PIXI.Graphics();
-		GameScene.bgtex2 = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage("image/floor.png"), Display.w, Display.h);
+		GameScene.bgtex2 = new PIXI.extras.TilingSprite(Core.resource.floor.texture, Display.w, Display.h);
 		GameScene.bgtex2.tint = Core.color.bg1;
 		GameScene.maskedContainer.addChild(GameScene.bgtex2);
 

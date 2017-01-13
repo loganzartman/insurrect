@@ -24,9 +24,11 @@
 	},
 
 	"resources": {
-		"title": "image/title.png",
-		"Andina": "andina.fnt",
-		"AndinaBold": "andina_bold.fnt"
+		"title": "resource/title.png",
+		"floor": "resource/floor.png",
+		"qmtex": "resource/qmtex.png",
+		"Andina": "resource/andina.fnt",
+		"AndinaBold": "resource/andina_bold.fnt"
 	},
 
 	"colors": {

@@ -1,4 +1,14 @@
+/**
+ * Represents an Entity that can be controlled by a set of arbitrary inputs.
+ * Use cases: Player, Hostile AIs
+ */
 class Controllable extends Entity {
+	/**
+	 * Params:
+	 * acceleration: rate of acceleration in pixels/s
+	 * deceleration: rate of deceleration when no movement input provided
+	 * maxSpeed: maximum speed in pixels/s
+	 */
 	constructor(params) {
 		params = Object.assign({
 			maxSpeed: 1.7,
@@ -45,10 +55,20 @@ class Controllable extends Entity {
 		super.frame(timescale);
 	}
 
+	/**
+	 * "Fires" whatever item the Entity is using.
+	 * Called by Controllable.frame
+	 * @param lookVector a vector representing the direction the Entity is aiming
+	 */
 	fire(lookVector) {
 
 	}
 
+	/**
+	 * Accepts an object containing any or all of the supported inputs.
+	 * Applies these inputs.
+	 * @param inputs current input values
+	 */
 	handleInputs(inputs) {
 		this.input = Object.assign(this.input, inputs);
 	}

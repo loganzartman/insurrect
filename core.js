@@ -2,7 +2,9 @@ var Core = {
 	data: null,
 	image: {},
 	init: function() {
+		Core.loaderGfx.init();
 		Core.load.json("game.json").then(function(data){
+			Core.loaderGfx.progress(0.1);
 			Core.data = data;
 
 			//parse colors
@@ -12,12 +14,19 @@ var Core = {
 			});
 
 			//load scripts
-			var scripts = data.scripts.sources.map(s => Core.load.script(s));
-			Promise.all(scripts).then(() => {
-				Core.scriptsLoaded();
-			}).catch(err => {
-				console.error("Error loading scripts: \n"+err);
-			});
+			var loadScript = function(i){
+				if (i === data.scripts.sources.length)
+					Core.scriptsLoaded();
+				else {
+					Core.load.script(data.scripts.sources[i]).then(() => {
+						Core.loaderGfx.progress(0.1 + i/data.scripts.sources.length*0.7);
+						loadScript(i+1);
+					}).catch(err => {
+						console.error("Error loading scripts: \n"+err);
+					});
+				}
+			};
+			loadScript(0);
 		}).catch(err => {
 			console.error("Could not load game data:\n"+err);
 		});
@@ -27,15 +36,51 @@ var Core = {
 		var loader = PIXI.loader;
 		Object.keys(Core.data.resources).forEach(n => loader.add(n, Core.data.resources[n]));
 		loader.on("complete", () => {
+			Core.loaderGfx.progress(1);
+
 			//alias
 			Core.resource = loader.resources;
 
+			Core.loaderGfx.destroy();
 			//call main entrypoint function
 			var f = window;
 			Core.data.scripts.init.split(".").forEach(v => f = f[v]);
 			f();
 		});
 		loader.load();
+	},
+
+	loaderGfx: {
+		barWidth: 200,
+		barHeight: 24,
+		init: function() {
+			Core.loaderGfx.canv = document.createElement("canvas");
+			Core.loaderGfx.canv.width = 320*3;
+			Core.loaderGfx.canv.height = 240*3;
+			Core.loaderGfx.ctx = Core.loaderGfx.canv.getContext("2d");
+			document.getElementById("container").appendChild(Core.loaderGfx.canv);
+		},
+		progress: function(val) {
+			var c = Core.loaderGfx.ctx;
+			var w = c.canvas.width, h = c.canvas.height;
+
+			c.save();
+			c.fillStyle = "black";
+			c.fillRect(0,0,w,h);
+			c.strokeStyle = "white";
+			c.fillStyle = "white";
+			c.lineWidth = 1;
+			c.translate(
+				w/2 - Core.loaderGfx.barWidth/2,
+				h/3 - Core.loaderGfx.barHeight/2
+			);
+			c.strokeRect(0,0,Core.loaderGfx.barWidth,Core.loaderGfx.barHeight);
+			c.fillRect(0,0,Core.loaderGfx.barWidth*val,Core.loaderGfx.barHeight);
+			c.restore();
+		},
+		destroy: function() {
+			document.getElementById("container").removeChild(Core.loaderGfx.canv);
+		}
 	},
 
 	/**
