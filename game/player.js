@@ -7,13 +7,13 @@ class Player extends Controllable {
 		//calculate movement input
 		var move = new Vector(0,0);
 		if (Input.keys[Input.key.UP])
-			move.y -= 2;
+			move.y -= 1;
 		if (Input.keys[Input.key.DOWN])
-			move.y += 2;
+			move.y += 1;
 		if (Input.keys[Input.key.LEFT])
-			move.x -= 2;
+			move.x -= 1;
 		if (Input.keys[Input.key.RIGHT])
-			move.x += 2;
+			move.x += 1;
 		
 		//calculate look direction
 		var look = new Vector(Input.mouse.x, Input.mouse.y)
@@ -35,12 +35,18 @@ class Player extends Controllable {
 				position: this.position.clone(),
 				velocity: Vector.fromDir(
 					lookVector.dir() + Math.random()*0.2 - 0.1,
-					4 + Math.random()*3
+					10 + Math.random()*4
 				),
+				elasticity: 0.3,
+				friction: 0.06,
+				life: 1,
 				radius: 2,
 				world: this.world,
 				color: Core.color.acc1
 			});
+			ent.listen("collision", () => {
+				ent.radius /= 2;
+			})
 			this.world.addEntity(ent);
 		}
 	}

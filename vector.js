@@ -74,6 +74,11 @@ class Vector {
 		return this.mult(this.dot(v) / (l*l));
 	}
 
+	reflectOver(normal) {
+		normal = Vector.fromDir(normal.dir() + Math.PI/2, 1);
+		return this.sub(normal.mult(2*this.dot(normal)));
+	}
+
 	len() {
 		return Math.sqrt(this.x*this.x + this.y*this.y);
 	}

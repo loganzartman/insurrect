@@ -1,7 +1,22 @@
 class Projectile extends Entity {
+    constructor(params) {
+        super(params);
+        params = Object.assign({
+            friction: 0,
+            elasticity: 0,
+            life: Infinity
+        }, params);
+        this.friction = params.friction;
+        this.elasticity = params.elasticity;
+        this.life = params.life;
+    }
+
     frame(timescale) {
         super.frame(timescale);
-        if (this.age > 1)
+        this.velocity = this.velocity.mult(1-this.friction);
+        if (this.velocity.isZero())
+            this.world.removeEntity(this);
+        if (this.age > this.life)
             this.world.removeEntity(this);
     }
 
@@ -16,7 +31,7 @@ class Projectile extends Entity {
                 return;
             var dist = collision.point.sub(this.position).len();
             if (nearest === null || dist < nearestDist) {
-                nearest = collision.point;
+                nearest = collision;
                 nearestDist = dist;
             }
         });
@@ -25,20 +40,12 @@ class Projectile extends Entity {
         if (nearest === null)
             this.position = this.position.add(dx);
         else {
-            dx = dx.unit().mult(nearest.sub(this.position).len() - this.radius*2);
+            dx = dx.unit().mult(nearest.point.sub(this.position).len() - this.radius*2);
             this.position = this.position.add(dx);
             this.emit("collision", [nearest]);
         }
     }
-
-    /**
-     * TODO: Issue: this now returns points.
-     * The collision logic used in Entity no longer works correctly, as it
-     * expects segments. This is OK for Projectiles, as they remove themselves
-     * from the world upon collision. However, it may create future problems.
-     * Possible solution: create a Collision class that contains both the
-     * collided thing (e.g. the segment) and the point of collision, if known.
-     */
+    
     getAllCollisions(dx) {
         //calculate a segment representing the path of this object
         var radius = dx.unit().mult(this.radius);
@@ -64,10 +71,13 @@ class Projectile extends Entity {
         return collisions;
     }
 
-    handleCollision(other) {
-        super.handleCollision(other);
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-        // this.world.removeEntity(this);
+    handleCollision(others) {
+        super.handleCollision(others);
+        
+        var other = others[0];
+        if (other && other.type === Collision.SEGMENT) {
+            this.velocity = this.velocity.reflectOver(other.object[1].sub(other.object[0]))
+                .mult(this.elasticity);
+        }
     }
 }

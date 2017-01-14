@@ -42,6 +42,39 @@
 		"acc3b": "0xFFE559"
 	},
 
+	"colors1": {
+		"bg1": "0xF9E4AD",
+		"bg2": "0x31152B",
+		"acc1": "0xE6B098",
+		"acc1b": "0xFFD9C0",
+		"acc2": "0xCC4452",
+		"acc2b": "0xFF7B83",
+		"acc3": "0x723147",
+		"acc3b": "0xA55F75"
+	},
+
+	"colors2": {
+		"bg1": "0xF2EBC7",
+		"bg2": "0x343642",
+		"acc1": "0x962D3E",
+		"acc1b": "0xE87680",
+		"acc2": "0x348899",
+		"acc2b": "0x78C7D9",
+		"acc3": "0x979C9C",
+		"acc3b": "0xD0D5D5"
+	},
+
+	"colors3": {
+		"bg1": "0xEEEFF7",
+		"bg2": "0x1C1D21",
+		"acc1": "0x445878",
+		"acc1b": "0x7184A7",
+		"acc2": "0x92CDCF",
+		"acc2b": "0xC0FCFD",
+		"acc3": "0x31353D",
+		"acc3b": "0x51555E"
+	},
+	
 	"inputBindings": {
 		"LEFT": 65,
 		"RIGHT": 68,

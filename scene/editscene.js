@@ -7,7 +7,6 @@ var EditScene = {
     },
 
     activate: function() {
-        EditScene.selectedObstacle =
         GameScene.activate();
         GameScene.world.listen("addObstacle", this.handleAddObstacle);
         GameScene.world.obstacles.forEach(this.handleAddObstacle);
@@ -37,6 +36,8 @@ var EditScene = {
 
         EditScene.stage.addChild(dbtDisplayShadow);
         EditScene.stage.addChild(dbtDisplayFore);
+        Game.WALLHACKS = true;
+        GameScene.LOOK_INTENSITY = 0;
     },
 
     handleAddObstacle: function(obs) {
@@ -55,6 +56,8 @@ var EditScene = {
         GameScene.deactivate();
         EditScene.stage.removeChild(GameScene.stage);
         GameScene.world.unlisten("addObstacle", this.handleAddObstacle);
+        Game.WALLHACKS = false;
+        GameScene.LOOK_INTENSITY = 0.4;
     },
 
     frame: function(timescale) {

@@ -5,6 +5,7 @@ var GameScene = {
 	viewOffset: new Vector(-Display.w/2, - Display.h/2),
 	viewTarget: new Vector(0,0),
 	VIEW_SPEED: 0.2,
+	LOOK_INTENSITY: 0.4,
 
 	init: function(params) {
 		//world setup
@@ -180,7 +181,7 @@ var GameScene = {
 		//update target position
 		GameScene.viewTarget = GameScene.world.player.position
 			.add(new Vector(Input.mouse)
-			.add(GameScene.viewOffset).mult(0.4));
+			.add(GameScene.viewOffset).mult(GameScene.LOOK_INTENSITY));
 
 		//move view toward target
 		GameScene.view = GameScene.view.mult(1-GameScene.VIEW_SPEED)

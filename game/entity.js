@@ -30,6 +30,24 @@ class Entity extends Emitter {
 		this.gfxDirty = true;
 	}
 
+	set radius(val) {
+		this._radius = val;
+		this.gfxDirty = true;
+	}
+
+	get radius() {
+		return this._radius;
+	}
+
+	set color(val) {
+		this._color = val;
+		this.gfxDirty = true;
+	}
+
+	get color() {
+		return this._color;
+	}
+
 	get age() {
 		return this.world.time - this.t0;
 	}
