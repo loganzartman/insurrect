@@ -191,10 +191,10 @@ var GameScene = {
 		GameScene.viewContainer.position = GameScene.view.negate().sub(GameScene.viewOffset);
 	},
 
-	frame: function(timescale) {
+	frame: function(timescale, ticks) {
 		//update
-		GameScene.updateView(timescale);
-		GameScene.world.frame(timescale);
+		GameScene.updateView(timescale, ticks);
+		GameScene.world.frame(timescale, ticks);
 
 		//draw player vision
 		//clear buffer

@@ -30,15 +30,19 @@ var Game = {
 
 		//start game loop
 		var t0 = Date.now();
+		var ticks = 0;
 		var frameFunc = function() {
 			//calculate time changes
 			var dt = -t0 + (t0 = Date.now());
 			Game.frametime = dt;
 			var timescale = dt / (1000 / Game.targetFps);
+			ticks += timescale;
 
 			//discard frames that take too long
 			if (dt < 500)
-				Game.frame(timescale);
+				Game.frame(timescale, Math.floor(ticks));
+
+			ticks -= Math.floor(ticks);
 
 			//request another update
 			requestAnimationFrame(frameFunc);
@@ -76,9 +80,10 @@ var Game = {
 	 * Called every frame by the game loop
 	 * @param timescale time elapsed as a fraction of the time per frame at
 	 *        the target framerate.
+	 * @param ticks the number of 60fps "ticks" that have elapsed
 	 */
-	frame: function(timescale) {
-		Game.activeScene.frame(timescale);
+	frame: function(timescale, ticks) {
+		Game.activeScene.frame(timescale, ticks);
 		Display.frame(timescale);
 	}
 }

@@ -13,7 +13,7 @@ class Projectile extends Entity {
 
     frame(timescale) {
         super.frame(timescale);
-        this.velocity = this.velocity.mult(1-this.friction);
+        this.velocity = this.velocity.mult(1-this.friction*timescale);
         if (this.velocity.isZero())
             this.world.removeEntity(this);
         if (this.age > this.life)

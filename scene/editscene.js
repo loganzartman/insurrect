@@ -60,8 +60,8 @@ var EditScene = {
         GameScene.LOOK_INTENSITY = 0.4;
     },
 
-    frame: function(timescale) {
-        GameScene.frame(timescale);
+    frame: function(timescale, ticks) {
+        GameScene.frame(timescale, ticks);
         
         //update debug text
         EditScene.debugText.text = "Editor: " + GameScene.world.levelName;
@@ -70,10 +70,12 @@ var EditScene = {
         );
         var onscreen = GameScene.world.obstacles.reduce(
             (val,o) => GameScene.inView(o.poly) ? o.vertices.length + val : val, 0
-        )
+        );
+        var entities = GameScene.world.entities.length;
         EditScene.debugText.text += "\nFPS (avg): " + (1000 / Game.frametime).toFixed(0);
         EditScene.debugText.text += "\n#Vertices: " + vertices;
         EditScene.debugText.text += "\n#Visible: " + onscreen;
+        EditScene.debugText.text += "\n#Entities: " + entities;
         Display.renderer.render(EditScene.debugText, EditScene.debugTextTexture);
     }
 }

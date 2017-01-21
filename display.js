@@ -3,6 +3,12 @@ var Display = {
 	h: 240,
 	padding: 4,
 	stage: null,
+
+	/**
+	 * Initialize display functionality
+	 * @param scale the scaling multiplier for the display
+	 * @param element the container for the display canvas
+	 */
 	init: function(scale, element) {
 		Display.scale = scale;
 
@@ -24,10 +30,10 @@ var Display = {
 
 	        var resolutionMultiplier = navigator.isCocoonJS ? this.resolution : 1.0 / this.resolution;
 
-	        //////////////////////////////////////
-	        // This is the only modification:
+	        /**********************************/
+	        /* This is the only modification: */
 	        resolutionMultiplier /= scale;
-	        //////////////////////////////////////
+	        /**********************************/
 
 	        point.x = (x - rect.left) * (this.interactionDOMElement.width / rect.width) * resolutionMultiplier;
 	        point.y = (y - rect.top) * (this.interactionDOMElement.height / rect.height) * resolutionMultiplier;
@@ -53,8 +59,13 @@ var Display = {
 		Display.renderer.plugins.interaction.setTargetElement(Display.canvas);
 	},
 
+	/**
+	 * Update the display.
+	 * Renders main Pixi container and copies to display canvas.
+	 * @param timescale time elapsed as a fraction of expected time
+	 */
 	frame: function(timescale) {
-		//draw stuff
+		//draw mouse cursor
 		Display.gfx.clear();
 		Display.gfx.lineStyle(1, Core.color.acc1, 1);
 		Display.gfx.drawCircle(
@@ -62,7 +73,7 @@ var Display = {
 			Input.mouse.left || Input.mouse.right ? 5 + Math.random() : 3
 		);
 
-		//render to screen
+		//render using Pixi and then copy Pixi canvas to display canvas
 		Display.renderer.render(Display.stage);
 		Display.cctx.drawImage(
 			Display.buffer,
@@ -71,6 +82,14 @@ var Display = {
 		);
 	},
 
+	/**
+	 * Builds an interactive button
+	 * @param text the text to display
+	 * @param color1 the primary color of the button
+	 * @param color2 the hover color of the button
+	 * @param action a callback that is called upon click
+	 * @return a Pixi Container
+	 */
 	makeButton: function(text, color1, color2, action) {
 		var cont = new PIXI.Container();
 

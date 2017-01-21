@@ -4,7 +4,11 @@ var Core = {
 	init: function() {
 		if (!Core.sanityCheck())
 			return;
+
+		//initialize temporary graphics for loading screen
 		Core.loaderGfx.init();
+
+		//load game metadata
 		Core.load.json("game.json").then(function(data){
 			Core.loaderGfx.progress(0.1);
 			Core.data = data;
@@ -15,7 +19,7 @@ var Core = {
 				Core.color[key] = parseInt(Core.data.colors[key], 16);
 			});
 
-			//load scripts
+			//load scripts sequentially
 			var loadScript = function(i){
 				if (i === data.scripts.sources.length)
 					Core.scriptsLoaded();
@@ -34,6 +38,10 @@ var Core = {
 		});
 	},
 
+	/**
+	 * Quickly checks a couple arbitrary ES6 APIs to guess whether the browser
+	 * will support the game and gracefully display an error message if not.
+	 */
 	sanityCheck: function() {
 		var cont = document.getElementById("container");
 		if (typeof Map === "undefined" || typeof Promise === "undefined") {
@@ -46,16 +54,19 @@ var Core = {
 		return true;
 	},
 
+	/**
+	 * Callback for script load completion (can assume that all game scripts
+	 * are ready)
+	 */
 	scriptsLoaded: function() {
+		//use Pixi resource loader to load game assets
 		var loader = PIXI.loader;
 		Object.keys(Core.data.resources).forEach(function(n){loader.add(n, Core.data.resources[n])});
 		loader.on("complete", function(){
 			Core.loaderGfx.progress(1);
-
-			//alias
-			Core.resource = loader.resources;
-
+			Core.resource = loader.resources; //alias
 			Core.loaderGfx.destroy();
+
 			//call main entrypoint function
 			var f = window;
 			Core.data.scripts.init.split(".").forEach(function(v){f = f[v]});
@@ -64,6 +75,9 @@ var Core = {
 		loader.load();
 	},
 
+	/**
+	 * Small utility for displaying graphics before scripts are loaded.
+	 */
 	loaderGfx: {
 		barWidth: 200,
 		barHeight: 24,
@@ -127,8 +141,10 @@ var Core = {
 		},
 
 		/**
-		 * Loads a JSON file and passes the parsed result to success callback.
-		 * If the file cannot be loaded, calls the fail callback.
+		 * Loads a JSON file and passes the parsed result to the resolve
+		 * function.
+		 * @param url url
+		 * @return a Promise
 		 */
 		json: function(url) {
 			return new Promise(function(resolve, reject){
@@ -141,6 +157,11 @@ var Core = {
 			});
 		},
 
+		/**
+		 * Loads a script and executes it immediately upon completion.
+		 * @param src url
+		 * @return a Promise
+		 */
 		script: function(src) {
 			return new Promise(function(resolve, reject){
 				var script = document.createElement("script");
@@ -149,20 +170,6 @@ var Core = {
 				};
 				script.src = src;
 				document.body.appendChild(script);
-			});
-		},
-
-		image: function(src, name) {
-			return new Promise(function(resolve, reject){
-				var img = new Image();
-				img.onload = function(){
-					Core.image[name] = img;
-					resolve(true);
-				};
-				img.onerror = function(err){
-					reject(err);
-				};
-				img.src = src;
 			});
 		}
 	}

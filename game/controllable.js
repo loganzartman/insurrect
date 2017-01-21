@@ -27,7 +27,7 @@ class Controllable extends Entity {
 		this.listen("input", this.handleInputs);
 	}
 
-	frame(timescale) {
+	frame(timescale, ticks) {
 		//handle movement input
 		var controlled = false;
 		if (!this.input.move.isZero()) {
@@ -49,10 +49,11 @@ class Controllable extends Entity {
 
 		//handle click input
 		if (this.input.fire) {
-			this.fire(this.input.look);
+			for (let i=0; i<ticks; i++)
+				this.fire(this.input.look);
 		}
 
-		super.frame(timescale);
+		super.frame(timescale, ticks);
 	}
 
 	/**

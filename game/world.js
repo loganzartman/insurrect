@@ -96,7 +96,7 @@ class World extends Emitter {
         this.addObstacle(obstacle);
 	}
 
-    frame(timescale) {
+    frame(timescale, ticks) {
         this.time += timescale / Game.targetFps;
 
         //update obstacles
@@ -106,7 +106,7 @@ class World extends Emitter {
 
 		//update entities
 		this.entities.forEach(function(entity){
-			entity.frame(timescale);
+			entity.frame(timescale, ticks);
 			entity.draw();
 		});
     }

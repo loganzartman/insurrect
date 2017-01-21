@@ -72,7 +72,7 @@ class Entity extends Emitter {
 		}
 	}
 
-	frame(timescale) {
+	frame(timescale, ticks) {
 		this.emit("frameStart");
 		if (!this.velocity.isZero())
 			this.move(this.velocity.mult(timescale));

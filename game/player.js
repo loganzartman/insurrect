@@ -3,7 +3,7 @@ class Player extends Controllable {
 		super(params);
 	}
 
-	frame(timescale) {
+	frame(timescale, ticks) {
 		//calculate movement input
 		var move = new Vector(0,0);
 		if (Input.keys[Input.key.UP])
@@ -26,7 +26,7 @@ class Player extends Controllable {
 			fire: Input.mouse.left
 		});
 
-		super.frame(timescale);
+		super.frame(timescale, ticks);
 	}
 
 	fire(lookVector) {
