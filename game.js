@@ -5,7 +5,8 @@ var Game = {
 
 	init: function() {
 		//initialize core functionality
-		Display.init(3, document.querySelector("#container"));
+		Display.calculateDimensions();
+		Display.init(document.querySelector("#container"));
 		Input.init(Display.canvas, Core.data.inputBindings);
 
 		//initialize scenes
@@ -14,6 +15,9 @@ var Game = {
 		GameScene.init({world: world});
 		EditScene.init();
 		Game.setScene(TitleScene);
+
+		//emit a display resize event
+		Display.events.emit("resize");
 
 		//fps monitoring
 		var frametimes = [];

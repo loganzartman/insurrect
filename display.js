@@ -1,16 +1,13 @@
-var Display = {
-	w: 320,
-	h: 240,
-	padding: 4,
-	stage: null,
-
+class Display {
 	/**
 	 * Initialize display functionality
 	 * @param scale the scaling multiplier for the display
 	 * @param element the container for the display canvas
 	 */
-	init: function(scale, element) {
-		Display.scale = scale;
+	static init(element) {
+		Display.padding = 4;
+		Display.stage = null;
+		Display.events = new Emitter();
 
 		//create rendering canvas
 		Display.buffer = document.createElement("canvas");
@@ -32,7 +29,7 @@ var Display = {
 
 	        /**********************************/
 	        /* This is the only modification: */
-	        resolutionMultiplier /= scale;
+	        resolutionMultiplier /= Display.scale;
 	        /**********************************/
 
 	        point.x = (x - rect.left) * (this.interactionDOMElement.width / rect.width) * resolutionMultiplier;
@@ -49,22 +46,44 @@ var Display = {
 
 		//create output canvas
 		Display.canvas = document.createElement("canvas");
-		Display.canvas.width = Math.ceil(Display.w * scale);
-		Display.canvas.height = Math.ceil(Display.h * scale);
+		Display.canvas.width = Math.ceil(Display.w * Display.scale);
+		Display.canvas.height = Math.ceil(Display.h * Display.scale);
 		Display.cctx = Display.canvas.getContext("2d");
 		Display.cctx.imageSmoothingEnabled = false;
 		element.appendChild(Display.canvas);
 
 		//rig PIXI interaction to work with custom display scaling
 		Display.renderer.plugins.interaction.setTargetElement(Display.canvas);
-	},
+
+		window.addEventListener("resize", function(){
+			Display.calculateDimensions();
+			Display.applyDimensions();
+		}, false);
+	}
+
+	static applyDimensions() {
+		Display.renderer.resize(Display.w, Display.h);
+		Display.canvas.width = Math.ceil(Display.w * Display.scale);
+		Display.canvas.height = Math.ceil(Display.h * Display.scale);
+		Display.cctx.imageSmoothingEnabled = false;
+		this.events.emit("resize");
+	}
+
+	static calculateDimensions() {
+		var w = window.innerWidth;
+		var h = window.innerHeight;
+		var scale = w / 480;
+		Display.scale = Math.floor(scale);
+		Display.w = Math.floor(w / Display.scale);
+		Display.h = Math.floor(h / Display.scale);
+	}
 
 	/**
 	 * Update the display.
 	 * Renders main Pixi container and copies to display canvas.
 	 * @param timescale time elapsed as a fraction of expected time
 	 */
-	frame: function(timescale) {
+	static frame(timescale) {
 		//draw mouse cursor
 		Display.gfx.clear();
 		Display.gfx.lineStyle(1, Core.color.acc1, 1);
@@ -80,7 +99,7 @@ var Display = {
 			0, 0,
 			Display.canvas.width, Display.canvas.height
 		);
-	},
+	}
 
 	/**
 	 * Builds an interactive button
@@ -90,7 +109,7 @@ var Display = {
 	 * @param action a callback that is called upon click
 	 * @return a Pixi Container
 	 */
-	makeButton: function(text, color1, color2, action) {
+	static makeButton(text, color1, color2, action) {
 		var cont = new PIXI.Container();
 
 		//create text
@@ -123,9 +142,9 @@ var Display = {
 		cont.addChild(gfx);
 		cont.addChild(txt);
 		return cont;
-	},
+	}
 
-	centerObj: function(displayObj, h, v) {
+	static centerObj(displayObj, h, v) {
 		if (h)
 			displayObj.position.x = Math.floor((Display.w - displayObj.width) / 2);
 		if (v)

@@ -2,7 +2,7 @@ var GameScene = {
 	stage: null,
 	t0: 0,
 	view: new Vector(0,0),
-	viewOffset: new Vector(-Display.w/2, - Display.h/2),
+	viewOffset: null,
 	viewTarget: new Vector(0,0),
 	VIEW_SPEED: 0.2,
 	LOOK_INTENSITY: 0.4,
@@ -56,6 +56,12 @@ var GameScene = {
 		//contains world objects
 		GameScene.objectContainer = new PIXI.Container();
 		GameScene.viewContainer.addChild(GameScene.objectContainer);
+
+		//handle display resizes
+		Display.events.listen("resize", evt => {
+			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);
+			GameScene.maskTexture.resize(Display.w, Display.h);
+		});
 	},
 
 	/**

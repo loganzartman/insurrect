@@ -2,13 +2,13 @@
 	"scripts": {
 		"sources": [
 			"pixi.js",
+			"emitter.js",
 			"game.js",
 			"util.js",
 			"display.js",
 			"input.js",
 			"vector.js",
 			"polygon.js",
-			"emitter.js",
 			"scene/titlescene.js",
 			"scene/gamescene.js",
 			"scene/editscene.js",

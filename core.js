@@ -83,8 +83,8 @@ var Core = {
 		barHeight: 24,
 		init: function() {
 			Core.loaderGfx.canv = document.createElement("canvas");
-			Core.loaderGfx.canv.width = 320*3;
-			Core.loaderGfx.canv.height = 240*3;
+			Core.loaderGfx.canv.width = window.innerWidth;
+			Core.loaderGfx.canv.height = window.innerHeight;
 			Core.loaderGfx.ctx = Core.loaderGfx.canv.getContext("2d");
 			document.getElementById("container").appendChild(Core.loaderGfx.canv);
 		},
