@@ -56,13 +56,12 @@ class Vector {
 		return new Vector(-this.x, -this.y);
 	}
 
-	mult(a,b) {
-		if (typeof b === "undefined") b = a;
+	mult(a, b=a) {
 		return new Vector(this.x * a, this.y * b);
 	}
 
-	div(a) {
-		return new Vector(this.x / a, this.y / a);
+	div(a, b=a) {
+		return new Vector(this.x / a, this.y / b);
 	}
 
 	dot(v) {
@@ -102,6 +101,10 @@ class Vector {
 		return new Vector(this.x / len, this.y / len);
 	}
 
+	unit() {
+		return this.normalize();
+	}
+
 	isZero() {
 		return this.x === 0 && this.y === 0;
 	}
@@ -115,6 +118,8 @@ class Vector {
 	toPixiPoint() {
 		return new PIXI.Point(this.x, this.y);
 	}
-}
 
-Vector.prototype.unit = Vector.prototype.normalize;
+	serialize() {
+		return [this.x, this.y];
+	}
+}

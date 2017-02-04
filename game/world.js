@@ -14,6 +14,7 @@ class World extends Emitter {
         this.time = 0;
         this.entities = [];
         this.obstacles = [];
+        this.prefabs = [];
 
         //build level
         this.buildLevel(this.levelName);
@@ -110,5 +111,24 @@ class World extends Emitter {
 			entity.frame(timescale, ticks);
 			entity.draw();
 		});
+    }
+
+    serializeObstacles(data) {
+    	if (!data.hasOwnProperty("obstacles"))
+    		data.objects = [];
+    	this.obstacles.forEach(obstacle => {
+    		data.objects.push(obstacle.serialize());
+    	});
+    }
+
+    serializeEntities(data) {
+
+    }
+
+    serialize() {
+    	var data = {};
+    	this.serializeObstacles(data);
+    	this.serializeEntities(data);
+    	return data;
     }
 }
