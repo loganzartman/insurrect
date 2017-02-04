@@ -9,6 +9,8 @@ var Game = {
 		Display.init(document.querySelector("#container"));
 		Input.init(Display.canvas, Core.data.inputBindings);
 
+		Game.events = new Emitter();
+
 		//initialize scenes
 		TitleScene.init();
 		var world = new World({levelName: "demo"});
@@ -69,6 +71,10 @@ var Game = {
 		scene.activate();
 		Display.stage = scene.stage;
 		Display.stage.addChildAt(Display.gfx, Display.stage.children.length);
+		Game.events.emit("sceneChanged", {
+			active: scene,
+			previous: Game.activeScene
+		});
 		Game.activeScene = scene;
 	},
 
@@ -78,6 +84,7 @@ var Game = {
 	start: function() {
 		GameScene.world.reset(); //TODO: maybe reactivation will occur without
 		                         //resetting the game?
+		Game.events.emit("gameStart");
 	},
 
 	/**

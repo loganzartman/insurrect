@@ -35,7 +35,7 @@ class Player extends Controllable {
 				position: this.position.clone(),
 				velocity: Vector.fromDir(
 					lookVector.dir() + Math.random()*0.2 - 0.1,
-					10 + Math.random()*4
+					16 + Math.random()*4
 				),
 				elasticity: 0.3,
 				friction: 0.06,

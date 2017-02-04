@@ -5,11 +5,12 @@ var GameScene = {
 	viewOffset: null,
 	viewTarget: new Vector(0,0),
 	VIEW_SPEED: 0.2,
-	LOOK_INTENSITY: 0.4,
+	LOOK_INTENSITY: 0.33,
 
 	init: function(params) {
 		//world setup
 		GameScene.world = params.world;
+		GameScene.world.scene = GameScene;
 
 		GameScene.world.listen("addEntity", ent => {
 			GameScene.objectContainer.addChild(ent.gfx);

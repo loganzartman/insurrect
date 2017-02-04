@@ -4,6 +4,7 @@
 class World extends Emitter {
     constructor(params) {
         super(params);
+        this.scene = null;
         this.levelName = params.levelName;
         this.reset();
     }
