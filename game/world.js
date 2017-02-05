@@ -78,8 +78,12 @@ class World extends Emitter {
 	buildPrefab(name, position) {
 		var data = Core.data.prefabs[name];
 		var type = data.type;
-		if (type === "obstacle")
-			this.buildObstacle(data, position);
+		if (type === "obstacle") {
+			var obs = this.buildObstacle(data, position);
+            obs.prefabName = name;
+            return obs;
+        }
+        return null;
 	}
 
 	/**
@@ -93,6 +97,7 @@ class World extends Emitter {
 			position: position
 		});
         this.addObstacle(obstacle);
+        return obstacle;
 	}
 
     frame(timescale, ticks) {

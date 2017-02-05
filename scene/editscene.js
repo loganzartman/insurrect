@@ -31,23 +31,21 @@ var EditScene = {
         //Set up editor interaction
         GameScene.stage.on("click", function(){
             if (EditScene.selectedObstacle !== null)
-                GameScene.world.buildObstacle(
+                GameScene.world.buildPrefab(
                     EditScene.selectedObstacle,
                     EditScene.calculatePlaceLocation(new Vector(Input.mouse), EditScene.phantomObstacle)
                 );
         });
 
-        EditScene.selectObstacle({
-            type: "obstacle",
-            vertices: [new Vector(0,0), new Vector(16,0), new Vector(16,16), new Vector(0,16)]
-        });
+        EditScene.selectObstacle(Object.keys(Core.data.prefabs)[0]);
 
         Game.WALLHACKS = true;
         GameScene.LOOK_INTENSITY = 0;
     },
 
-    selectObstacle: function(data) {
-        EditScene.selectedObstacle = data;
+    selectObstacle: function(name) {
+        EditScene.selectedObstacle = name;
+        var data = Core.data.prefabs[name];
 
         //remove old phantom object graphics if any
         if (EditScene.phantomObstacle !== null)
@@ -85,7 +83,7 @@ var EditScene = {
             if (EditScene.selectIndex < 0)
                 EditScene.selectIndex += N;
 
-            EditScene.selectObstacle(Core.data.prefabs[prefabKeys[EditScene.selectIndex]]);
+            EditScene.selectObstacle(prefabKeys[EditScene.selectIndex]);
         }));
 
         //changes grid scale

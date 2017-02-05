@@ -2,9 +2,15 @@ class Obstacle {
 	constructor(params) {
 		if (!params.hasOwnProperty("vertices"))
 			throw new Error("Obstacle must have vertices!");
+		
+		params = Object.assign({
+			prefabName: null
+		}, params);
+
 		this.position = params.position;
 		this.vertices = params.vertices.map(v => new Vector(v).add(this.position));
 		this.poly = new Polygon(this.vertices);
+		this.prefabName = params.prefabName;
 
 		this.gfx = new PIXI.Graphics();
 		this.gfx.hitArea = this.poly.toPixiPolygon();
@@ -43,13 +49,19 @@ class Obstacle {
 
 	serialize() {
 		var data = {
-			type: "obstacle",
-			vertices: [],
 			position: this.position.serialize()
 		};
-		this.vertices.forEach(vertex => {
-			data.vertices.push(vertex.sub(this.position).serialize());
-		});
+
+		if (this.prefabName === null) {
+			data.type = "obstacle";
+			data.vertices = this.vertices.map(
+				vertex => vertex.sub(this.position).serialize());
+		}
+		else {
+			data.type = "prefab";
+			data.name = this.prefabName;
+		}
+
 		return data;
 	}
 }
