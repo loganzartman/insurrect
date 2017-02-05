@@ -3,7 +3,7 @@ class Obstacle {
 		if (!params.hasOwnProperty("vertices"))
 			throw new Error("Obstacle must have vertices!");
 		this.position = params.position;
-		this.vertices = params.vertices.map(v => v.add(this.position));
+		this.vertices = params.vertices.map(v => new Vector(v).add(this.position));
 		this.poly = new Polygon(this.vertices);
 
 		this.gfx = new PIXI.Graphics();
@@ -14,6 +14,10 @@ class Obstacle {
 
 	contains(point) {
 		return this.poly.contains(point.x, point.y);
+	}
+
+	getBounds() {
+		return this.poly.getBounds();
 	}
 
 	getSegments() {
@@ -44,7 +48,7 @@ class Obstacle {
 			position: this.position.serialize()
 		};
 		this.vertices.forEach(vertex => {
-			data.vertices.push(vertex.serialize());
+			data.vertices.push(vertex.sub(this.position).serialize());
 		});
 		return data;
 	}

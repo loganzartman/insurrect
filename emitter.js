@@ -7,6 +7,7 @@ class Emitter {
 		if (!this.listeners.hasOwnProperty(event))
 			this.listeners[event] = [];
 		this.listeners[event].push(callback);
+		return {event: event, callback: callback};
 	}
 
 	unlisten(event, callback) {

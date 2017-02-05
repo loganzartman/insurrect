@@ -18,6 +18,8 @@ var Input = {
 		document.addEventListener("contextmenu", function(e){e.preventDefault();}, false);
 		Input.displayElement = displayElement;
 
+		Input.events = new Emitter();
+
 		//load keybindings
 		Input.loadBindings(bindingMap);
 	},
@@ -38,12 +40,19 @@ var Input = {
 	//key press handler
 	handleKeydown: function(event){
 		Input.keys[event.keyCode] = true;
-		if (Input.vkList.indexOf(event.keyCode) >= 0) event.preventDefault();
+		if (Input.vkList.indexOf(event.keyCode) >= 0)
+			event.preventDefault();
+		Input.events.emit("keydown", {
+			keyCode: event.keyCode
+		});
 	},
 
 	//key release handler
 	handleKeyup: function(event){
 		Input.keys[event.keyCode] = false;
+		Input.events.emit("keyup", {
+			keyCode: event.keyCode
+		});
 	},
 
 	handleMousemove: function(event){

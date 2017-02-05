@@ -77,11 +77,9 @@ class World extends Emitter {
 	 */
 	buildPrefab(name, position) {
 		var data = Core.data.prefabs[name];
-		data.forEach(item => {
-			var type = item.type;
-			if (type === "obstacle")
-				this.buildObstacle(item, position);
-		});
+		var type = data.type;
+		if (type === "obstacle")
+			this.buildObstacle(data, position);
 	}
 
 	/**
@@ -90,9 +88,8 @@ class World extends Emitter {
 	 * @param position a vector at which to insert the obstacle
 	 */
     buildObstacle(data, position) {
-		var vertices = data.vertices.map(v => new Vector(v));
 		var obstacle = new Obstacle({
-			vertices: vertices,
+			vertices: data.vertices,
 			position: position
 		});
         this.addObstacle(obstacle);

@@ -46,6 +46,23 @@ class Polygon {
         return segments;
     }
 
+    /**
+     * Returns an AABB of this polygon
+     */
+    getBounds() {
+        var max = new Vector(this.points[0]), min = new Vector(this.points[0]);
+        this.points.forEach(point => {
+            max.x = Math.max(max.x, point.x);
+            max.y = Math.max(max.y, point.y);
+            min.x = Math.min(min.x, point.x);
+            min.y = Math.min(min.y, point.y);
+        });
+        return {
+            max: max,
+            min: min
+        };
+    }
+
     toPixiPolygon() {
         return new PIXI.Polygon(this.points.map(v => v.toPixiPoint()));
     }

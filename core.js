@@ -80,7 +80,7 @@ var Core = {
 	 */
 	loaderGfx: {
 		barWidth: 200,
-		barHeight: 24,
+		barHeight: 12,
 		init: function() {
 			Core.loaderGfx.canv = document.createElement("canvas");
 			Core.loaderGfx.canv.width = window.innerWidth;
@@ -103,7 +103,7 @@ var Core = {
 			c.lineWidth = 1;
 			c.translate(
 				w/2 - Core.loaderGfx.barWidth/2,
-				h/3 - Core.loaderGfx.barHeight/2
+				h/3 - Core.loaderGfx.barHeight/2 + 0.5
 			);
 			c.strokeRect(0,0,Core.loaderGfx.barWidth,Core.loaderGfx.barHeight);
 			c.fillRect(0,0,Core.loaderGfx.barWidth*val,Core.loaderGfx.barHeight);

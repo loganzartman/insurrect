@@ -1,9 +1,10 @@
 var EditScene = {
     stage: null,
+    selectIndex: 0,
     selectedObstacle: null,
     phantomObstacle: null,
     allowPlayerFire: false,
-    gridScale: 8,
+    gridScale: 1,
 
     init: function(params) {
         EditScene.stage = new PIXI.Container();
@@ -32,7 +33,7 @@ var EditScene = {
             if (EditScene.selectedObstacle !== null)
                 GameScene.world.buildObstacle(
                     EditScene.selectedObstacle,
-                    EditScene.calculatePlaceLocation(new Vector(Input.mouse)).add(GameScene.viewOffset)
+                    EditScene.calculatePlaceLocation(new Vector(Input.mouse), EditScene.phantomObstacle)
                 );
         });
 
@@ -45,18 +46,18 @@ var EditScene = {
         GameScene.LOOK_INTENSITY = 0;
     },
 
-    selectObstacle(data) {
+    selectObstacle: function(data) {
         EditScene.selectedObstacle = data;
+
+        //remove old phantom object graphics if any
+        if (EditScene.phantomObstacle !== null)
+            EditScene.stage.removeChild(EditScene.phantomObstacle.gfx);
+        
+        //create phantom object
         EditScene.phantomObstacle = new Obstacle(Object.assign({position: new Vector(0,0)}, data));
         EditScene.phantomObstacle.draw();
         EditScene.phantomObstacle.gfx.alpha = 0.75;
         EditScene.phantomObstacle.gfx.hitArea = new PIXI.Rectangle(0,0,0,0);
-
-        //remove old phantom object graphics if any
-        var idx = EditScene.stage.children.indexOf(EditScene.phantomObstacle.gfx);
-        if (idx >= 0) {
-            EditScene.stage.removeChild(EditScene.phantomObstacle.gfx);
-        }
 
         //add new phantom object graphics
         idx = EditScene.stage.children.indexOf(EditScene.overlayGfx);
@@ -64,6 +65,38 @@ var EditScene = {
     },
 
     initUI: function() {
+        //listeners
+        EditScene.inputListeners = [];
+
+        //cycles through prefabs that can be placed in level
+        EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
+            //increment or decrement selected prefab index           
+            if (event.keyCode === Input.key.PREV)
+                EditScene.selectIndex++;
+            else if (event.keyCode === Input.key.NEXT)
+                EditScene.selectIndex--;
+            else
+                return;
+
+            //wrap around
+            var prefabKeys = Object.keys(Core.data.prefabs);
+            var N = prefabKeys.length;
+            EditScene.selectIndex %= N;
+            if (EditScene.selectIndex < 0)
+                EditScene.selectIndex += N;
+
+            EditScene.selectObstacle(Core.data.prefabs[prefabKeys[EditScene.selectIndex]]);
+        }));
+
+        //changes grid scale
+        EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
+            if (event.keyCode === Input.key.LESS)
+                EditScene.gridScale/=2;
+            else if (event.keyCode === Input.key.MORE)
+                EditScene.gridScale*=2;
+            EditScene.gridScale = Math.min(16, Math.ceil(EditScene.gridScale));
+        }));
+
         //create graphics overlay
         EditScene.overlayGfx = new PIXI.Graphics();
 
@@ -82,9 +115,24 @@ var EditScene = {
         dbtDisplayShadow.position.y = 1;
         dbtDisplayShadow.tint = Core.color.bg2;
 
+        //create export button
+        var exportBtn = Display.makeButton("Export", Core.color.acc3,
+            Core.color.acc1, EditScene.doExport);
+        exportBtn.position.x = Display.w - exportBtn.width - 8;
+        exportBtn.position.y = 8;
+
         EditScene.stage.addChild(EditScene.overlayGfx);
         EditScene.stage.addChild(dbtDisplayShadow);
         EditScene.stage.addChild(dbtDisplayFore);
+        EditScene.stage.addChild(exportBtn);
+    },
+
+    doExport: function() {
+        var data = GameScene.world.serialize();
+        var str = JSON.stringify(data);
+        var url = "data:text/plain;base64,";
+        url += btoa(str);
+        window.open(url);
     },
 
     /**
@@ -94,32 +142,37 @@ var EditScene = {
     updateOverlay: function() {
         var gfx = EditScene.overlayGfx;
         gfx.clear();
+        gfx.blendMode = PIXI.BLEND_MODES.ADD;
         var pos = EditScene.calculatePlaceLocation(new Vector(Input.mouse));
-        pos = pos.sub(GameScene.view);
+        pos = pos.sub(GameScene.view).sub(GameScene.viewOffset);
 
-        //placement grid calculations
-        const GRID_RANGE_PX = 64;
-        var steps = Math.ceil(GRID_RANGE_PX / EditScene.gridScale);
-        var x0 = pos.x - GRID_RANGE_PX;
-        var x1 = pos.x + GRID_RANGE_PX;
-        var y0 = pos.y - GRID_RANGE_PX;
-        var y1 = pos.y + GRID_RANGE_PX;
-        var opacity = z => (1-Math.abs(z/steps))*0.25;
+        if (EditScene.gridScale > 1) {
+            //placement grid calculations
+            const GRID_RANGE_PX = 64;
+            var steps = Math.ceil(GRID_RANGE_PX / EditScene.gridScale);
+            var x0 = pos.x - GRID_RANGE_PX;
+            var x1 = pos.x + GRID_RANGE_PX;
+            var y0 = pos.y - GRID_RANGE_PX;
+            var y1 = pos.y + GRID_RANGE_PX;
+            var opacity = 0.1;
 
-        //draw placement grid
-        for (let y=-steps; y<=steps; y++) { 
-            gfx.lineStyle(1, 0x900000, opacity(y));
-            gfx.moveTo(x0, pos.y+y*EditScene.gridScale);
-            gfx.lineTo(x1, pos.y+y*EditScene.gridScale);
-        }
-        for (let x=-steps; x<=steps; x++) { 
-            gfx.lineStyle(1, 0x900000, opacity(x));
-            gfx.moveTo(pos.x+x*EditScene.gridScale, y0);
-            gfx.lineTo(pos.x+x*EditScene.gridScale, y1);
+            //draw placement grid
+            for (let y=-steps; y<=steps; y++) { 
+                gfx.lineStyle(1, 0xFFFFFF, opacity);
+                gfx.moveTo(x0, pos.y+y*EditScene.gridScale);
+                gfx.lineTo(x1, pos.y+y*EditScene.gridScale);
+            }
+            for (let x=-steps; x<=steps; x++) { 
+                gfx.lineStyle(1, 0xFFFFFF, opacity);
+                gfx.moveTo(pos.x+x*EditScene.gridScale, y0);
+                gfx.lineTo(pos.x+x*EditScene.gridScale, y1);
+            }
         }
 
         //move phantom object
         if (EditScene.phantomObstacle !== null) {
+            pos = EditScene.calculatePlaceLocation(new Vector(Input.mouse), EditScene.phantomObstacle);
+            pos = pos.sub(GameScene.view).sub(GameScene.viewOffset);
             EditScene.phantomObstacle.gfx.position = pos;
         }
     },
@@ -131,10 +184,19 @@ var EditScene = {
      * @param mouse screen-relative mouse Vector (i.e. Input.mouse)
      * @return world-relative placement Vector
      */
-    calculatePlaceLocation: function(mouse) {
-        mouse = mouse.add(GameScene.view).div(EditScene.gridScale);
-        mouse.x = Math.floor(mouse.x);
-        mouse.y = Math.floor(mouse.y);
+    calculatePlaceLocation: function(mouse, object) {
+        var offset = new Vector();
+        
+        if (typeof object !== "undefined") {
+            var bounds = object.getBounds();
+            offset = bounds.max.sub(bounds.min).sub(object.position).div(-2);
+            offset = offset.sub(bounds.min);
+        }
+        
+        mouse = mouse.add(offset).add(GameScene.view).add(GameScene.viewOffset)
+            .div(EditScene.gridScale);
+        mouse.x = Math.round(mouse.x);
+        mouse.y = Math.round(mouse.y);
         mouse = mouse.mult(EditScene.gridScale);
         return mouse;
     },
@@ -159,6 +221,7 @@ var EditScene = {
         GameScene.deactivate();
         EditScene.stage.removeChild(GameScene.stage);
         GameScene.world.unlisten("addObstacle", this.handleAddObstacle);
+        EditScene.inputListeners.forEach(l => Input.events.unlisten(l.event, l.callback));
         Game.WALLHACKS = false;
         GameScene.LOOK_INTENSITY = 0.4;
     },
@@ -180,6 +243,8 @@ var EditScene = {
         EditScene.debugText.text += "\n#Vertices: " + vertices;
         EditScene.debugText.text += "\n#Visible: " + onscreen;
         EditScene.debugText.text += "\n#Entities: " + entities;
+        EditScene.debugText.text += "\n[ and ] cycles prefabs.";
+        EditScene.debugText.text += "\n+ and - to change grid size.";
         Display.renderer.render(EditScene.debugText, EditScene.debugTextTexture);
     }
 }
