@@ -10,7 +10,6 @@ var Core = {
 
 		//load game metadata
 		Core.load.json("game.json").then(function(data){
-			Core.loaderGfx.progress(0.1);
 			Core.data = data;
 
 			//parse colors
@@ -19,20 +18,20 @@ var Core = {
 				Core.color[key] = parseInt(Core.data.colors[key], 16);
 			});
 
+			Core.loaderGfx.progress(0.1);
+
 			//load scripts sequentially
-			var loadScript = function(i){
-				if (i === data.scripts.sources.length)
-					Core.scriptsLoaded();
-				else {
-					Core.load.script(data.scripts.sources[i]).then(function(){
-						Core.loaderGfx.progress(0.1 + i/data.scripts.sources.length*0.7);
-						loadScript(i+1);
-					}).catch(function(err){
-						console.error("Error loading scripts: \n"+err);
-					});
-				}
-			};
-			loadScript(0);
+			var loaded = 0;
+			for (var i=0, j=data.scripts.sources.length; i<j; i++) {
+				Core.load.script(data.scripts.sources[i]).then(function(){
+					loaded++;
+					Core.loaderGfx.progress(0.1 + loaded/j*0.9);
+					if (loaded === j)
+						Core.scriptsLoaded();
+				}).catch(function(err){
+					console.error("Error loading scripts: \n"+err);
+				});
+			}
 		}).catch(function(err){
 			console.error("Could not load game data:\n"+err);
 		});
@@ -81,26 +80,45 @@ var Core = {
 	loaderGfx: {
 		barWidth: 200,
 		barHeight: 12,
+		prog: 0,
+		progTgt: 0,
 		init: function() {
 			Core.loaderGfx.canv = document.createElement("canvas");
 			Core.loaderGfx.canv.width = window.innerWidth;
 			Core.loaderGfx.canv.height = window.innerHeight;
 			Core.loaderGfx.ctx = Core.loaderGfx.canv.getContext("2d");
 			document.getElementById("container").appendChild(Core.loaderGfx.canv);
+			Core.loaderGfx.timer = setInterval(Core.loaderGfx.redraw, 16);
 		},
-		color: function(packed) {
-			return "#" + packed.toString(16);
+		color: function(packed, alpha) {
+			if (typeof alpha === "undefined")
+				alpha = 1.0;
+			var red = (packed >>> 16) & 0xFF;
+			var grn = (packed >>> 8) & 0xFF;
+			var blu = (packed) & 0xFF;
+			return "rgba("+red+","+grn+","+blu+","+alpha+")";
 		},
-		progress: function(val) {
+		redraw: function() {
+			if (Core.loaderGfx.progTgt === 0)
+				return;
+
+			//update progress
+			var val = Core.loaderGfx.prog * 0.8 + Core.loaderGfx.progTgt * 0.2;
+			Core.loaderGfx.prog = val;
+
+			//aliases
 			var c = Core.loaderGfx.ctx;
 			var w = c.canvas.width, h = c.canvas.height;
 
+			//set style
 			c.save();
-			c.fillStyle = "black";
+			c.fillStyle = Core.loaderGfx.color(Core.color.bg1);
 			c.fillRect(0,0,w,h);
-			c.strokeStyle = "white";
-			c.fillStyle = "white";
+			var col = Core.loaderGfx.color(Core.color.acc1, val);
+			c.strokeStyle = col;
+			c.fillStyle = col;
 			c.lineWidth = 1;
+
 			c.translate(
 				w/2 - Core.loaderGfx.barWidth/2,
 				h/3 - Core.loaderGfx.barHeight/2 + 0.5
@@ -109,8 +127,12 @@ var Core = {
 			c.fillRect(0,0,Core.loaderGfx.barWidth*val,Core.loaderGfx.barHeight);
 			c.restore();
 		},
+		progress: function(val) {
+			Core.loaderGfx.progTgt = val;
+		},
 		destroy: function() {
 			document.getElementById("container").removeChild(Core.loaderGfx.canv);
+			clearInterval(Core.loaderGfx.timer);
 		}
 	},
 
@@ -169,6 +191,7 @@ var Core = {
 					resolve(true);
 				};
 				script.src = src;
+				script.async = false;
 				document.body.appendChild(script);
 			});
 		}

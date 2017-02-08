@@ -2,6 +2,7 @@ var Game = {
 	targetFps: 60,
 	activeScene: null,
 	WALLHACKS: false,
+	TIMEWARP: 1,
 
 	init: function() {
 		//initialize core functionality
@@ -42,11 +43,11 @@ var Game = {
 			var dt = -t0 + (t0 = Date.now());
 			Game.frametime = dt;
 			var timescale = dt / (1000 / Game.targetFps);
-			ticks += timescale;
+			ticks += timescale*Game.TIMEWARP;
 
 			//discard frames that take too long
 			if (dt < 500)
-				Game.frame(timescale, Math.floor(ticks));
+				Game.frame(timescale*Game.TIMEWARP, Math.floor(ticks));
 
 			ticks -= Math.floor(ticks);
 

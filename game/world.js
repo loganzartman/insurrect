@@ -105,13 +105,13 @@ class World extends Emitter {
 
         //update obstacles
 		this.obstacles.forEach(function(obstacle){
-			obstacle.draw();
+			obstacle.draw(timescale);
 		});
 
 		//update entities
 		this.entities.forEach(function(entity){
 			entity.frame(timescale, ticks);
-			entity.draw();
+			entity.draw(timescale);
 		});
     }
 

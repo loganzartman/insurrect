@@ -13,17 +13,18 @@ class Projectile extends Entity {
         this.oldVel = this.velocity.clone();
     }
 
-    draw() {
+    draw(timescale) {
     	this.gfx.position.x = this.position.x;
         this.gfx.position.y = this.position.y;
         if (!this.gfxDirty)
             return;
 
         this.gfxDirty = false;
+        var dx = this.oldPos.sub(this.position);
         this.gfx.clear();
         this.gfx.lineStyle(1, this.color, 1);
         this.gfx.moveTo(0,0);
-        this.gfx.lineTo(this.oldPos.x-this.position.x, this.oldPos.y-this.position.y);
+        this.gfx.lineTo(dx.x, dx.y);
     }
 
     frame(timescale) {

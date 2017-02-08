@@ -69,9 +69,9 @@ var EditScene = {
         //cycles through prefabs that can be placed in level
         EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
             //increment or decrement selected prefab index           
-            if (event.keyCode === Input.key.PREV)
+            if (event.keyCode === Input.key.NEXT)
                 EditScene.selectIndex++;
-            else if (event.keyCode === Input.key.NEXT)
+            else if (event.keyCode === Input.key.PREV)
                 EditScene.selectIndex--;
             else
                 return;
@@ -241,8 +241,8 @@ var EditScene = {
         EditScene.debugText.text += "\n#Vertices: " + vertices;
         EditScene.debugText.text += "\n#Visible: " + onscreen;
         EditScene.debugText.text += "\n#Entities: " + entities;
-        EditScene.debugText.text += "\n[ and ] cycles prefabs.";
-        EditScene.debugText.text += "\n+ and - to change grid size.";
+        EditScene.debugText.text += "\n[ and ] cycle prefabs.";
+        EditScene.debugText.text += "\n; and ' change grid size.";
         Display.renderer.render(EditScene.debugText, EditScene.debugTextTexture);
     }
 }
