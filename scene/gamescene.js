@@ -4,7 +4,11 @@ var GameScene = {
 	view: new Vector(0,0),
 	viewOffset: null,
 	viewTarget: new Vector(0,0),
-	VIEW_SPEED: 0.2,
+	viewVelocity: new Vector(0,0),
+	VIEW_ACC: 0.025,
+	VIEW_DAMP: 0.3,
+	VIEW_MOVE: 0.8,
+	VIEW_MOVE_EXP: 2,
 	LOOK_INTENSITY: 0.33,
 
 	init: function(params) {
@@ -190,9 +194,18 @@ var GameScene = {
 			.add(new Vector(Input.mouse)
 			.add(GameScene.viewOffset).mult(GameScene.LOOK_INTENSITY));
 
-		//move view toward target
-		GameScene.view = GameScene.view.mult(1-GameScene.VIEW_SPEED)
-			.add(GameScene.viewTarget.mult(GameScene.VIEW_SPEED));
+		//accelerate toward target
+		var viewAcc = GameScene.viewTarget.sub(GameScene.view).mult(GameScene.VIEW_ACC);
+		GameScene.viewVelocity = GameScene.viewVelocity.add(viewAcc).mult(1-GameScene.VIEW_DAMP);
+
+		//apply view velocity
+		GameScene.view = GameScene.view.add(GameScene.viewVelocity);
+
+		//move view toward target without respect to velocity
+		var dView = GameScene.viewTarget.sub(GameScene.view).div(Display.w);
+		var len = Math.pow(dView.len(), GameScene.VIEW_MOVE_EXP);
+		dView = dView.unit().mult(len);
+		GameScene.view = GameScene.view.add(dView.mult(Display.w * GameScene.VIEW_MOVE));
 
 		//move container to apply view position
 		GameScene.viewContainer.position = GameScene.view.negate().sub(GameScene.viewOffset);
