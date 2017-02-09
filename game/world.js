@@ -64,9 +64,9 @@ class World extends Emitter {
         var data = Core.data.levels[name];
 		data.objects.forEach(object => {
 			if (object.type === "obstacle")
-				this.buildObstacle(object, new Vector(object.position));
+				this.buildObstacle(object);
             else if (object.type === "prefab")
-                this.buildPrefab(object.name, new Vector(object.position));
+                this.buildPrefab(object);
 		});
     }
 
@@ -75,12 +75,14 @@ class World extends Emitter {
 	 * @param name the type of prefab as defined in game.json
 	 * @param position a vector at which to insert the prefab
 	 */
-	buildPrefab(name, position) {
-		var data = Core.data.prefabs[name];
-		var type = data.type;
+	buildPrefab(data) {
+		var prefabData = Object.assign({}, Core.data.prefabs[data.name]);
+        var type = prefabData.type;
+        prefabData = Object.assign(prefabData, data);
+        
 		if (type === "obstacle") {
-			var obs = this.buildObstacle(data, position);
-            obs.prefabName = name;
+			var obs = this.buildObstacle(prefabData);
+            obs.prefabName = data.name;
             return obs;
         }
         return null;
@@ -91,11 +93,9 @@ class World extends Emitter {
 	 * @param data the data for this obstacle
 	 * @param position a vector at which to insert the obstacle
 	 */
-    buildObstacle(data, position) {
-		var obstacle = new Obstacle({
-			vertices: data.vertices,
-			position: position
-		});
+    buildObstacle(data) {
+        data = Object.assign({}, data); //clone
+		var obstacle = new Obstacle(data);
         this.addObstacle(obstacle);
         return obstacle;
 	}

@@ -4,18 +4,42 @@ class Obstacle {
 			throw new Error("Obstacle must have vertices!");
 		
 		params = Object.assign({
+			rotation: 0,
 			prefabName: null
 		}, params);
 
-		this.position = params.position;
-		this.vertices = params.vertices.map(v => new Vector(v).add(this.position));
-		this.poly = new Polygon(this.vertices);
-		this.prefabName = params.prefabName;
+		this.position = new Vector(params.position);
+		this.rotation = params.rotation;
+		
+		//save un-transformed vertices
+		this.originalVertices = params.vertices.map(v => new Vector(v));
 
+		this.prefabName = params.prefabName;
 		this.gfx = new PIXI.Graphics();
-		this.gfx.hitArea = this.poly.toPixiPolygon();
 		this.gfx.interactive = true;
+
+		this.updateTransform();
+	}
+
+	updateTransform() {
+		//rotate and offset vertices
+		var bounds = new Polygon(this.originalVertices).getBounds();
+		var offset = bounds.max.sub(bounds.min).div(-2).sub(bounds.min); //offset to center object on origin
+		this.vertices = this.originalVertices.map(v => {
+			var centered = v.add(offset); //use centered vertices to perform rotation
+			var dir = centered.dir() + this.rotation * Math.PI / 180;
+			var len = centered.len();
+			return Vector.fromDir(dir, len).add(this.position).sub(offset);
+		});
+
+		//construct polygon
+		this.poly = new Polygon(this.vertices);
+
+		//update graphics
+		this.gfx.hitArea = this.poly.toPixiPolygon();
 		this.gfxDirty = true;
+
+		delete this.segments; //one sneaky trick to regenerate segments
 	}
 
 	contains(point) {
@@ -54,8 +78,7 @@ class Obstacle {
 
 		if (this.prefabName === null) {
 			data.type = "obstacle";
-			data.vertices = this.vertices.map(
-				vertex => vertex.sub(this.position).serialize());
+			data.vertices = this.originalVertices.map(v => v.serialize());
 		}
 		else {
 			data.type = "prefab";

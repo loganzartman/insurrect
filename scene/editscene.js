@@ -30,11 +30,14 @@ var EditScene = {
 
         //Set up editor interaction
         GameScene.stage.on("click", function(){
-            if (EditScene.selectedObstacle !== null)
-                GameScene.world.buildPrefab(
-                    EditScene.selectedObstacle,
-                    EditScene.calculatePlaceLocation(new Vector(Input.mouse), EditScene.phantomObstacle)
-                );
+            if (EditScene.selectedObstacle !== null) {
+                GameScene.world.buildPrefab({
+                    type: "prefab",
+                    name: EditScene.selectedObstacle,
+                    position: EditScene.calculatePlaceLocation(new Vector(Input.mouse), EditScene.phantomObstacle),
+                    rotation: EditScene.phantomObstacle.rotation
+                });
+            }
         });
 
         EditScene.selectObstacle(Object.keys(Core.data.prefabs)[0]);
@@ -93,6 +96,15 @@ var EditScene = {
             else if (event.keyCode === Input.key.MORE)
                 EditScene.gridScale*=2;
             EditScene.gridScale = Math.min(16, Math.ceil(EditScene.gridScale));
+        }));
+
+        //rotates object
+        EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
+            if (event.keyCode === Input.key.R) {
+                EditScene.phantomObstacle.rotation = (EditScene.phantomObstacle.rotation + 90) % 360;
+                EditScene.phantomObstacle.updateTransform();
+                EditScene.phantomObstacle.draw();
+            }
         }));
 
         //create graphics overlay
@@ -186,7 +198,7 @@ var EditScene = {
         var offset = new Vector();
         
         if (typeof object !== "undefined") {
-            var bounds = object.getBounds();
+            var bounds = new Polygon(object.originalVertices).getBounds();
             offset = bounds.max.sub(bounds.min).sub(object.position).div(-2);
             offset = offset.sub(bounds.min);
         }

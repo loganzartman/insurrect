@@ -41,7 +41,7 @@ var TitleScene = {
 
 	frame: function(timescale) {
 		var t = TitleScene.time += timescale / Game.targetFps;
-		TitleScene.title.position.x = (Display.w-TitleScene.title.width)/2;
+		TitleScene.title.position.x = Math.floor((Display.w-TitleScene.title.width)/2);
 		var f = 1 - Math.pow(Math.max(0, 1-t/1.5), 2);
 		TitleScene.title.position.y = Math.floor(-f * 30 + 40);
 		TitleScene.title.alpha = f;
