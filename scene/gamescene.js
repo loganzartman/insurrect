@@ -62,6 +62,24 @@ var GameScene = {
 		GameScene.objectContainer = new PIXI.Container();
 		GameScene.viewContainer.addChild(GameScene.objectContainer);
 
+		//create debug text
+        GameScene.debugText = new PIXI.extras.BitmapText("debug: ", {
+            font: "AndinaBold",
+            tint: 0xFFFFFF
+        });
+        GameScene.debugText.position = new PIXI.Point(8,8);
+        
+        //create text shadow
+        GameScene.debugTextTexture = new PIXI.RenderTexture(Display.w, Display.h);
+        var dbtDisplayFore = new PIXI.Sprite(GameScene.debugTextTexture);
+        dbtDisplayFore.tint = Core.color.acc1;
+        var dbtDisplayShadow = new PIXI.Sprite(GameScene.debugTextTexture);
+        dbtDisplayShadow.position.y = 1;
+        dbtDisplayShadow.tint = Core.color.bg2;
+
+        GameScene.stage.addChild(dbtDisplayShadow);
+        GameScene.stage.addChild(dbtDisplayFore);
+
 		//handle display resizes
 		Display.events.listen("resize", evt => {
 			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);
@@ -101,6 +119,7 @@ var GameScene = {
 		//collect visible polygons
 		viewRect = GameScene.getViewRect();
 		viewRect.noDisplay = true;
+		var viewSegs = viewRect.getSegments();
 		var polygons = [];
 		var segments = [];
 		GameScene.world.obstacles.forEach(function(object){
@@ -111,7 +130,7 @@ var GameScene = {
 		});
 		polygons.push(viewRect);
 
-		//cast ray from position to each vertexa
+		//cast ray from position to each vertex
 		var intersections = [];
 		var vertices = [];
 		polygons.forEach(function(p){
@@ -125,29 +144,36 @@ var GameScene = {
 
 		//avoid getting stuck on corners
 		var angles = vertices.map(v => v.sub(position).dir());
+		var temp = [];
 		angles.forEach(a => {
-			angles.push(a - 0.00001);
-			angles.push(a + 0.00001);
+			temp.push(a - 0.00001);
+			// temp.push(a);
+			temp.push(a + 0.00001);
 		});
+		angles = temp;
 
 		var visiblePolys = [];
 		angles.forEach(function(dir){
 			var min = null;
 			var minPoly = null;
-			polygons.forEach(function(polygon){
-				for (var i=0,j=polygon.points.length; i<j; i++) {
-					var pointA = polygon.points[i];
-					var pointB = polygon.points[(i+1)%j];
-					var result = Util.geom.raySegIntersect(
-						position, Vector.fromDir(dir), pointA, pointB);
-					if (result !== null) {
-						if (min === null || result.param < min.param) {
-							min = result;
-							minPoly = polygon;
-						}
+			
+			var dirVector = Vector.fromDir(dir);
+			var segs = GameScene.world.segSpace.getRaycast(
+				GameScene.world.player.position.x, GameScene.world.player.position.y,
+				dirVector.x, dirVector.y, Math.max(Display.w, Display.h)
+			);
+			viewSegs.forEach(function(segment){segs.push(segment)});
+			segs.forEach(function(segment){
+				var result = Util.geom.raySegIntersect(
+						position, dirVector, segment);
+				if (result !== null) {
+					if (min === null || result.param < min.param) {
+						min = result;
+						minPoly = segment.parentPolygon;
 					}
 				}
-			});
+			})
+
 			if (min !== null) {
 				intersections.push(new Vector(min.x, min.y));
 				if (includeObjects && !minPoly.noDisplay && !visiblePolys.includes(minPoly))
@@ -255,5 +281,10 @@ var GameScene = {
 		//update masked background position
 		GameScene.bgtex2.tilePosition.x = Math.floor(-GameScene.view.x);
 		GameScene.bgtex2.tilePosition.y = Math.floor(-GameScene.view.y);
+
+		//redraw debug text
+		Display.renderer.render(GameScene.debugText, GameScene.debugTextTexture);
+		GameScene.debugText.text = "";
+		GameScene.debugText.text += "FPS: " + (1000 / Game.frametime).toFixed(0);
 	}
 };

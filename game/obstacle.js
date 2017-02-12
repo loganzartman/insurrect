@@ -1,4 +1,4 @@
-class Obstacle {
+class Obstacle extends Emitter {
 	constructor(params) {
 		if (!params.hasOwnProperty("vertices"))
 			throw new Error("Obstacle must have vertices!");
@@ -7,6 +7,8 @@ class Obstacle {
 			rotation: 0,
 			prefabName: null
 		}, params);
+
+		super(params);
 
 		this.position = new Vector(params.position);
 		this.rotation = params.rotation;
@@ -40,6 +42,8 @@ class Obstacle {
 		this.gfxDirty = true;
 
 		delete this.segments; //one sneaky trick to regenerate segments
+
+		this.emit("verticesChanged", {vertices: this.vertices});
 	}
 
 	contains(point) {
@@ -73,7 +77,8 @@ class Obstacle {
 
 	serialize() {
 		var data = {
-			position: this.position.serialize()
+			position: this.position.serialize(),
+			rotation: this.rotation
 		};
 
 		if (this.prefabName === null) {

@@ -101,7 +101,7 @@ var EditScene = {
         //rotates object
         EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
             if (event.keyCode === Input.key.R) {
-                EditScene.phantomObstacle.rotation = (EditScene.phantomObstacle.rotation + 90) % 360;
+                EditScene.phantomObstacle.rotation = (EditScene.phantomObstacle.rotation + 45) % 360;
                 EditScene.phantomObstacle.updateTransform();
                 EditScene.phantomObstacle.draw();
             }
@@ -110,21 +110,6 @@ var EditScene = {
         //create graphics overlay
         EditScene.overlayGfx = new PIXI.Graphics();
 
-        //create debug text
-        EditScene.debugText = new PIXI.extras.BitmapText("debug: ", {
-            font: "AndinaBold",
-            tint: 0xFFFFFF
-        });
-        EditScene.debugText.position = new PIXI.Point(8,8);
-        
-        //create text shadow
-        EditScene.debugTextTexture = new PIXI.RenderTexture(Display.w, Display.h);
-        var dbtDisplayFore = new PIXI.Sprite(EditScene.debugTextTexture);
-        dbtDisplayFore.tint = Core.color.acc1;
-        var dbtDisplayShadow = new PIXI.Sprite(EditScene.debugTextTexture);
-        dbtDisplayShadow.position.y = 1;
-        dbtDisplayShadow.tint = Core.color.bg2;
-
         //create export button
         var exportBtn = Display.makeButton("Export", Core.color.acc3,
             Core.color.acc1, EditScene.doExport);
@@ -132,8 +117,6 @@ var EditScene = {
         exportBtn.position.y = 8;
 
         EditScene.stage.addChild(EditScene.overlayGfx);
-        EditScene.stage.addChild(dbtDisplayShadow);
-        EditScene.stage.addChild(dbtDisplayFore);
         EditScene.stage.addChild(exportBtn);
     },
 
@@ -237,11 +220,10 @@ var EditScene = {
     },
 
     frame: function(timescale, ticks) {
-        GameScene.frame(timescale, ticks);
         EditScene.updateOverlay();
         
         //update debug text
-        EditScene.debugText.text = "Editor: " + GameScene.world.levelName;
+        GameScene.debugText.text = "Editor: " + GameScene.world.levelName;
         var vertices = GameScene.world.obstacles.reduce(
             (val,o) => o.vertices.length + val, 0
         );
@@ -249,12 +231,12 @@ var EditScene = {
             (val,o) => GameScene.inView(o.poly) ? o.vertices.length + val : val, 0
         );
         var entities = GameScene.world.entities.length;
-        EditScene.debugText.text += "\nFPS (avg): " + (1000 / Game.frametime).toFixed(0);
-        EditScene.debugText.text += "\n#Vertices: " + vertices;
-        EditScene.debugText.text += "\n#Visible: " + onscreen;
-        EditScene.debugText.text += "\n#Entities: " + entities;
-        EditScene.debugText.text += "\n[ and ] cycle prefabs.";
-        EditScene.debugText.text += "\n; and ' change grid size.";
-        Display.renderer.render(EditScene.debugText, EditScene.debugTextTexture);
+        GameScene.debugText.text += "\n#Vertices: " + vertices;
+        GameScene.debugText.text += "\n#Visible: " + onscreen;
+        GameScene.debugText.text += "\n#Entities: " + entities;
+        GameScene.debugText.text += "\n[ and ] cycle prefabs.";
+        GameScene.debugText.text += "\n; and ' change grid size.";
+        
+        GameScene.frame(timescale, ticks);
     }
 }

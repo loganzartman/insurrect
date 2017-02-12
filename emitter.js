@@ -7,13 +7,21 @@ class Emitter {
 		if (!this.listeners.hasOwnProperty(event))
 			this.listeners[event] = [];
 		this.listeners[event].push(callback);
-		return {event: event, callback: callback};
+		let that = this;
+		return {event: event, callback: callback, remove: function(){
+			that.unlisten(event, callback);
+		}};
 	}
 
 	unlisten(event, callback) {
+		if (typeof event === "object") {
+			callback = event.callback;
+			event = event.event;
+		}
+
 		if (this.listeners.hasOwnProperty(event)
 			&& this.listeners[event].includes(callback)) {
-			this.listeners.splice(this.listeners[event].indexOf(callback), 1);
+			this.listeners[event].splice(this.listeners[event].indexOf(callback), 1);
 			return true;
 		}
 		return false;

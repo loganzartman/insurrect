@@ -10,7 +10,9 @@ var Util = {
 		 * @param pointB second point in the line segment
 		 * @return whether an intersection exists.
 		 */
-		circleSegIntersect: function(circlePos,radius,pointA,pointB) {
+		circleSegIntersect: function(circlePos,radius,segment) {
+			var pointA = segment.a;
+			var pointB = segment.b;
 			//todo: check parallel things to avoid doing this
 			pointB = pointB.add(new Vector(0.0001,0.0001));
 
@@ -62,15 +64,20 @@ var Util = {
 		 * @param pointB second point in the segment
 		 * @return intersection, if any
 		 */
-		raySegIntersect: function(rayPoint, rayDir, pointA, pointB) {
-			var segDx = pointB.sub(pointA);
-			if (rayDir.dir() === segDx.dir())
-				return null;
+		raySegIntersect: function(rayPoint, rayDir, segment) {
+			var pointA = segment.a;
+			var pointB = segment.b;
+
+			// var segDx = pointB.sub(pointA);
+			var segDx = pointB.x - pointA.x;
+			var segDy = pointB.y - pointA.y;
+			// if (rayDir.dir() === segDx.dir())
+			// 	return null;
 
 			//solve for line parameters
 			var T2 = (rayDir.x * (pointA.y - rayPoint.y) + rayDir.y * (rayPoint.x - pointA.x));
-			T2 /= (segDx.x*rayDir.y - segDx.y*rayDir.x);
-			var T1 = (pointA.x + segDx.x * T2 - rayPoint.x) / rayDir.x;
+			T2 /= (segDx*rayDir.y - segDy*rayDir.x);
+			var T1 = (pointA.x + segDx * T2 - rayPoint.x) / rayDir.x;
 
 			//parameters out of bounds indicates no intersection
 			if (T1<0)
@@ -95,7 +102,11 @@ var Util = {
 		 * @param b2 point 2 in the second segment
 		 * @return intersection Vector, or null if there is none
 		 */
-		segSegIntersect: function(a1, a2, b1, b2) {
+		segSegIntersect: function(segA, segB) {
+			var a1 = segA.a;
+			var a2 = segA.b;
+			var b1 = segB.a;
+			var b2 = segB.b;
 			var x0 = a1.x, x1 = b1.x, x2 = a2.x, x3 = b2.x;
 			var y0 = a1.y, y1 = b1.y, y2 = a2.y, y3 = b2.y;
 
@@ -132,7 +143,7 @@ var Util = {
 			var intersections = [];
 			segs1.forEach(function(a){
 				segs2.forEach(function(b){
-					var i = Util.geom.segSegIntersect(a[0], a[1], b[0], b[1]);
+					var i = Util.geom.segSegIntersect(a, b);
 					if (i)
 						intersections.push(i);
 				});

@@ -80,22 +80,20 @@ class Projectile extends Entity {
         var radius = dx.unit().mult(this.radius);
         var pointA = this.position.add(dx).add(radius);
         var pointB = this.position.sub(radius);
+        var selfSeg = new Segment(pointA, pointB);
 
         //find any collisions
         var collisions = [];
-        this.world.obstacles.forEach(object => {
-            if (object instanceof Obstacle) {
-                object.getSegments().forEach(segment => {
-                    var point = Util.geom.segSegIntersect(pointA, pointB, segment[0], segment[1]);
-                    if (point)
-                        collisions.push(new Collision({
-                            self: this,
-                            type: Collision.SEGMENT,
-                            object: segment,
-                            point: point
-                        }));
-                });
-            }
+        var segments = this.world.segSpace.getNearby(this, dx.len());
+        segments.forEach(segment => {
+            var point = Util.geom.segSegIntersect(selfSeg, segment);
+            if (point)
+                collisions.push(new Collision({
+                    self: this,
+                    type: Collision.SEGMENT,
+                    object: segment,
+                    point: point
+                }));
         });
         return collisions;
     }
@@ -105,7 +103,7 @@ class Projectile extends Entity {
         
         var other = others[0];
         if (other && other.type === Collision.SEGMENT) {
-            this.velocity = this.velocity.reflectOver(other.object[1].sub(other.object[0]))
+            this.velocity = this.velocity.reflectOver(other.object.b.sub(other.object.a))
                 .mult(this.elasticity);
         }
     }

@@ -41,8 +41,11 @@ class Polygon {
      */
     getSegments() {
         var segments = [];
-        for (var i=0,j=this.points.length; i<j; i++)
-            segments.push([this.points[i], this.points[(i+1)%j]]);
+        for (var i=0,j=this.points.length; i<j; i++) {
+            var seg = new Segment(this.points[i], this.points[(i+1)%j]);
+            seg.parentPolygon = this;
+            segments.push(seg);
+        }
         return segments;
     }
 

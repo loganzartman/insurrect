@@ -6,6 +6,7 @@ class World extends Emitter {
         super(params);
         this.scene = null;
         this.levelName = params.levelName;
+        this.listnrs = [];
         this.reset();
     }
 
@@ -15,6 +16,10 @@ class World extends Emitter {
         this.entities = [];
         this.obstacles = [];
         this.prefabs = [];
+        this.rebuildSegSpace();
+
+        this.listnrs.forEach(listener => listener.remove());
+        this.listnrs = [];
 
         //build level
         this.buildLevel(this.levelName);
@@ -43,7 +48,9 @@ class World extends Emitter {
 
     addObstacle(obs) {
         this.obstacles.push(obs);
+        this.listnrs.push(obs.listen("verticesChanged", this.rebuildSegSpace));
         this.emit("addObstacle", obs);
+        this.rebuildSegSpace();
     }
 
     removeObstacle(obs) {
@@ -52,8 +59,18 @@ class World extends Emitter {
             return false;
         this.obstacles.splice(idx, 1);
         obs.gfx.destroy();
+        this.rebuildSegSpace();
         this.emit("removeObstacle", obs);
         return true;
+    }
+
+    rebuildSegSpace() {
+        this.segSpace = new SegmentSpace({binSize: 32});
+        this.obstacles.forEach(obstacle => {
+            obstacle.getSegments().forEach(segment => {
+                this.segSpace.add(segment);
+            });
+        });
     }
 
     /**

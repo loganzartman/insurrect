@@ -60,9 +60,9 @@ class Entity extends Emitter {
 			var others = this.getAllCollisions();
 			if (others.length > 0) {
 				this.position = this.position.sub(step);
-				var minstep = others[0].object[1].sub(others[0].object[0]).project(step);
+				var minstep = others[0].object.b.sub(others[0].object.a).project(step);
 				others.forEach(function(coll){
-					var nstep = coll.object[1].sub(coll.object[0]).project(step);
+					var nstep = coll.object.b.sub(coll.object.a).project(step);
 					if (nstep.len() < minstep.len())
 						minstep = nstep;
 				});
@@ -97,7 +97,7 @@ class Entity extends Emitter {
 		this.world.obstacles.forEach(function(object) {
 			if (object instanceof Obstacle) {
 				object.getSegments().forEach(function(segment){
-					if (Util.geom.circleSegIntersect(entity.position, entity.radius, segment[0], segment[1]))
+					if (Util.geom.circleSegIntersect(entity.position, entity.radius, segment))
 						collisions.push(new Collision({
 							self: this,
 							type: Collision.SEGMENT,
