@@ -2,6 +2,8 @@ class Segment {
 	constructor(a, b) {
 		this.a = a;
 		this.b = b;
+		this._geomDirty = true; //must be set manually!
+		this._normal = null;
 	}
 
 	/**
@@ -57,6 +59,30 @@ class Segment {
 		if (t < 0 || t > 1)
 			return false;
 		return t;
+	}
+
+	/**
+	 * Returns a Vector representing the normal of this segment.
+	 * @return the normal
+	 */
+	getNormal() {
+		if (!this._geomDirty)
+			return this._normal;
+		
+		//compute normal vector (the sign of the direction here is arbitrarily chosen)
+		let dx = this.b.sub(this.a);
+		this._normal = Vector.fromDir(dx.dir() + Math.PI * 0.5, 1);
+		this._geomDirty = false;
+		return this._normal;
+	}
+
+	/**
+	 * Returns a Vector representing the midpoint of this segment.
+	 * @return the midpoint
+	 */
+	getMidpoint() {
+		let dx = this.b.sub(this.a);
+		return this.a.add(dx.mult(0.5));
 	}
 
 	hash() {
