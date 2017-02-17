@@ -4,6 +4,61 @@ class Segment {
 		this.b = b;
 	}
 
+	/**
+	 * Returns 2 to 4 segments that are the result of dividing this segment
+	 * and another across their intersection point.  If any of the resulting
+	 * segments are of zero length, they are not returned.
+	 * @param segment the other segment
+	 */
+	divide(segment) {
+		let isect = Util.geom.segSegIntersect(this, segment);
+		
+		//if there is no intersection, no split occurs
+		if (isect === null)
+			return [this, segment];
+
+		//return the result of both splits
+		return this.divideAt(isect).concat(segment.divideAt(isect));
+	}
+
+	/**
+	 * Returns a 1 to 2 segments that are a result of splitting this segment
+	 * across an intersection point
+	 */
+	divideAt(point) {
+		let t = this.contains(point);
+		if (!t || t === 0 || t === 1)
+			return [this];
+
+		let dx = this.b.sub(this.a);
+		let len = dx.len();
+		let dxu = dx.unit();
+
+		let mid = this.a.add(dxu.mult(len * t));
+		return [
+			new Segment(this.a, mid),
+			new Segment(mid, this.b)
+		];
+	}
+
+	/**
+	 * Determines whether a given point lies on this line segment.
+	 * @param point the point to test
+	 * @returns false if the segment does not contain this point.
+	 * Otherwise, returns  
+	 */
+	contains(point) {
+		let dx = this.b.sub(this.a).unit();
+		let t0 = (point.y - this.a.y) / (dx.y);
+		let t1 = (point.x - this.a.x) / (dx.x);
+		if (!isNaN(t0) && !isNaN(t0) && t0 !== t1)
+			return false;
+		let t = t0 || t1; //nasty border case for NaNs
+		if (t < 0 || t > 1)
+			return false;
+		return t;
+	}
+
 	hash() {
 		return ~~((this.a.x * 31 + this.a.y * 7) + (this.b.x * 11 + this.b.y * 41));
 	}
