@@ -80,6 +80,9 @@ var GameScene = {
         GameScene.stage.addChild(dbtDisplayShadow);
         GameScene.stage.addChild(dbtDisplayFore);
 
+        GameScene.debugGfx = new PIXI.Graphics();
+        GameScene.stage.addChild(GameScene.debugGfx);
+
 		//handle display resizes
 		Display.events.listen("resize", evt => {
 			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);
@@ -157,22 +160,19 @@ var GameScene = {
 			var min = null;
 			var minPoly = null;
 			
-			var dirVector = Vector.fromDir(dir);
-			var segs = GameScene.world.segSpace.getRaycast(
-				GameScene.world.player.position.x, GameScene.world.player.position.y,
-				dirVector.x, dirVector.y, Math.max(Display.w, Display.h)
-			);
-			viewSegs.forEach(function(segment){segs.push(segment)});
-			segs.forEach(function(segment){
+			let test = (segment) => {
 				var result = Util.geom.raySegIntersect(
-						position, dirVector, segment);
+						position, Vector.fromDir(dir, 1), segment);
 				if (result !== null) {
 					if (min === null || result.param < min.param) {
 						min = result;
 						minPoly = segment.parentPolygon;
 					}
 				}
-			})
+				return true;
+			};
+			GameScene.world.bsp.traverse(/*GameScene.world.player.position,*/ test);
+			viewSegs.forEach(function(segment){test(segment)});
 
 			if (min !== null) {
 				intersections.push(new Vector(min.x, min.y));
@@ -274,6 +274,8 @@ var GameScene = {
 			GameScene.maskGfx.drawRect(0,0,Display.w,Display.h);
 			GameScene.maskGfx.endFill();
 		}
+
+		GameScene.world.bsp.renderDebug(GameScene.debugGfx);
 
 		//copy mask graphics buffer to the mask texture
 		Display.renderer.render(GameScene.maskGfx, GameScene.maskTexture);

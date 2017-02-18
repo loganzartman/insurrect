@@ -36,6 +36,7 @@ class Obstacle extends Emitter {
 
 		//construct polygon
 		this.poly = new Polygon(this.vertices);
+		this.poly.parentObstacle = this;
 
 		//update graphics
 		this.gfx.hitArea = this.poly.toPixiPolygon();

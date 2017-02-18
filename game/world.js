@@ -16,7 +16,7 @@ class World extends Emitter {
         this.entities = [];
         this.obstacles = [];
         this.prefabs = [];
-        this.rebuildSegSpace();
+        this.rebuildStructures();
 
         this.listnrs.forEach(listener => listener.remove());
         this.listnrs = [];
@@ -48,9 +48,9 @@ class World extends Emitter {
 
     addObstacle(obs) {
         this.obstacles.push(obs);
-        this.listnrs.push(obs.listen("verticesChanged", this.rebuildSegSpace));
+        this.listnrs.push(obs.listen("verticesChanged", this.rebuildStructures));
         this.emit("addObstacle", obs);
-        this.rebuildSegSpace();
+        this.rebuildStructures();
     }
 
     removeObstacle(obs) {
@@ -59,18 +59,22 @@ class World extends Emitter {
             return false;
         this.obstacles.splice(idx, 1);
         obs.gfx.destroy();
-        this.rebuildSegSpace();
+        this.rebuildStructures();
         this.emit("removeObstacle", obs);
         return true;
     }
 
-    rebuildSegSpace() {
+    rebuildStructures() {
+        let segments = [];
         this.segSpace = new SegmentSpace({binSize: 32});
         this.obstacles.forEach(obstacle => {
             obstacle.getSegments().forEach(segment => {
                 this.segSpace.add(segment);
+                segments.push(segment);
             });
         });
+
+        this.bsp = new BinarySpacePartition({segments: segments});
     }
 
     /**

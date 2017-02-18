@@ -13,7 +13,7 @@ class Segment {
 	 * @param segment the other segment
 	 */
 	divide(segment) {
-		let isect = Util.geom.segSegIntersect(this, segment);
+		let isect = this.getIntersection(segment);
 		
 		//if there is no intersection, no split occurs
 		if (isect === null)
@@ -61,6 +61,10 @@ class Segment {
 		return t;
 	}
 
+	getIntersection(segment) {
+		return Util.geom.segSegIntersect(this, segment);
+	}
+
 	/**
 	 * Returns a Vector representing the normal of this segment.
 	 * @return the normal
@@ -83,6 +87,40 @@ class Segment {
 	getMidpoint() {
 		let dx = this.b.sub(this.a);
 		return this.a.add(dx.mult(0.5));
+	}
+
+	/**
+	 * Returns -1, 0, 1 depending on which side of this segment a point lies on
+	 * @return the side
+	 */
+	getPointSide(point) {
+		let pos = Math.sign(
+			(this.b.x - this.a.x) * (point.y - this.a.y) - 
+			(this.b.y - this.a.y) * (point.x - this.a.x)
+		);
+		return pos;
+	}
+
+	/**
+	 * Tests to see if this segment is wholly in front of another.
+	 * A result of 1 or -1 would indicate this; be consistent.
+	 * I've arbitrarily chosen 1 for my uses.
+	 * If the segments intersect, this returns the intersection point instead.
+	 * (yes, the mixing of return types is very bad)
+	 */
+	inFront(segment) {
+		let isect = Util.geom.segSegIntersect(this, segment);
+		if (isect !== null)
+			return isect;
+		else {
+			let midpt = this.getMidpoint();
+			let side = segment.getPointSide(midpt);
+			return side;
+		}
+	}
+
+	toString() {
+		return this.a.toString() + " -- " + this.b.toString();
 	}
 
 	hash() {

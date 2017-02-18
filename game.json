@@ -16,6 +16,7 @@
 			"scene/editscene.js",
 			"game/partitionedSpace.js",
 			"game/segmentSpace.js",
+			"game/binarySpacePartition.js",
 			"game/world.js",
 			"game/obstacle.js",
 			"game/collision.js",

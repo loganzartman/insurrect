@@ -119,6 +119,10 @@ class Vector {
 		return new PIXI.Point(this.x, this.y);
 	}
 
+	toString() {
+		return "("+this.x+","+this.y+")";
+	}
+
 	serialize() {
 		return [this.x, this.y];
 	}
