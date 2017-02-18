@@ -167,11 +167,12 @@ var GameScene = {
 					if (min === null || result.param < min.param) {
 						min = result;
 						minPoly = segment.parentPolygon;
+						return false;
 					}
 				}
 				return true;
 			};
-			GameScene.world.bsp.traverse(/*GameScene.world.player.position,*/ test);
+			GameScene.world.bsp.traverseNTF(GameScene.world.player.position, test);
 			viewSegs.forEach(function(segment){test(segment)});
 
 			if (min !== null) {

@@ -18,8 +18,8 @@ class BinarySpacePartition extends Emitter {
 	 */
 	rebuildAll() {
 		//this is probably overly generic considering its usage
-		let makeNode = (data=[], left=null, right=null) => {
-			return {data: data, left: left, right: right};
+		let makeNode = (data=[], back=null, front=null) => {
+			return {data: data, back: back, front: front};
 		};
 
 		let segments = this.segments.slice();
@@ -36,15 +36,15 @@ class BinarySpacePartition extends Emitter {
 				//if inFront returns an intersection point, need to divide the segment
 				//yeah I know this is gross, but it saves a repeat calculation
 				if (inFront instanceof Vector) {
-					segments.concat(segment.divideAt(inFront));
+					segments = segments.concat(segment.divideAt(inFront));
 					return false;
 				}
 
 				//if inFront returns -1, this segment is behind
 				else if (inFront === -1) {
-					if (!node.left)
-						node.left = makeNode();
-					node.left.data.push(segment);
+					if (!node.back)
+						node.back = makeNode();
+					node.back.data.push(segment);
 					return false;
 				}
 
@@ -55,17 +55,17 @@ class BinarySpacePartition extends Emitter {
 
 				//if inFront returns 1, this segment is in front
 				else if (inFront === 1) {
-					if (!node.right)
-						node.right = makeNode();
-					node.right.data.push(segment);
+					if (!node.front)
+						node.front = makeNode();
+					node.front.data.push(segment);
 					return false;
 				}
 			});
 
-			if (node.right)
-				step(node.right);
-			if (node.left)
-				step(node.left);
+			if (node.front)
+				step(node.front);
+			if (node.back)
+				step(node.back);
 		};
 
 		step(A);
@@ -81,51 +81,43 @@ class BinarySpacePartition extends Emitter {
 	 * If the callback returns false, the traversal is aborted.
 	 */
 	traverseNearToFar(point, callback, node=this.root) {
-		//base case
 		if (node === null)
-			return;
+			return true;
 
-		let seg0 = node.data[0];
-
-		//base case
-		if (!node.left && !node.right)
-			node.data.forEach(s => callback(s));
-		//recursive case
-		else {
-			let front = seg0.getPointSide(point);
-
-			//point is in front of this segment
-			if (front === 1) {
-				this.traverseNearToFar(point, callback, node.left);
-				let flag = true;
-				node.data.forEach(s => {flag = flag && callback(s)});
-				if (!flag)
-					return;
-				this.traverseNearToFar(point, callback, node.right);
-			}
-			//point is on the line of this segment
-			else if (front === 0) {
-				this.traverseNearToFar(point, callback, node.right);
-				this.traverseNearToFar(point, callback, node.left);
-			}
-			//point is behind this segment
-			else if (front === -1) {
-				this.traverseNearToFar(point, callback, node.right);
-				let flag = true;
-				node.data.forEach(s => {flag = flag && callback(s)});
-				if (!flag)
-					return;
-				this.traverseNearToFar(point, callback, node.left);
-			}
+		let side = node.data[0].getPointSide(point);
+		if (side === 1) {
+			if (!this.traverseNearToFar(point, callback, node.front))
+				return false;
+			let flag = true;
+			node.data.forEach(seg => flag = flag && callback(seg));
+			if (!flag)
+				return false;
+			if (!this.traverseNearToFar(point, callback, node.back))
+				return false;
 		}
+		else if (side === -1) {
+			if (!this.traverseNearToFar(point, callback, node.back))
+				return false;
+			let flag = true;
+			node.data.forEach(seg => flag = flag && callback(seg));
+			if (!flag)
+				return false;
+			if (!this.traverseNearToFar(point, callback, node.front))
+				return false;
+		}
+		return true;
+	}
+
+	traverseNTF(point, callback, node=this.root) {
+		
 	}
 
 	traverse(callback, node=this.root) {
 		if (node === null)
 			return;
-		this.traverse(callback, node.left);
+		this.traverse(callback, node.back);
 		node.data.forEach(s => callback(s));
-		this.traverse(callback, node.right);
+		this.traverse(callback, node.front);
 	}
 
 	renderDebug(gfx) {
@@ -144,9 +136,9 @@ class BinarySpacePartition extends Emitter {
 		let step = (node, spaces) => {
 			if (node === null)
 				return;
-			step(node.right, spaces + "   ");
+			step(node.front, spaces + "   ");
 			buffer += spaces + node.data[0].getMidpoint().toString() + "\n";
-			step(node.left, spaces + "   ");
+			step(node.back, spaces + "   ");
 		};
 		step(this.root, "");
 		return buffer;

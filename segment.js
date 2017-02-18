@@ -110,7 +110,7 @@ class Segment {
 	 */
 	inFront(segment) {
 		let isect = Util.geom.segSegIntersect(this, segment);
-		if (isect !== null)
+		if (isect !== null && this.contains(isect))
 			return isect;
 		else {
 			let midpt = this.getMidpoint();
