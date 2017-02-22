@@ -172,7 +172,7 @@ var GameScene = {
 				}
 				return true;
 			};
-			GameScene.world.bsp.traverseNTF(GameScene.world.player.position, test);
+			GameScene.world.bsp.traverseNearToFar(GameScene.world.player.position, test);
 			viewSegs.forEach(function(segment){test(segment)});
 
 			if (min !== null) {
@@ -277,6 +277,7 @@ var GameScene = {
 		}
 
 		GameScene.world.bsp.renderDebug(GameScene.debugGfx);
+		GameScene.debugGfx.hitArea = new PIXI.Rectangle(0,0,0,0);
 
 		//copy mask graphics buffer to the mask texture
 		Display.renderer.render(GameScene.maskGfx, GameScene.maskTexture);

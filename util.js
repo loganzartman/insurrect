@@ -132,6 +132,34 @@ var Util = {
 			);
 		},
 
+		segLineIntersect: function(seg, line) {
+			var a1 = seg.a;
+			var a2 = seg.b;
+			var b1 = line.a;
+			var b2 = line.b;
+			var x0 = a1.x, x1 = b1.x, x2 = a2.x, x3 = b2.x;
+			var y0 = a1.y, y1 = b1.y, y2 = a2.y, y3 = b2.y;
+
+			//solve for parameters t and u
+			//where t and u are the parameters of the parametric forms of lines
+			//A and B respectively
+			var fraction = 1/(x0*(y1-y3) - x1*(y0-y2) - x2*(y1-y3) + x3*(y0-y2));
+			var t = x0*(y1-y3) - x1*(y0-y3) + x3*(y0-y1);
+			t *= fraction;
+			var u = x0*(y1-y2) - x1*(y0-y2) + x2*(y0-y1);
+			u *= fraction;
+
+			//parameters out of the bounds [0,1] indicates no intersection
+			if (isNaN(t) || t < 0 || t > 1)
+				return null;
+
+			//calculate intersection position using parametric forms
+			return new Vector(
+				x0 + t*(x2 - x0),
+				y0 + t*(y2 - y0)
+			);
+		},
+
 		/**
 		 * Finds all intersections between segments in list 1 and segments in
 		 * list 2.
@@ -143,12 +171,27 @@ var Util = {
 			var intersections = [];
 			segs1.forEach(function(a){
 				segs2.forEach(function(b){
+					if (a === b)
+						return;
 					var i = Util.geom.segSegIntersect(a, b);
 					if (i)
 						intersections.push(i);
 				});
 			});
 			return intersections;
+		},
+
+		fixSegments: function(segments) {
+			let out = [];
+			segments.forEach(segment => {
+				let src = [segment];
+				src.forEach(segA => {
+					segments.forEach(segB => {
+						segA.divide(segB).forEach(seg => out.push(seg));
+					});
+				});
+			});
+			return out;
 		}
 	}
 };

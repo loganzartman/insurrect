@@ -234,6 +234,7 @@ var EditScene = {
         GameScene.debugText.text += "\n#Vertices: " + vertices;
         GameScene.debugText.text += "\n#Visible: " + onscreen;
         GameScene.debugText.text += "\n#Entities: " + entities;
+        GameScene.debugText.text += "\nBSP Size: " + GameScene.world.bsp.size;
         GameScene.debugText.text += "\n[ and ] cycle prefabs.";
         GameScene.debugText.text += "\n; and ' change grid size.";
         

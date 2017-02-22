@@ -29,7 +29,7 @@ class Segment {
 	 */
 	divideAt(point) {
 		let t = this.contains(point);
-		if (!t || t === 0 || t === 1)
+		if (t<0 || t === 0 || t === 1)
 			return [this];
 
 		let dx = this.b.sub(this.a);
@@ -37,27 +37,30 @@ class Segment {
 		let dxu = dx.unit();
 
 		let mid = this.a.add(dxu.mult(len * t));
-		return [
-			new Segment(this.a, mid),
-			new Segment(mid, this.b)
-		];
+		
+		let one = new Segment(this.a, mid);
+		one.parentPolygon = this.parentPolygon;
+		let two = new Segment(mid, this.b);
+		two.parentPolygon = this.parentPolygon;
+
+		return [one, two];
 	}
 
 	/**
 	 * Determines whether a given point lies on this line segment.
 	 * @param point the point to test
-	 * @returns false if the segment does not contain this point.
+	 * @returns -1 if the segment does not contain this point.
 	 * Otherwise, returns  
 	 */
 	contains(point) {
-		let dx = this.b.sub(this.a).unit();
+		let dx = this.b.sub(this.a);
 		let t0 = (point.y - this.a.y) / (dx.y);
 		let t1 = (point.x - this.a.x) / (dx.x);
-		if (!isNaN(t0) && !isNaN(t0) && t0 !== t1)
-			return false;
+		if (!isNaN(t0) && !isNaN(t1) && t0 !== t1)
+			return -1;
 		let t = t0 || t1; //nasty border case for NaNs
 		if (t < 0 || t > 1)
-			return false;
+			return -1;
 		return t;
 	}
 
@@ -105,18 +108,11 @@ class Segment {
 	 * Tests to see if this segment is wholly in front of another.
 	 * A result of 1 or -1 would indicate this; be consistent.
 	 * I've arbitrarily chosen 1 for my uses.
-	 * If the segments intersect, this returns the intersection point instead.
-	 * (yes, the mixing of return types is very bad)
 	 */
 	inFront(segment) {
-		let isect = Util.geom.segSegIntersect(this, segment);
-		if (isect !== null && this.contains(isect))
-			return isect;
-		else {
-			let midpt = this.getMidpoint();
-			let side = segment.getPointSide(midpt);
-			return side;
-		}
+		let midpt = this.getMidpoint();
+		let side = segment.getPointSide(midpt);
+		return side;
 	}
 
 	toString() {
