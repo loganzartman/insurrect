@@ -4,11 +4,25 @@ class BinarySpacePartition extends Emitter {
 		if (!params.hasOwnProperty("segments"))
 			throw new Error("Must specify list of segments for which to construct BSP.");
 		this.setSegments(params.segments);
+		this.rebuildOptimal();
 	}
 
 	setSegments(segments) {
 		this.segments = segments;
-		this.rebuildAll();
+		this.bestIdx = Math.floor(this.segments.length/2);
+	}
+
+	rebuildOptimal() {
+		let bestN = -1, bestIdx=-1;
+		for (let i=0,j=this.segments.length; i<j; i++) {
+			this.rebuildAll(i);
+			if (bestN<0 || this.size < bestN) {
+				bestIdx = i;
+				bestN = this.size;
+			}
+		}
+		this.bestIdx = bestIdx;
+		this.rebuildAll(bestIdx);
 	}
 
 	/**
@@ -16,7 +30,7 @@ class BinarySpacePartition extends Emitter {
 	 * Implements the algorithm as descibed here:
 	 * https://en.wikipedia.org/wiki/Binary_space_partitioning
 	 */
-	rebuildAll() {
+	rebuildAll(idx0=this.bestIdx) {
 		this.size = 0;
 
 		//this is probably overly generic considering its usage
@@ -26,6 +40,9 @@ class BinarySpacePartition extends Emitter {
 		};
 
 		let segments = this.segments.slice();
+		let temp = segments[idx0];
+		segments[idx0] = segments[0];
+		segments[0] = temp;
 		
 		// //preprocess segments
 		// segments = Util.geom.fixSegments(segments);

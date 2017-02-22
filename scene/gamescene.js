@@ -160,9 +160,10 @@ var GameScene = {
 			var min = null;
 			var minPoly = null;
 			
+			var dirVector = Vector.fromDir(dir, 1);
 			let test = (segment) => {
 				var result = Util.geom.raySegIntersect(
-						position, Vector.fromDir(dir, 1), segment);
+						position, dirVector, segment);
 				if (result !== null) {
 					if (min === null || result.param < min.param) {
 						min = result;
@@ -172,7 +173,13 @@ var GameScene = {
 				}
 				return true;
 			};
-			GameScene.world.bsp.traverseNearToFar(GameScene.world.player.position, test);
+			GameScene.world.segSpace.getRaycast(
+				GameScene.world.player.position.x, GameScene.world.player.position.y,
+				dirVector.x, dirVector.y, Display.w
+			).forEach(test);
+
+			// GameScene.world.bsp.traverseNearToFar(GameScene.world.player.position, test);
+			
 			viewSegs.forEach(function(segment){test(segment)});
 
 			if (min !== null) {
@@ -276,7 +283,7 @@ var GameScene = {
 			GameScene.maskGfx.endFill();
 		}
 
-		GameScene.world.bsp.renderDebug(GameScene.debugGfx);
+		// GameScene.world.bsp.renderDebug(GameScene.debugGfx);
 		GameScene.debugGfx.hitArea = new PIXI.Rectangle(0,0,0,0);
 
 		//copy mask graphics buffer to the mask texture

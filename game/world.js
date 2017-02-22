@@ -74,7 +74,7 @@ class World extends Emitter {
             });
         });
 
-        this.bsp = new BinarySpacePartition({segments: segments});
+        // this.bsp = new BinarySpacePartition({segments: segments});
     }
 
     /**
