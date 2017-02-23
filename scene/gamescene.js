@@ -168,15 +168,14 @@ var GameScene = {
 					if (min === null || result.param < min.param) {
 						min = result;
 						minPoly = segment.parentPolygon;
-						return false;
 					}
 				}
-				return true;
 			};
 			GameScene.world.segSpace.getRaycast(
 				GameScene.world.player.position.x, GameScene.world.player.position.y,
-				dirVector.x, dirVector.y, Display.w
-			).forEach(test);
+				dirVector.x, dirVector.y, Display.diag * 0.5,
+				test
+			);
 
 			// GameScene.world.bsp.traverseNearToFar(GameScene.world.player.position, test);
 			
@@ -284,6 +283,8 @@ var GameScene = {
 		}
 
 		// GameScene.world.bsp.renderDebug(GameScene.debugGfx);
+		GameScene.debugGfx.clear();
+		// GameScene.world.segSpace.drawDebug(GameScene.debugGfx);
 		GameScene.debugGfx.hitArea = new PIXI.Rectangle(0,0,0,0);
 
 		//copy mask graphics buffer to the mask texture

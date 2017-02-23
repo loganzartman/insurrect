@@ -41,4 +41,8 @@ class SegmentSpace extends PartitionedSpace {
 		let bins = this.getBins(segment);
 		bins.forEach(bin => this.removeAt(segment, bin));
 	}
+
+	drawDebug(gfx) {
+		super.drawDebug(gfx);
+	}
 }

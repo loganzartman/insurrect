@@ -66,7 +66,7 @@ class World extends Emitter {
 
     rebuildStructures() {
         let segments = [];
-        this.segSpace = new SegmentSpace({binSize: 32});
+        this.segSpace = new SegmentSpace({binSize: 24});
         this.obstacles.forEach(obstacle => {
             obstacle.getSegments().forEach(segment => {
                 this.segSpace.add(segment);

@@ -42,6 +42,7 @@ class Display {
 			view: Display.buffer,
 			antialias: false
 		});
+
 		Display.gfx = new PIXI.Graphics();
 
 		//create output canvas
@@ -76,6 +77,7 @@ class Display {
 		Display.scale = Math.floor(scale);
 		Display.w = Math.floor(w / Display.scale);
 		Display.h = Math.floor(h / Display.scale);
+		Display.diag = Math.sqrt(Display.w*Display.w + Display.h*Display.h);
 	}
 
 	/**

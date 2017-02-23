@@ -77,7 +77,7 @@ class PartitionedSpace {
 		return items;
 	}
 
-	getRaycast(x0, y0, dx, dy, maxdist) {
+	getRaycast(x0, y0, dx, dy, maxdist, callback) {
 		var len = Math.sqrt(dx*dx + dy*dy);
 		if (len !== 1) {
 			dx /= len;
@@ -100,9 +100,10 @@ class PartitionedSpace {
 				var items = this.getAt(hash);
 				if (items === null)
 					continue;
+
 				items.forEach(item => {
 					if (set.add(item.hash()))
-						list.push(item);
+						callback(item);
 				});
 			}
 
@@ -111,8 +112,6 @@ class PartitionedSpace {
 			y0 += dy;
 			dist += step;
 		}
-
-		return list;
 	}
 
 	remove(entity) {
@@ -123,5 +122,22 @@ class PartitionedSpace {
 	removeAt(entity, hash) {
 		if (this.data.has(hash))
 			this.data.get(hash).remove(entity);
+	}
+
+	drawDebug(gfx) {
+		gfx.lineStyle(1, 0xFF0000, 0.25);
+		for (var x=GameScene.view.x+GameScene.viewOffset.x, x1=x+Display.w+this.binSize; x<x1; x+=this.binSize) {
+			for (var y=GameScene.view.y+GameScene.viewOffset.y, y1=y+Display.h+this.binSize; y<y1; y+=this.binSize) {
+				var binX = Math.floor(x/this.binSize);
+				var binY = Math.floor(y/this.binSize);
+				var offsetX = (x/this.binSize)-binX;
+				var offsetY = (y/this.binSize)-binY;
+				gfx.drawRect(
+					(binX*this.binSize)-GameScene.view.x-GameScene.viewOffset.x,
+					(binY*this.binSize)-GameScene.view.y-GameScene.viewOffset.y,
+					this.binSize, this.binSize
+				);
+			}
+		}
 	}
 }
