@@ -210,6 +210,7 @@ var GameScene = {
 
 		// GameScene.world.bsp.renderDebug(GameScene.debugGfx);
 		GameScene.debugGfx.clear();
+		GameScene.caster.drawDebug(GameScene.debugGfx);
 		// GameScene.world.segSpace.drawDebug(GameScene.debugGfx);
 		GameScene.debugGfx.hitArea = new PIXI.Rectangle(0,0,0,0);
 

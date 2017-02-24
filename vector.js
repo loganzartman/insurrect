@@ -115,6 +115,10 @@ class Vector {
 		return true;
 	}
 
+	hash() {
+		return ~~(this.x*33) + ~~(this.y*17);
+	}
+
 	toPixiPoint() {
 		return new PIXI.Point(this.x, this.y);
 	}
