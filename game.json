@@ -18,6 +18,7 @@
 			"game/segmentSpace.js",
 			"game/binarySpacePartition.js",
 			"game/world.js",
+			"game/caster.js",
 			"game/obstacle.js",
 			"game/collision.js",
 			"game/entity.js",

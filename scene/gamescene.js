@@ -30,6 +30,21 @@ var GameScene = {
 			GameScene.objectContainer.removeChild(obs.gfx);
 		});
 
+		GameScene.caster = new Caster({world: GameScene.world});
+
+		GameScene.initGfx();
+
+		//handle display resizes
+		Display.events.listen("resize", evt => {
+			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);
+			GameScene.maskTexture.resize(Display.w, Display.h);
+		});
+	},
+
+	/**
+	 * Prepares graphics
+	 */
+	initGfx: function() {
 		//graphics setup
 		GameScene.stage = new PIXI.Container();
 
@@ -82,12 +97,6 @@ var GameScene = {
 
         GameScene.debugGfx = new PIXI.Graphics();
         GameScene.stage.addChild(GameScene.debugGfx);
-
-		//handle display resizes
-		Display.events.listen("resize", evt => {
-			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);
-			GameScene.maskTexture.resize(Display.w, Display.h);
-		});
 	},
 
 	/**
@@ -111,89 +120,6 @@ var GameScene = {
 	 */
 	deactivate: function() {
 
-	},
-
-	/**
-	 * Generates a polygon representing visible areas from a given position.
-	 * @param position where from?
-	 */
-	calculateVision: function(position, includeObjects) {
-		// return new PIXI.Polygon([position]);
-		//collect visible polygons
-		viewRect = GameScene.getViewRect();
-		viewRect.noDisplay = true;
-		var viewSegs = viewRect.getSegments();
-		var polygons = [];
-		var segments = [];
-		GameScene.world.obstacles.forEach(function(object){
-			if (object instanceof Obstacle && GameScene.inView(object.poly)) {
-				polygons.push(object.poly);
-				object.poly.getSegments().forEach(s => segments.push(s));
-			}
-		});
-		polygons.push(viewRect);
-
-		//cast ray from position to each vertex
-		var intersections = [];
-		var vertices = [];
-		polygons.forEach(function(p){
-			p.points.forEach(function(v){
-				vertices.push(v);
-			})
-		});
-
-		Util.geom.segIntersections(viewRect.getSegments(), segments)
-			.forEach(i => vertices.push(i));
-
-		//avoid getting stuck on corners
-		var angles = vertices.map(v => v.sub(position).dir());
-		var temp = [];
-		angles.forEach(a => {
-			temp.push(a - 0.00001);
-			// temp.push(a);
-			temp.push(a + 0.00001);
-		});
-		angles = temp;
-
-		var visiblePolys = [];
-		angles.forEach(function(dir){
-			var min = null;
-			var minPoly = null;
-			
-			var dirVector = Vector.fromDir(dir, 1);
-			let test = (segment) => {
-				var result = Util.geom.raySegIntersect(
-						position, dirVector, segment);
-				if (result !== null) {
-					if (min === null || result.param < min.param) {
-						min = result;
-						minPoly = segment.parentPolygon;
-					}
-				}
-			};
-			GameScene.world.segSpace.getRaycast(
-				GameScene.world.player.position.x, GameScene.world.player.position.y,
-				dirVector.x, dirVector.y, Display.diag * 0.5,
-				test
-			);
-
-			// GameScene.world.bsp.traverseNearToFar(GameScene.world.player.position, test);
-			
-			viewSegs.forEach(function(segment){test(segment)});
-
-			if (min !== null) {
-				intersections.push(new Vector(min.x, min.y));
-				if (includeObjects && !minPoly.noDisplay && !visiblePolys.includes(minPoly))
-					visiblePolys.push(minPoly);
-			}
-		});
-
-		//sort intersections by angle
-		intersections.sort((a,b) => a.sub(position).dir() - b.sub(position).dir());
-
-		//construct polygon representing vision
-		visiblePolys.push(new Polygon(intersections));
-		return visiblePolys;
 	},
 
 	getViewRect: function() {
@@ -257,7 +183,7 @@ var GameScene = {
 		GameScene.maskGfx.endFill();
 
 		//calculate visible polygons
-		var polys = GameScene.calculateVision(
+		var polys = GameScene.caster.cast(
 			GameScene.world.player.position.add(new Vector(0.0001,0.0001)), true);
 
 		//render each visible polygon to mask graphics
