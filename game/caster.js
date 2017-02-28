@@ -64,10 +64,9 @@ class Caster extends Emitter {
 	 * Geometry cannot change after the preprocess.
 	 */
 	preprocess(viewpoint) {
-		//sort points by distance to viewpoint (ascending)
-		this.points.sort((a,b) => {
-			let distanceA = a.point.sub(viewpoint).len();
-			let distanceB = b.point.sub(viewpoint).len();
+		this.segments.sort((a,b) => {
+			let distanceA = a.distanceFrom(viewpoint);
+			let distanceB = b.distanceFrom(viewpoint);
 			return distanceA - distanceB;
 		});
 
@@ -97,26 +96,13 @@ class Caster extends Emitter {
 			let dirVector = Vector.fromDir(angle, 1);
 			let point = null;
 
-			//iterate over points in order of distance
-			for (let i=0, j=this.points.length; i<j; i++) {
-				let nearest = null;
-				let nearestDist = 0;
+			//iterate over segments in order of distance
+			for (let i=0, j=this.segments.length; i<j; i++) {
+				let segment = this.segments[i];
+				let isect = Util.geom.raySegIntersect(viewpoint, dirVector, segment);
 
-				//iterate over segments associated with a point
-				for (let k=0, m=this.points[i].segments.length; k<m; k++) {
-					let segment = this.points[i].segments[k];
-					let isect = Util.geom.raySegIntersect(viewpoint, dirVector, segment);
-					if (isect !== null) {
-						let dist = new Vector(isect).sub(viewpoint).len();
-						if (nearest === null || dist < nearestDist) {
-							nearest = isect;
-							nearestDist = dist;
-						}
-					}
-				}
-
-				if (nearest) {
-					point = new Vector(nearest);
+				if (isect) {
+					point = new Vector(isect);
 					point.angle = point.sub(viewpoint).dir();
 					break;
 				}
@@ -135,12 +121,29 @@ class Caster extends Emitter {
 	}
 
 	drawDebug(gfx) {
+		this.segments.forEach((item,idx) => {
+			let displayPosA = item.a.sub(GameScene.view).sub(GameScene.viewOffset);
+			let displayPosB = item.b.sub(GameScene.view).sub(GameScene.viewOffset);
+			let col = idx*4/this.segments.length;
+			let color = (Math.min(255,col*255)) | 0x00FF00;
+			if (idx === 0) color = 0xFFFFFF;
+			gfx.lineStyle(1, color, 1);
+			gfx.moveTo(displayPosA.x, displayPosA.y);
+			gfx.lineTo(displayPosB.x, displayPosB.y);
+		});
+
 		this.points.forEach((item,idx) => {
 			let displayPos = item.point.sub(GameScene.view).sub(GameScene.viewOffset);
 			let col = idx*4/this.points.length;
+			gfx.lineStyle(0);
 			gfx.beginFill((Math.min(255,col*255) << 8) | 0xFF0000, 1);
 			gfx.drawRect(displayPos.x, displayPos.y, 1, 1);
 			gfx.endFill();
 		});
+
+		let point = this.segments[0].nearestPoint(GameScene.world.player.position)
+			.sub(GameScene.view).sub(GameScene.viewOffset);
+		gfx.beginFill(0xFF00FF, 1);
+		gfx.drawRect(point.x-2, point.y-2, 4, 4);
 	}
 }

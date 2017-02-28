@@ -68,9 +68,17 @@ class Vector {
 		return this.x*v.x + this.y*v.y;
 	}
 
+	cross(v) {
+		return this.x*v.y - this.y*v.x;
+	}
+
 	project(v) {
 		var l = this.len();
 		return this.mult(this.dot(v) / (l*l));
+	}
+
+	perpendicular() {
+		return new Vector(-this.y, this.x);
 	}
 
 	reflectOver(normal) {

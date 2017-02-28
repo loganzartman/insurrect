@@ -46,6 +46,27 @@ class Segment {
 		return [one, two];
 	}
 
+	nearestPoint(point) {
+		let line = this.b.sub(this.a);
+		let perp= line.perpendicular();
+		let dpa = this.a.sub(point);
+		let dl = perp.project(dpa);
+		let p = point.add(dl);
+
+		let min = new Vector(Math.min(this.b.x, this.a.x), Math.min(this.b.y, this.a.y));
+		let max = new Vector(Math.max(this.b.x, this.a.x), Math.max(this.b.y, this.a.y));
+		if (p.x <= max.x && p.y <= max.y && p.x >= min.x && p.y >= min.y)
+			return p;
+
+		let distA = this.a.sub(point).len();
+		let distB = this.b.sub(point).len();
+		return distA < distB ? this.a : this.b;
+	}
+
+	distanceFrom(point) {
+		return this.nearestPoint(point).sub(point).len();
+	}
+
 	/**
 	 * Determines whether a given point lies on this line segment.
 	 * @param point the point to test
