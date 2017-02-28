@@ -30,8 +30,6 @@ var GameScene = {
 			GameScene.objectContainer.removeChild(obs.gfx);
 		});
 
-		GameScene.caster = new Caster({world: GameScene.world});
-
 		GameScene.initGfx();
 
 		//handle display resizes
@@ -183,8 +181,11 @@ var GameScene = {
 		GameScene.maskGfx.endFill();
 
 		//calculate visible polygons
-		var polys = GameScene.caster.cast(
-			GameScene.world.player.position.add(new Vector(0.0001,0.0001)), true);
+		var polys = GameScene.world.caster.cast(
+			GameScene.world.player.position.add(new Vector(0.0001,0.0001)),
+			GameScene.getViewRect(),
+			true
+		);
 
 		//render each visible polygon to mask graphics
 		polys.forEach(function(poly){
@@ -210,7 +211,7 @@ var GameScene = {
 
 		// GameScene.world.bsp.renderDebug(GameScene.debugGfx);
 		GameScene.debugGfx.clear();
-		GameScene.caster.drawDebug(GameScene.debugGfx);
+		GameScene.world.caster.drawDebug(GameScene.debugGfx);
 		// GameScene.world.segSpace.drawDebug(GameScene.debugGfx);
 		GameScene.debugGfx.hitArea = new PIXI.Rectangle(0,0,0,0);
 

@@ -118,6 +118,8 @@ class Vector {
 	}
 
 	equals(v) {
+		if (v === null || v === undefined)
+			return false;
 		if (v.x !== this.x || v.y !== this.y)
 			return false;
 		return true;

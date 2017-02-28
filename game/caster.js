@@ -9,7 +9,6 @@ class Caster extends Emitter {
 		});
 
 		this.world = params.world;
-		this.init();
 	}
 
 	/**
@@ -63,7 +62,16 @@ class Caster extends Emitter {
 	 * Performs preprocessing for a cast.
 	 * Geometry cannot change after the preprocess.
 	 */
-	preprocess(viewpoint) {
+	preprocess(viewpoint, viewport) {
+		//add viewport geometry
+		viewport.getSegments().forEach(segment => {
+			segment.VIEWPORT_GEOM = true;
+			this.segments.push(segment);
+		});
+		viewport.points.forEach(point => {
+			this.points.push({point: point, VIEWPORT_GEOM: true});
+		});
+
 		this.segments.sort((a,b) => {
 			let distanceA = a.distanceFrom(viewpoint);
 			let distanceB = b.distanceFrom(viewpoint);
@@ -81,12 +89,21 @@ class Caster extends Emitter {
 		});
 	}
 
+	postprocess(viewpoint) {
+		//remove viewport geometry
+		this.segments = this.segments.filter(s => !("VIEWPORT_GEOM" in s));
+		this.points = this.points.filter(p => !("VIEWPORT_GEOM" in p));
+	}
+
 	/**
 	 * Computes visible area
 	 * @return a list of Polygons representing visibility from viewpoint
 	 */
-	cast(viewpoint, includeStructure) {
-		this.preprocess(viewpoint);
+	cast(viewpoint, viewport, includeStructure, notDirty) {
+		if (!notDirty) {
+			this.postprocess(viewpoint, viewport);
+			this.preprocess(viewpoint, viewport);
+		}
 
 		let points = [];
 		let polys = [];

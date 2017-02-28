@@ -7,6 +7,7 @@ class World extends Emitter {
         this.scene = null;
         this.levelName = params.levelName;
         this.listnrs = [];
+        this.caster = new Caster({world: this});
         this.reset();
     }
 
@@ -74,6 +75,7 @@ class World extends Emitter {
             });
         });
 
+        this.caster.init();
         // this.bsp = new BinarySpacePartition({segments: segments});
     }
 
