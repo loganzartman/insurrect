@@ -15,9 +15,11 @@ class Caster extends Emitter {
 	/**
 	 * Performs initialization.
 	 * Must reinitialize if geometry changes.
+	 * TODO: benchmark and see if using set to reduce searching significantly improves perf
 	 */
 	init() {
 		this.points = [];
+		this.segments = [];
 		let set = new IntSet();
 
 		//attempts to append a new segment for an existing point
@@ -35,6 +37,7 @@ class Caster extends Emitter {
 		//create an internal list of points and all of the segments associated with them
 		this.world.obstacles.forEach(obstacle => {
 			obstacle.getSegments().forEach(segment => {
+				this.segments.push(segment);
 				[segment.a, segment.b].forEach(point => {
 					//if the set doens't yet contain the hash for this point, it is likely to be new
 					if (set.add(point.hash())) {
@@ -61,10 +64,21 @@ class Caster extends Emitter {
 	 * Geometry cannot change after the preprocess.
 	 */
 	preprocess(viewpoint) {
+		//sort points by distance to viewpoint (ascending)
 		this.points.sort((a,b) => {
 			let distanceA = a.point.sub(viewpoint).len();
 			let distanceB = b.point.sub(viewpoint).len();
 			return distanceA - distanceB;
+		});
+
+		//collect list of all casting directions
+		const epsilon = 1e-4;
+		this.angles = [];
+		this.points.forEach(item => {
+			let angle = item.point.sub(viewpoint).dir();
+			this.angles.push(angle-epsilon);
+			this.angles.push(angle);
+			this.angles.push(angle+epsilon);
 		});
 	}
 
@@ -72,15 +86,52 @@ class Caster extends Emitter {
 	 * Computes visible area
 	 * @return a list of Polygons representing visibility from viewpoint
 	 */
-	cast(viewpoint, includeWholePolygons) {
+	cast(viewpoint, includeStructure) {
 		this.preprocess(viewpoint);
-		let points = [
-			new Vector(viewpoint.x-64, viewpoint.y-64),
-			new Vector(viewpoint.x+64, viewpoint.y-64),
-			new Vector(viewpoint.x+64, viewpoint.y+64),
-			new Vector(viewpoint.x-64, viewpoint.y+64)
-		];
-		return [new Polygon(points)];
+
+		let points = [];
+		let polys = [];
+
+		//iterate over casting directions
+		this.angles.forEach(angle => {
+			let dirVector = Vector.fromDir(angle, 1);
+			let point = null;
+
+			//iterate over points in order of distance
+			for (let i=0, j=this.points.length; i<j; i++) {
+				let nearest = null;
+				let nearestDist = 0;
+
+				//iterate over segments associated with a point
+				for (let k=0, m=this.points[i].segments.length; k<m; k++) {
+					let segment = this.points[i].segments[k];
+					let isect = Util.geom.raySegIntersect(viewpoint, dirVector, segment);
+					if (isect !== null) {
+						let dist = new Vector(isect).sub(viewpoint).len();
+						if (nearest === null || dist < nearestDist) {
+							nearest = isect;
+							nearestDist = dist;
+						}
+					}
+				}
+
+				if (nearest) {
+					point = new Vector(nearest);
+					point.angle = point.sub(viewpoint).dir();
+					break;
+				}
+			}
+
+			if (point !== null)
+				points.push(point);
+		});
+
+		points.sort(function(a,b){
+			return b.angle - a.angle;
+		});
+
+		polys.push(new Polygon(points));
+		return polys;
 	}
 
 	drawDebug(gfx) {

@@ -65,12 +65,12 @@ class World extends Emitter {
     }
 
     rebuildStructures() {
-        let segments = [];
+        this.segments = [];
         this.segSpace = new SegmentSpace({binSize: 24});
         this.obstacles.forEach(obstacle => {
             obstacle.getSegments().forEach(segment => {
                 this.segSpace.add(segment);
-                segments.push(segment);
+                this.segments.push(segment);
             });
         });
 
