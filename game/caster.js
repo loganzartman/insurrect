@@ -94,6 +94,8 @@ class Caster extends Emitter {
 		const epsilon = 1e-12;
 		this.angles = [];
 		this.points.forEach(item => {
+			if (!viewport.contains(item.point) && !("VIEWPORT_GEOM" in item))
+				return;
 			let angle = item.point.sub(viewpoint).dir();
 			this.angles.push(angle-epsilon);
 			// this.angles.push(angle);
