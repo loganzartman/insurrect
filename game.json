@@ -37,7 +37,7 @@
 		"AndinaBold": "resource/andina_bold.fnt"
 	},
 
-	"colors": {
+	"colors2": {
 		"bg1": "0xD9CEBA",
 		"bg2": "0x263145",
 		"acc1": "0xD9559D",
@@ -59,7 +59,7 @@
 		"acc3b": "0xA55F75"
 	},
 
-	"colors2": {
+	"colors": {
 		"bg1": "0xF2EBC7",
 		"bg2": "0x343642",
 		"acc1": "0x962D3E",
@@ -117,7 +117,7 @@
 	},
 
 	"levels": {
-		"demo3": {
+		"demo1": {
 			"objects": [
 				{
 					"type": "obstacle",

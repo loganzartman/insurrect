@@ -187,6 +187,9 @@ var GameScene = {
 			true
 		);
 
+		GameScene.debugGfx.clear();
+		// GameScene.world.caster.drawDebug(GameScene.debugGfx);
+
 		//render each visible polygon to mask graphics
 		polys.forEach(function(poly){
 			var points = poly.points.map(p =>
@@ -200,6 +203,14 @@ var GameScene = {
 			for (var i=0; i<points.length; i++)
 				GameScene.maskGfx.lineTo((points[i].x), (points[i].y));
 			GameScene.maskGfx.endFill();
+
+			// GameScene.debugGfx.lineStyle(1, 0xFF0000, 1);
+			// GameScene.debugGfx.moveTo(
+			// 	(points[points.length-1].x),
+			// 	(points[points.length-1].y)
+			// );
+			// for (var i=0; i<points.length; i++)
+			// 	GameScene.debugGfx.lineTo((points[i].x), (points[i].y));
 		});
 
 		if (Game.WALLHACKS) {
@@ -210,8 +221,6 @@ var GameScene = {
 		}
 
 		// GameScene.world.bsp.renderDebug(GameScene.debugGfx);
-		GameScene.debugGfx.clear();
-		GameScene.world.caster.drawDebug(GameScene.debugGfx);
 		// GameScene.world.segSpace.drawDebug(GameScene.debugGfx);
 		GameScene.debugGfx.hitArea = new PIXI.Rectangle(0,0,0,0);
 

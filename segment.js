@@ -53,9 +53,8 @@ class Segment {
 		let dl = perp.project(dpa);
 		let p = point.add(dl);
 
-		let min = new Vector(Math.min(this.b.x, this.a.x), Math.min(this.b.y, this.a.y));
-		let max = new Vector(Math.max(this.b.x, this.a.x), Math.max(this.b.y, this.a.y));
-		if (p.x <= max.x && p.y <= max.y && p.x >= min.x && p.y >= min.y)
+		let mid = this.b.add(this.a).mult(0.5);
+		if (p.sub(mid).len() <= line.len()*0.5)
 			return p;
 
 		let distA = this.a.sub(point).len();
