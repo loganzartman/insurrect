@@ -8,6 +8,8 @@ var EditScene = {
     mergeMode: false,
     mergedObstacles: [],
     mergeRemoveEnabled: true,
+    UNION: 1,
+    DIFFERENCE: 2,
 
     init: function(params) {
         EditScene.stage = new PIXI.Container();
@@ -55,10 +57,12 @@ var EditScene = {
                     EditScene.mergedObstacles.forEach(obs => GameScene.world.removeObstacle(obs));
                     EditScene.mergedObstacles = [];
 
-                    polys.push(obs.poly);
-                    var merged = Polygon.union(polys, polys); //merge all merge geometry
-                    polys.pop();
-                    
+                    var merged;
+                    if (polys.length === 0 || EditScene.mergeMode === EditScene.UNION)
+                        merged = Polygon.union(polys, [obs.poly]);
+                    else
+                        merged = Polygon.difference(polys, [obs.poly]); //merge all merge geometry
+
                     merged.forEach(poly => {
                         var obs = new Obstacle({vertices: poly.points});
                         GameScene.world.addObstacle(obs); //add merged geometry to world
@@ -173,11 +177,12 @@ var EditScene = {
     },
 
     toggleMerge: function() {
-        EditScene.mergeMode = !EditScene.mergeMode;
+        EditScene.mergeMode = (EditScene.mergeMode+1)%3;
         if (EditScene.mergeMode) {
             EditScene.mergedObstacles = [];
         }
-        EditScene.mergeBtn.setText(EditScene.mergeMode ? "Merge ( ON)" : "Merge (OFF)");
+        var strings = ["Merge (OFF)", "Merge (ADD)", "Merge (SUB)"];
+        EditScene.mergeBtn.setText(strings[EditScene.mergeMode]);
     },
 
     /**
