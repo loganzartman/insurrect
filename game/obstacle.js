@@ -5,7 +5,8 @@ class Obstacle extends Emitter {
 		
 		params = Object.assign({
 			rotation: 0,
-			prefabName: null
+			prefabName: null,
+			position: new Vector(0,0)
 		}, params);
 
 		super(params);

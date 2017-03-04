@@ -203,14 +203,6 @@ var GameScene = {
 			for (var i=0; i<points.length; i++)
 				GameScene.maskGfx.lineTo((points[i].x), (points[i].y));
 			GameScene.maskGfx.endFill();
-
-			// GameScene.debugGfx.lineStyle(1, 0xFF0000, 1);
-			// GameScene.debugGfx.moveTo(
-			// 	(points[points.length-1].x),
-			// 	(points[points.length-1].y)
-			// );
-			// for (var i=0; i<points.length; i++)
-			// 	GameScene.debugGfx.lineTo((points[i].x), (points[i].y));
 		});
 
 		if (Game.WALLHACKS) {

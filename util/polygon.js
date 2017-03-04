@@ -4,7 +4,7 @@ class Polygon {
         this.points = points.map(function(point){
             if (point instanceof Vector)
                 return point
-            return new Vector(point.x, point.y);
+            return new Vector(point);
         });
     }
 
@@ -68,5 +68,65 @@ class Polygon {
 
     toPixiPolygon() {
         return new PIXI.Polygon(this.points.map(v => v.toPixiPoint()));
+    }
+
+    toClipperPath() {
+        return this.points.map(v => {return {X: v.x, Y: v.y}});
+    }
+
+    static fromClipperPath(path) {
+        return new Polygon(path.map(point => new Vector(point.X, point.Y)));
+    }
+
+    static toClipperPaths(polygons) {
+        let paths = [];
+        polygons.forEach(poly => paths.push(poly.toClipperPath()));
+        return paths;
+    }
+
+    static fromClipperPaths(paths) {
+        let result = [];
+        paths.forEach(path => {
+            result.push(Polygon.fromClipperPath(path));
+        });
+        return result;
+    }
+
+    static clip(subjects, clips, clipType) {
+        let clip = new ClipperLib.Clipper();
+        
+        //prepare paths
+        let subjPaths = Polygon.toClipperPaths(subjects);
+        let clipPaths = Polygon.toClipperPaths(clips);
+        ClipperLib.JS.ScaleUpPaths(subjPaths, 100);
+        ClipperLib.JS.ScaleUpPaths(clipPaths, 100);
+
+        //perform clipping
+        clip.AddPaths(subjPaths, ClipperLib.PolyType.ptSubject, true);
+        clip.AddPaths(clipPaths, ClipperLib.PolyType.ptClip, true);
+        let solnPaths = [];
+        let success = clip.Execute(
+            clipType,
+            solnPaths,
+            ClipperLib.PolyFillType.pftNonZero,
+            ClipperLib.PolyFillType.pftNonZero
+        );
+        if (!success)
+            throw new Error("Clipping failed!");
+
+        //simplify and clean result
+        solnPaths = ClipperLib.Clipper.CleanPolygons(solnPaths, 100 * 0.1);
+
+        //scale down and output
+        ClipperLib.JS.ScaleDownPaths(solnPaths, 100);
+        return Polygon.fromClipperPaths(solnPaths);
+    }
+
+    static union(subjects, clips) {
+        return Polygon.clip(subjects, clips, ClipperLib.ClipType.ctUnion);
+    }
+
+    static difference(subjects, clips) {
+        return Polygon.clip(subjects, clips, ClipperLib.ClipType.ctDifference);
     }
 }

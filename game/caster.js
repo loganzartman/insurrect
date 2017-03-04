@@ -5,11 +5,9 @@ class Caster extends Emitter {
 
 		super(params);
 		params = Object.assign(params, {
-			maxDist: 1000,
 			DEBUG: true
 		});
 
-		this.maxDist = params.maxDist;
 		this.world = params.world;
 		this.DEBUG = params.DEBUG;
 	}
@@ -182,14 +180,6 @@ class Caster extends Emitter {
 	drawDebug(gfx) {
 		if (!this.DEBUG)
 			return;
-
-		// this.debugSegments.forEach((item) => {
-		// 	let displayPosA = item.a.sub(GameScene.view).sub(GameScene.viewOffset);
-		// 	let displayPosB = item.b.sub(GameScene.view).sub(GameScene.viewOffset);
-		// 	gfx.lineStyle(1, 0x700010, 0.5);
-		// 	gfx.moveTo(displayPosA.x, displayPosA.y);
-		// 	gfx.lineTo(displayPosB.x, displayPosB.y);
-		// });
 
 		this.segments.forEach((item,idx) => {
 			let displayPosA = item.a.sub(GameScene.view).sub(GameScene.viewOffset);

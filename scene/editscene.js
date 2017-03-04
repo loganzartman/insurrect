@@ -5,6 +5,9 @@ var EditScene = {
     phantomObstacle: null,
     allowPlayerFire: false,
     gridScale: 1,
+    mergeMode: false,
+    mergedObstacles: [],
+    mergeRemoveEnabled: true,
 
     init: function(params) {
         EditScene.stage = new PIXI.Container();
@@ -31,12 +34,37 @@ var EditScene = {
         //Set up editor interaction
         GameScene.stage.on("click", function(){
             if (EditScene.selectedObstacle !== null) {
-                GameScene.world.buildPrefab({
+                //construct the selected prefab
+                var obs = GameScene.world.buildPrefab({
                     type: "prefab",
                     name: EditScene.selectedObstacle,
                     position: EditScene.calculatePlaceLocation(new Vector(Input.mouse), EditScene.phantomObstacle),
                     rotation: EditScene.phantomObstacle.rotation
                 });
+
+                //if geometry merge mode is enabled, remove it and reinsert a merged obstacle
+                if (EditScene.mergeMode) {
+                    EditScene.mergeRemoveEnabled = false;
+                    GameScene.world.removeObstacle(obs); //remove the new obstacle
+                    EditScene.mergeRemoveEnabled = true;
+
+                    //compile a list of merge geometry polygons
+                    var polys = EditScene.mergedObstacles.map(obs => obs.poly);
+
+                    //remove the existing merged geometry from the world
+                    EditScene.mergedObstacles.forEach(obs => GameScene.world.removeObstacle(obs));
+                    EditScene.mergedObstacles = [];
+
+                    polys.push(obs.poly);
+                    var merged = Polygon.union(polys, polys); //merge all merge geometry
+                    polys.pop();
+                    
+                    merged.forEach(poly => {
+                        var obs = new Obstacle({vertices: poly.points});
+                        GameScene.world.addObstacle(obs); //add merged geometry to world
+                        EditScene.mergedObstacles.push(obs); //keep track of merged geometry
+                    });
+                }
             }
         });
 
@@ -103,6 +131,7 @@ var EditScene = {
             if (event.keyCode === Input.key.R) {
                 EditScene.phantomObstacle.rotation = (EditScene.phantomObstacle.rotation + 45) % 360;
                 EditScene.phantomObstacle.updateTransform();
+                EditScene.phantomObstacle.gfx.hitArea = new PIXI.Rectangle(0,0,0,0);
                 EditScene.phantomObstacle.draw();
             }
         }));
@@ -116,8 +145,15 @@ var EditScene = {
         exportBtn.position.x = Display.w - exportBtn.width - 8;
         exportBtn.position.y = 8;
 
+        //create merge button
+        EditScene.mergeBtn = Display.makeButton("Merge (OFF)", Core.color.acc3,
+            Core.color.acc1, EditScene.toggleMerge);
+        EditScene.mergeBtn.position.x = Display.w - EditScene.mergeBtn.width - 8;
+        EditScene.mergeBtn.position.y = 10 + exportBtn.height;
+
         EditScene.stage.addChild(EditScene.overlayGfx);
         EditScene.stage.addChild(exportBtn);
+        EditScene.stage.addChild(EditScene.mergeBtn);
     },
 
     doExport: function() {
@@ -126,6 +162,22 @@ var EditScene = {
         var url = "data:text/plain;base64,";
         url += btoa(str);
         window.open(url);
+    },
+
+    doMerge: function(obstacle) {
+        var polygons = GameScene.world.obstacles.map(obstacle => obstacle.poly);
+        var result = Polygon.union(polygons, polygons);
+        GameScene.world.removeAllObstacles();
+        result.forEach(poly => GameScene.world.addObstacle(new Obstacle({vertices: poly.points})));
+        GameScene.world.rebuildStructures();
+    },
+
+    toggleMerge: function() {
+        EditScene.mergeMode = !EditScene.mergeMode;
+        if (EditScene.mergeMode) {
+            EditScene.mergedObstacles = [];
+        }
+        EditScene.mergeBtn.setText(EditScene.mergeMode ? "Merge ( ON)" : "Merge (OFF)");
     },
 
     /**
@@ -207,6 +259,8 @@ var EditScene = {
         });
         obs.gfx.on("rightclick", function(){
             GameScene.world.removeObstacle(obs);
+            if (EditScene.mergeRemoveEnabled && EditScene.mergedObstacles.includes(obs))
+                EditScene.mergedObstacles.splice(EditScene.mergedObstacles.indexOf(obs), 1);
         });
     },
 

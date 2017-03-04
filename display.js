@@ -120,19 +120,27 @@ class Display {
 			align: "left",
 			tint: 0xFFFFFF
 		});
-		txt.updateText();
 		txt.position.x = Display.padding;
 		txt.position.y = Display.padding;
 
 		//create button
 		var gfx = new PIXI.Graphics();
-		gfx.lineStyle(1, 0xFFFFFF);
-		gfx.drawRect(0, 0, txt.width + Display.padding * 2, 10 + Display.padding * 2);
-		txt.tint = gfx.tint = color1;
+
+		//add text update capability
+		cont.setText = function(text) {
+			txt.text = text;
+			txt.updateText();
+			gfx.clear();
+			gfx.lineStyle(1, 0xFFFFFF);
+			gfx.drawRect(0, 0, txt.width + Display.padding * 2, 10 + Display.padding * 2);
+			gfx.hitArea = new PIXI.Rectangle(0, 0, gfx.width, gfx.height);
+			txt.tint = gfx.tint = color1;
+		};
+
+		cont.setText(text);
 
 		//add interactivity
 		gfx.interactive = true;
-		gfx.hitArea = new PIXI.Rectangle(0, 0, gfx.width, gfx.height);
 		gfx.on("mouseover", function(){
 			txt.tint = gfx.tint = color2;
 		});
@@ -143,6 +151,7 @@ class Display {
 
 		cont.addChild(gfx);
 		cont.addChild(txt);
+
 		return cont;
 	}
 

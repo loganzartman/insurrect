@@ -65,6 +65,16 @@ class World extends Emitter {
         return true;
     }
 
+    removeAllObstacles() {
+        this.obstacles.forEach(obs => {
+            obs.gfx.destroy();
+            this.emit("removeObstacle", obs);
+        });
+        this.obstacles = [];
+        this.rebuildStructures();
+        return true;
+    }
+
     rebuildStructures() {
         this.segments = [];
         this.segSpace = new SegmentSpace({binSize: 24});
