@@ -47,10 +47,8 @@ class Display {
 
 		//create output canvas
 		Display.canvas = document.createElement("canvas");
-		Display.canvas.width = Math.ceil(Display.w * Display.scale);
-		Display.canvas.height = Math.ceil(Display.h * Display.scale);
 		Display.cctx = Display.canvas.getContext("2d");
-		Display.cctx.imageSmoothingEnabled = false;
+		Display.applyDimensions();
 		element.appendChild(Display.canvas);
 
 		//rig PIXI interaction to work with custom display scaling
@@ -66,13 +64,15 @@ class Display {
 		Display.renderer.resize(Display.w, Display.h);
 		Display.canvas.width = Math.ceil(Display.w * Display.scale);
 		Display.canvas.height = Math.ceil(Display.h * Display.scale);
+		Display.canvas.style.width = Display.canvas.width / window.devicePixelRatio + "px";
+		Display.canvas.style.height = Display.canvas.height / window.devicePixelRatio + "px";
 		Display.cctx.imageSmoothingEnabled = false;
 		this.events.emit("resize");
 	}
 
 	static calculateDimensions() {
-		var w = window.innerWidth;
-		var h = window.innerHeight;
+		var w = window.innerWidth * window.devicePixelRatio;
+		var h = window.innerHeight * window.devicePixelRatio;
 		var scale = w / 480;
 		Display.scale = Math.floor(scale);
 		Display.w = Math.floor(w / Display.scale);

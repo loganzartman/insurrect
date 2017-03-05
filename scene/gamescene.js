@@ -36,6 +36,10 @@ var GameScene = {
 		Display.events.listen("resize", evt => {
 			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);
 			GameScene.maskTexture.resize(Display.w, Display.h);
+			GameScene.bgtex.width = Display.w;
+			GameScene.bgtex.height = Display.h;
+			GameScene.bgtex2.width = Display.w;
+			GameScene.bgtex2.height = Display.h;
 		});
 	},
 
@@ -51,9 +55,13 @@ var GameScene = {
 		GameScene.bloom = new BloomFilter();
 		GameScene.bloom.blurXFilter.passes = 2;
 		GameScene.bloom.blurYFilter.passes = 2;
-		GameScene.bloom.blurXFilter.blur = 6;
-		GameScene.bloom.blurYFilter.blur = 2;
-		GameScene.gameStage.filters = [GameScene.bloom];
+		GameScene.bloom.blurXFilter.blur = 3;
+		GameScene.bloom.blurYFilter.blur = 1;
+		GameScene.rgbsplit = new RGBSplitFilter();
+		GameScene.rgbsplit.red = new PIXI.Point(0,1);
+		GameScene.rgbsplit.blue = new PIXI.Point(0,-1);
+		GameScene.rgbsplit.green = new PIXI.Point(0,0);
+		GameScene.gameStage.filters = [GameScene.bloom, GameScene.rgbsplit];
 
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();
@@ -92,7 +100,7 @@ var GameScene = {
         GameScene.debugText.position = new PIXI.Point(8,8);
         
         //create text shadow
-        GameScene.debugTextTexture = new PIXI.RenderTexture(Display.w, Display.h);
+        GameScene.debugTextTexture = PIXI.RenderTexture.create(Display.w, Display.h);
         var dbtDisplayFore = new PIXI.Sprite(GameScene.debugTextTexture);
         dbtDisplayFore.tint = Core.color.acc1;
         var dbtDisplayShadow = new PIXI.Sprite(GameScene.debugTextTexture);

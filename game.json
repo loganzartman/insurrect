@@ -3,6 +3,7 @@
 		"sources": [
 			"lib/pixi.js",
 			"lib/bloom.js",
+			"lib/rgbsplit.js",
 			"lib/clipper.js",
 			"emitter.js",
 			"game.js",
