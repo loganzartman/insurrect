@@ -112,7 +112,7 @@ var Core = {
 
 			//set style
 			c.save();
-			c.fillStyle = Core.loaderGfx.color(Core.color.bg1);
+			c.fillStyle = Core.loaderGfx.color(Core.color.bg2);
 			c.fillRect(0,0,w,h);
 			var col = Core.loaderGfx.color(Core.color.acc1, val);
 			c.strokeStyle = col;

@@ -2,6 +2,7 @@
 	"scripts": {
 		"sources": [
 			"lib/pixi.js",
+			"lib/bloom.js",
 			"lib/clipper.js",
 			"emitter.js",
 			"game.js",
@@ -38,7 +39,7 @@
 		"AndinaBold": "resource/andina_bold.fnt"
 	},
 
-	"colors": {
+	"colors0": {
 		"bg1": "0xD9CEBA",
 		"bg2": "0x263145",
 		"acc1": "0xD9559D",
@@ -49,15 +50,15 @@
 		"acc3b": "0xFFE559"
 	},
 
-	"colors1": {
-		"bg1": "0xF9E4AD",
-		"bg2": "0x31152B",
-		"acc1": "0xE6B098",
-		"acc1b": "0xFFD9C0",
-		"acc2": "0xCC4452",
-		"acc2b": "0xFF7B83",
-		"acc3": "0x723147",
-		"acc3b": "0xA55F75"
+	"colors": {
+		"bg1": "0x263145",
+		"bg2": "0x0E1219",
+		"acc1": "0xD9559D",
+		"acc1b": "0xFF8DD4",
+		"acc2": "0x465D8C",
+		"acc2b": "0x8EA2D6",
+		"acc3": "0xD9A404",
+		"acc3b": "0xFFE559"
 	},
 
 	"colors2": {

@@ -45,13 +45,22 @@ var GameScene = {
 	initGfx: function() {
 		//graphics setup
 		GameScene.stage = new PIXI.Container();
+		GameScene.gameStage = new PIXI.Container();
+		GameScene.stage.addChild(GameScene.gameStage);
+
+		GameScene.bloom = new BloomFilter();
+		GameScene.bloom.blurXFilter.passes = 2;
+		GameScene.bloom.blurYFilter.passes = 2;
+		GameScene.bloom.blurXFilter.blur = 6;
+		GameScene.bloom.blurYFilter.blur = 2;
+		GameScene.gameStage.filters = [GameScene.bloom];
 
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();
-		GameScene.stage.addChild(GameScene.unmaskedBg);
+		GameScene.gameStage.addChild(GameScene.unmaskedBg);
 		GameScene.bgtex = new PIXI.extras.TilingSprite(Core.resource.qmtex.texture, Display.w, Display.h);
 		GameScene.bgtex.tint = Core.color.bg2;
-		GameScene.stage.addChild(GameScene.bgtex);
+		GameScene.gameStage.addChild(GameScene.bgtex);
 
 		//contains anything that is masked by player sight
 		GameScene.maskedContainer = new PIXI.Container();
@@ -59,7 +68,7 @@ var GameScene = {
 		GameScene.maskTexture = PIXI.RenderTexture.create(Display.w, Display.h);
 		GameScene.mask = new PIXI.Sprite(GameScene.maskTexture);
 		GameScene.maskedContainer.mask = GameScene.mask;
-		GameScene.stage.addChild(GameScene.maskedContainer);
+		GameScene.gameStage.addChild(GameScene.maskedContainer);
 
 		//background
 		GameScene.bg = new PIXI.Graphics();
