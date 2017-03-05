@@ -54,6 +54,8 @@ class Display {
 		//rig PIXI interaction to work with custom display scaling
 		Display.renderer.plugins.interaction.setTargetElement(Display.canvas);
 
+		Display.gui = Core.gui.addFolder("Graphics");
+
 		window.addEventListener("resize", function(){
 			Display.calculateDimensions();
 			Display.applyDimensions();

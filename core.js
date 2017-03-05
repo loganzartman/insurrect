@@ -58,6 +58,8 @@ var Core = {
 	 * are ready)
 	 */
 	scriptsLoaded: function() {
+		Core.gui = new dat.GUI();
+
 		//use Pixi resource loader to load game assets
 		var loader = PIXI.loader;
 		Object.keys(Core.data.resources).forEach(function(n){loader.add(n, Core.data.resources[n])});

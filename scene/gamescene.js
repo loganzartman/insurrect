@@ -31,6 +31,11 @@ var GameScene = {
 		});
 
 		GameScene.initGfx();
+		Display.gui.add({
+			x: false,
+			get debugCaster() {return this.x},
+			set debugCaster(z) {this.x = z; GameScene.world.caster.DEBUG = z;}
+		}, "debugCaster");
 
 		//handle display resizes
 		Display.events.listen("resize", evt => {
@@ -52,16 +57,7 @@ var GameScene = {
 		GameScene.gameStage = new PIXI.Container();
 		GameScene.stage.addChild(GameScene.gameStage);
 
-		GameScene.bloom = new BloomFilter();
-		GameScene.bloom.blurXFilter.passes = 2;
-		GameScene.bloom.blurYFilter.passes = 2;
-		GameScene.bloom.blurXFilter.blur = 3;
-		GameScene.bloom.blurYFilter.blur = 1;
-		GameScene.rgbsplit = new RGBSplitFilter();
-		GameScene.rgbsplit.red = new PIXI.Point(0,1);
-		GameScene.rgbsplit.blue = new PIXI.Point(0,-1);
-		GameScene.rgbsplit.green = new PIXI.Point(0,0);
-		GameScene.gameStage.filters = [GameScene.bloom, GameScene.rgbsplit];
+		GameScene.initFilters();
 
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();
@@ -112,6 +108,76 @@ var GameScene = {
 
         GameScene.debugGfx = new PIXI.Graphics();
         GameScene.stage.addChild(GameScene.debugGfx);
+	},
+
+	initFilters: function() {
+		GameScene.bloom = new BloomFilter();
+		GameScene.bloom.blurXFilter.passes = 4;
+		GameScene.bloom.blurYFilter.passes = 4;
+		GameScene.bloom.blurXFilter.blur = 3;
+		GameScene.bloom.blurYFilter.blur = 3;
+		GameScene.rgbsplit = new RGBSplitFilter();
+		GameScene.rgbsplit.red = new PIXI.Point(0,1);
+		GameScene.rgbsplit.blue = new PIXI.Point(0,-1);
+		GameScene.rgbsplit.green = new PIXI.Point(0,0);
+		GameScene.gameStage.filters = [GameScene.bloom, GameScene.rgbsplit];
+
+		var filterOptions = {
+			bloom: true,
+			aberration: true,
+			bloomStr: 0.75,
+			bloomSat: 0.5,
+			bloomThresh: 0.3,
+			set enableBloom(bool) {
+				filterOptions.bloom = bool;
+				filterOptions.update();
+			},
+			get enableBloom() {
+				return filterOptions.bloom;
+			},
+			set enableAberration(bool) {
+				filterOptions.aberration = bool;
+				filterOptions.update();
+			},
+			get enableAberration() {
+				return filterOptions.aberration;
+			},
+			set bloomStrength(s) {
+				filterOptions.bloomStr = s;
+				filterOptions.update();
+			},
+			get bloomStrength() {
+				return filterOptions.bloomStr;
+			},
+			set bloomSaturation(s) {
+				filterOptions.bloomSat = s;
+				filterOptions.update();
+			},
+			get bloomSaturation() {
+				return filterOptions.bloomSat;
+			},
+			set bloomThreshold(s) {
+				filterOptions.bloomThresh = s;
+				filterOptions.update();
+			},
+			get bloomThreshold() {
+				return filterOptions.bloomThresh;
+			},
+			update() {
+				GameScene.bloom.enabled = filterOptions.bloom;
+				GameScene.rgbsplit.enabled = filterOptions.aberration;
+				GameScene.bloom.cmFilter.saturate(-1 + 3 * filterOptions.bloomSat);
+			    GameScene.bloom.cmFilter.brightness(0.08, true);
+			    GameScene.bloom.cmFilter.contrast(30 * filterOptions.bloomStr, true);
+			    GameScene.bloom.threshold.threshold = filterOptions.bloomThresh;
+			}
+		};
+		filterOptions.update();
+		Display.gui.add(filterOptions, "enableBloom");
+		Display.gui.add(filterOptions, "enableAberration");
+		Display.gui.add(filterOptions, "bloomStrength").min(0).max(1).step(0.05);
+		Display.gui.add(filterOptions, "bloomSaturation").min(0).max(1).step(0.05);
+		Display.gui.add(filterOptions, "bloomThreshold").min(0).max(1).step(0.05);
 	},
 
 	/**
