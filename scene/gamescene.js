@@ -188,7 +188,7 @@ var GameScene = {
 		);
 
 		GameScene.debugGfx.clear();
-		// GameScene.world.caster.drawDebug(GameScene.debugGfx);
+		GameScene.world.caster.drawDebug(GameScene.debugGfx);
 
 		//render each visible polygon to mask graphics
 		polys.forEach(function(poly){

@@ -126,7 +126,7 @@ class Vector {
 	}
 
 	hash() {
-		return ~~(this.x*33) + ~~(this.y*17);
+		return Math.round(this.x*33) + Math.round(this.y*17);
 	}
 
 	toPixiPoint() {

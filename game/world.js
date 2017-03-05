@@ -49,7 +49,7 @@ class World extends Emitter {
 
     addObstacle(obs) {
         this.obstacles.push(obs);
-        this.listnrs.push(obs.listen("verticesChanged", this.rebuildStructures));
+        this.listnrs.push(obs.listen("verticesChanged", () => this.rebuildStructures()));
         this.emit("addObstacle", obs);
         this.rebuildStructures();
     }

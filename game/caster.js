@@ -5,7 +5,7 @@ class Caster extends Emitter {
 
 		super(params);
 		params = Object.assign(params, {
-			DEBUG: true
+			DEBUG: false
 		});
 
 		this.world = params.world;
@@ -21,7 +21,6 @@ class Caster extends Emitter {
 		this.points = [];
 		this.segments = [];
 		this.debugSegments = [];
-		let set = new IntSet();
 
 		//attempts to append a new segment for an existing point
 		//returns false if that point doesn't actually exist
@@ -40,20 +39,12 @@ class Caster extends Emitter {
 			obstacle.getSegments().forEach(segment => {
 				this.segments.push(segment);
 				[segment.a, segment.b].forEach(point => {
-					//if the set doens't yet contain the hash for this point, it is likely to be new
-					if (set.add(point.hash())) {
-						//actually search the list just in case
-						if (!tryAppend(point, segment)) {
-							//it really is a new point
-							this.points.push({
-								point: point,
-								segments: [segment]
-							});
-						}
-					}
-					else {
-						//search the list and append this segment to the list for the point
-						tryAppend(point, segment);
+					if (!tryAppend(point, segment)) {
+						//it really is a new point
+						this.points.push({
+							point: point,
+							segments: [segment]
+						});
 					}
 				});
 			});
@@ -197,7 +188,8 @@ class Caster extends Emitter {
 			let col = idx*4/this.points.length;
 			gfx.lineStyle(0);
 			gfx.beginFill((Math.min(255,col*255) << 8) | 0xFF0000, 1);
-			gfx.drawRect(displayPos.x, displayPos.y, 1, 1);
+			gfx.drawRect(displayPos.x-2, displayPos.y, 5, 1);
+			gfx.drawRect(displayPos.x, displayPos.y-2, 1, 5);
 			gfx.endFill();
 		});
 
