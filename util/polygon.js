@@ -1,11 +1,16 @@
 class Polygon {
-    constructor(points) {
+    constructor(points, holes) {
+        if (typeof holes === "undefined")
+            holes = [];
+
         //ensure that all points are Vectors
         this.points = points.map(function(point){
             if (point instanceof Vector)
                 return point
             return new Vector(point);
         });
+
+        this.holes = holes;
     }
 
     /**
@@ -78,6 +83,13 @@ class Polygon {
         return new Polygon(path.map(point => new Vector(point.X, point.Y)));
     }
 
+    static fromClipperExPoly(exPoly) {
+        return new Polygon(
+            exPoly.outer.map(point => new Vector(point.X, point.Y)),
+            exPoly.holes.map(hole => hole.map(point => new Vector(point.X, point.Y)))
+        );
+    }
+
     static toClipperPaths(polygons) {
         let paths = [];
         polygons.forEach(poly => paths.push(poly.toClipperPath()));
@@ -85,11 +97,15 @@ class Polygon {
     }
 
     static fromClipperPaths(paths) {
-        let result = [];
-        paths.forEach(path => {
-            result.push(Polygon.fromClipperPath(path));
-        });
-        return result;
+        return paths.map(path => Polygon.fromClipperPath(path));
+    }
+
+    static fromClipperExPolys(exPolys) {
+        return exPolys.map(poly => Polygon.fromClipperExPoly(poly));
+    }
+
+    static triangulate() {
+
     }
 
     static clip(subjects, clips, clipType) {
@@ -104,22 +120,35 @@ class Polygon {
         //perform clipping
         clip.AddPaths(subjPaths, ClipperLib.PolyType.ptSubject, true);
         clip.AddPaths(clipPaths, ClipperLib.PolyType.ptClip, true);
-        let solnPaths = [];
+        let solnTree = new ClipperLib.PolyTree();
         let success = clip.Execute(
             clipType,
-            solnPaths,
+            solnTree,
             ClipperLib.PolyFillType.pftNonZero,
             ClipperLib.PolyFillType.pftNonZero
         );
         if (!success)
             throw new Error("Clipping failed!");
 
-        //simplify and clean result
-        solnPaths = ClipperLib.Clipper.CleanPolygons(solnPaths, 100 * 0.1);
+        let exPolys = ClipperLib.JS.PolyTreeToExPolygons(solnTree);
+        Polygon.scaleExPolygons(exPolys, 1/100);
+        
+        return Polygon.fromClipperExPolys(exPolys);
+    }
 
-        //scale down and output
-        ClipperLib.JS.ScaleDownPaths(solnPaths, 100);
-        return Polygon.fromClipperPaths(solnPaths);
+    static scaleExPolygons(exPolygons, scale) {
+        exPolygons.forEach(poly => {
+            poly.outer.forEach(point => {
+                point.X *= scale;
+                point.Y *= scale;
+            });
+            poly.holes.forEach(hole => {
+                hole.forEach(point => {
+                    point.X *= scale;
+                    point.Y *= scale;
+                });
+            });
+        });
     }
 
     static union(subjects, clips) {
