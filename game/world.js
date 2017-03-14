@@ -8,6 +8,7 @@ class World extends Emitter {
         this.levelName = params.levelName;
         this.listnrs = [];
         this.caster = new Caster({world: this});
+        this.navmesh = new NavMesh({world: this});
         this.reset();
     }
 
@@ -146,6 +147,34 @@ class World extends Emitter {
 			entity.frame(timescale, ticks);
 			entity.draw(timescale);
 		});
+    }
+
+    getBounds() {
+        //collect points
+        let points = [];
+        this.obstacles.forEach(obs => {
+            obs.poly.points.forEach(point => points.push(point));
+        });
+        
+        //find min/max points
+        let min = new Vector(points[0]);
+        let max = new Vector(points[0]);
+        points.forEach(point => {
+            min.x = Math.min(min.x, point.x);
+            min.y = Math.min(min.y, point.y);
+            max.x = Math.max(max.x, point.x);
+            max.y = Math.max(max.y, point.y);
+        });
+        
+        //offset path
+        max = max.add(new Vector(20,20));
+        min = min.sub(new Vector(20,20));
+        return new Polygon([
+            new Vector(min.x, min.y),
+            new Vector(max.x, min.y),
+            new Vector(max.x, max.y),
+            new Vector(min.x, max.y)
+        ]);
     }
 
     serializeObstacles(data) {

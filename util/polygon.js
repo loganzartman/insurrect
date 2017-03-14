@@ -13,6 +13,10 @@ class Polygon {
         this.holes = holes;
     }
 
+    addHole(poly) {
+        this.holes.push(poly.points);
+    }
+
     /**
      * Determine whether this Polygon contains a given point.
      * @param point a Vector
@@ -71,12 +75,29 @@ class Polygon {
         };
     }
 
+    clean() {
+        const SCALE = 100;
+        let path = this.toClipperPath();
+        ClipperLib.JS.ScaleUpPath(path, SCALE);
+        path = ClipperLib.Clipper.CleanPolygon(path, 0.1 * SCALE);
+        ClipperLib.JS.ScaleDownPath(path, SCALE);
+        this.points = Polygon.fromClipperPath(path).points;
+    }
+
     toPixiPolygon() {
         return new PIXI.Polygon(this.points.map(v => v.toPixiPoint()));
     }
 
     toClipperPath() {
         return this.points.map(v => {return {X: v.x, Y: v.y}});
+    }
+
+    toP2TContext() {
+        let contour = this.points.map(point => new poly2tri.Point(point.x, point.y));
+        let holes = this.holes.map(hole => hole.map(point => new poly2tri.Point(point.x, point.y)));
+        let ctx = new poly2tri.SweepContext(contour);
+        holes.forEach(hole => ctx.addHole(hole));
+        return ctx;
     }
 
     static fromClipperPath(path) {
@@ -104,8 +125,9 @@ class Polygon {
         return exPolys.map(poly => Polygon.fromClipperExPoly(poly));
     }
 
-    static triangulate() {
-
+    static fromP2TTriangle(tri) {
+        let points = tri.getPoints().map(point => new Vector(point));
+        return new Polygon(points);
     }
 
     static clip(subjects, clips, clipType) {
@@ -157,5 +179,28 @@ class Polygon {
 
     static difference(subjects, clips) {
         return Polygon.clip(subjects, clips, ClipperLib.ClipType.ctDifference);
+    }
+
+    static simplify(polys) {
+        const SCALE = 100;
+        let paths = Polygon.toClipperPaths(polys);
+        ClipperLib.JS.ScaleUpPaths(paths, SCALE);
+        paths = ClipperLib.Clipper.SimplifyPolygons(paths, ClipperLib.PolyFillType.pftNonZero);
+        ClipperLib.JS.ScaleDownPaths(paths, SCALE);
+        return Polygon.fromClipperPaths(paths);
+    }
+
+    static offset(polys, distance, miterLimit=2, arcTolerance=0.25) {
+        const SCALE = 100;
+        let paths = Polygon.toClipperPaths(polys);
+        ClipperLib.JS.ScaleUpPaths(paths, SCALE);
+        
+        let co = new ClipperLib.ClipperOffset(miterLimit, arcTolerance);
+        co.AddPaths(paths, ClipperLib.JoinType.jtSquare, ClipperLib.EndType.etClosedPolygon);
+        let result = [];
+        co.Execute(result, distance * SCALE);
+
+        ClipperLib.JS.ScaleDownPaths(result, SCALE);
+        return Polygon.fromClipperPaths(result);
     }
 }
