@@ -15,7 +15,6 @@ class Caster extends Emitter {
 	/**
 	 * Performs initialization.
 	 * Must reinitialize if geometry changes.
-	 * TODO: benchmark and see if using set to reduce searching significantly improves perf
 	 */
 	init() {
 		this.points = [];

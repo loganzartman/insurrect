@@ -31,11 +31,20 @@ var GameScene = {
 		});
 
 		GameScene.initGfx();
+		Display.gui.add({
+			x: false,
+			get debugCaster() {return this.x},
+			set debugCaster(z) {this.x = z; GameScene.world.caster.DEBUG = z;}
+		}, "debugCaster");
 
 		//handle display resizes
 		Display.events.listen("resize", evt => {
 			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);
 			GameScene.maskTexture.resize(Display.w, Display.h);
+			GameScene.bgtex.width = Display.w;
+			GameScene.bgtex.height = Display.h;
+			GameScene.bgtex2.width = Display.w;
+			GameScene.bgtex2.height = Display.h;
 		});
 	},
 
@@ -45,13 +54,17 @@ var GameScene = {
 	initGfx: function() {
 		//graphics setup
 		GameScene.stage = new PIXI.Container();
+		GameScene.gameStage = new PIXI.Container();
+		GameScene.stage.addChild(GameScene.gameStage);
+
+		// GameScene.initFilters();
 
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();
-		GameScene.stage.addChild(GameScene.unmaskedBg);
+		GameScene.gameStage.addChild(GameScene.unmaskedBg);
 		GameScene.bgtex = new PIXI.extras.TilingSprite(Core.resource.qmtex.texture, Display.w, Display.h);
 		GameScene.bgtex.tint = Core.color.bg2;
-		GameScene.stage.addChild(GameScene.bgtex);
+		GameScene.gameStage.addChild(GameScene.bgtex);
 
 		//contains anything that is masked by player sight
 		GameScene.maskedContainer = new PIXI.Container();
@@ -59,7 +72,7 @@ var GameScene = {
 		GameScene.maskTexture = PIXI.RenderTexture.create(Display.w, Display.h);
 		GameScene.mask = new PIXI.Sprite(GameScene.maskTexture);
 		GameScene.maskedContainer.mask = GameScene.mask;
-		GameScene.stage.addChild(GameScene.maskedContainer);
+		GameScene.gameStage.addChild(GameScene.maskedContainer);
 
 		//background
 		GameScene.bg = new PIXI.Graphics();
@@ -83,7 +96,7 @@ var GameScene = {
         GameScene.debugText.position = new PIXI.Point(8,8);
         
         //create text shadow
-        GameScene.debugTextTexture = new PIXI.RenderTexture(Display.w, Display.h);
+        GameScene.debugTextTexture = PIXI.RenderTexture.create(Display.w, Display.h);
         var dbtDisplayFore = new PIXI.Sprite(GameScene.debugTextTexture);
         dbtDisplayFore.tint = Core.color.acc1;
         var dbtDisplayShadow = new PIXI.Sprite(GameScene.debugTextTexture);
@@ -95,6 +108,76 @@ var GameScene = {
 
         GameScene.debugGfx = new PIXI.Graphics();
         GameScene.stage.addChild(GameScene.debugGfx);
+	},
+
+	initFilters: function() {
+		GameScene.bloom = new BloomFilter();
+		GameScene.bloom.blurXFilter.passes = 4;
+		GameScene.bloom.blurYFilter.passes = 4;
+		GameScene.bloom.blurXFilter.blur = 3;
+		GameScene.bloom.blurYFilter.blur = 3;
+		GameScene.rgbsplit = new RGBSplitFilter();
+		GameScene.rgbsplit.red = new PIXI.Point(0,1);
+		GameScene.rgbsplit.blue = new PIXI.Point(0,-1);
+		GameScene.rgbsplit.green = new PIXI.Point(0,0);
+		GameScene.gameStage.filters = [GameScene.bloom, GameScene.rgbsplit];
+
+		var filterOptions = {
+			bloom: true,
+			aberration: true,
+			bloomStr: 0.75,
+			bloomSat: 0.5,
+			bloomThresh: 0.3,
+			set enableBloom(bool) {
+				filterOptions.bloom = bool;
+				filterOptions.update();
+			},
+			get enableBloom() {
+				return filterOptions.bloom;
+			},
+			set enableAberration(bool) {
+				filterOptions.aberration = bool;
+				filterOptions.update();
+			},
+			get enableAberration() {
+				return filterOptions.aberration;
+			},
+			set bloomStrength(s) {
+				filterOptions.bloomStr = s;
+				filterOptions.update();
+			},
+			get bloomStrength() {
+				return filterOptions.bloomStr;
+			},
+			set bloomSaturation(s) {
+				filterOptions.bloomSat = s;
+				filterOptions.update();
+			},
+			get bloomSaturation() {
+				return filterOptions.bloomSat;
+			},
+			set bloomThreshold(s) {
+				filterOptions.bloomThresh = s;
+				filterOptions.update();
+			},
+			get bloomThreshold() {
+				return filterOptions.bloomThresh;
+			},
+			update() {
+				GameScene.bloom.enabled = filterOptions.bloom;
+				GameScene.rgbsplit.enabled = filterOptions.aberration;
+				GameScene.bloom.cmFilter.saturate(-1 + 3 * filterOptions.bloomSat);
+			    GameScene.bloom.cmFilter.brightness(0.08, true);
+			    GameScene.bloom.cmFilter.contrast(30 * filterOptions.bloomStr, true);
+			    GameScene.bloom.threshold.threshold = filterOptions.bloomThresh;
+			}
+		};
+		filterOptions.update();
+		Display.gui.add(filterOptions, "enableBloom");
+		Display.gui.add(filterOptions, "enableAberration");
+		Display.gui.add(filterOptions, "bloomStrength").min(0).max(1).step(0.05);
+		Display.gui.add(filterOptions, "bloomSaturation").min(0).max(1).step(0.05);
+		Display.gui.add(filterOptions, "bloomThreshold").min(0).max(1).step(0.05);
 	},
 
 	/**

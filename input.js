@@ -58,8 +58,8 @@ var Input = {
 	handleMousemove: function(event){
 		var x = event.pageX - Input.displayElement.offsetLeft;
 		var y = event.pageY - Input.displayElement.offsetTop;
-		Input.mouse.x = Math.max(0, Math.min(Input.displayElement.offsetWidth, x)) / Display.scale;
-		Input.mouse.y = Math.max(0, Math.min(Input.displayElement.offsetHeight, y)) / Display.scale;
+		Input.mouse.x = Math.max(0, Math.min(Input.displayElement.offsetWidth, x)) / Display.scale * window.devicePixelRatio;
+		Input.mouse.y = Math.max(0, Math.min(Input.displayElement.offsetHeight, y)) / Display.scale * window.devicePixelRatio;
 	},
 
 	handleMousedown: function(event){
