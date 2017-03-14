@@ -43,6 +43,18 @@ class Polygon {
         return inside;
     }
 
+    adjacentTo(poly) {
+        let segsA = this.getSegments();
+        let segsB = poly.getSegments();
+        for (let i=0; i<segsA.length; i++) {
+            for (let j=0; j<segsB.length; j++) {
+                if (segsA[i].inFront(segsB[j], 0.1) === 0)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Generates an array of all segments in this Polygon.
      * Each segment is represented by an array containing two Vectors.

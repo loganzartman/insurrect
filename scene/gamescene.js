@@ -36,6 +36,11 @@ var GameScene = {
 			get debugCaster() {return this.x},
 			set debugCaster(z) {this.x = z; GameScene.world.caster.DEBUG = z;}
 		}, "debugCaster");
+		Display.gui.add({
+			x: false,
+			get debugNavMesh() {return this.x},
+			set debugNavMesh(z) {this.x = z; GameScene.world.navmesh.DEBUG = z;}
+		}, "debugNavMesh");
 
 		//handle display resizes
 		Display.events.listen("resize", evt => {

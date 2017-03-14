@@ -17,6 +17,7 @@
 			"util/vector.js",
 			"util/segment.js",
 			"util/polygon.js",
+			"util/graph.js",
 			"util/partitionedSpace.js",
 			"util/segmentSpace.js",
 			"util/binarySpacePartition.js",

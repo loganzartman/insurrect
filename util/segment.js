@@ -116,12 +116,10 @@ class Segment {
 	 * Returns -1, 0, 1 depending on which side of this segment a point lies on
 	 * @return the side
 	 */
-	getPointSide(point) {
-		let pos = Math.sign(
-			(this.b.x - this.a.x) * (point.y - this.a.y) - 
-			(this.b.y - this.a.y) * (point.x - this.a.x)
-		);
-		return pos;
+	getPointSide(point, tolerance=0) {
+		let pos = (this.b.x - this.a.x) * (point.y - this.a.y) - 
+			(this.b.y - this.a.y) * (point.x - this.a.x);
+		return Math.abs(pos) < tolerance ? 0 : Math.sign(pos);
 	}
 
 	/**
@@ -129,9 +127,9 @@ class Segment {
 	 * A result of 1 or -1 would indicate this; be consistent.
 	 * I've arbitrarily chosen 1 for my uses.
 	 */
-	inFront(segment) {
+	inFront(segment, tolerance=0) {
 		let midpt = this.getMidpoint();
-		let side = segment.getPointSide(midpt);
+		let side = segment.getPointSide(midpt, tolerance);
 		return side;
 	}
 
