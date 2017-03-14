@@ -42,7 +42,7 @@
 		"AndinaBold": "resource/andina_bold.fnt"
 	},
 
-	"colors0": {
+	"colors": {
 		"bg1": "0xD9CEBA",
 		"bg2": "0x263145",
 		"acc1": "0xD9559D",
@@ -53,7 +53,7 @@
 		"acc3b": "0xFFE559"
 	},
 
-	"colors": {
+	"colors1": {
 		"bg1": "0x263145",
 		"bg2": "0x0E1219",
 		"acc1": "0xD9559D",

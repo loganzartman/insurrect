@@ -57,7 +57,7 @@ var GameScene = {
 		GameScene.gameStage = new PIXI.Container();
 		GameScene.stage.addChild(GameScene.gameStage);
 
-		GameScene.initFilters();
+		// GameScene.initFilters();
 
 		//unmasked things
 		GameScene.unmaskedBg = new PIXI.Graphics();

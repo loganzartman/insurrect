@@ -53,7 +53,7 @@ var TitleScene = {
 
 		//draw background
 		TitleScene.gfx.clear();
-		TitleScene.gfx.beginFill(Core.color.bg2, 1);
+		TitleScene.gfx.beginFill(Core.color.bg1, 1);
 		TitleScene.gfx.drawRect(0, 0, Display.w, Display.h);
 		TitleScene.gfx.endFill();
 	}
