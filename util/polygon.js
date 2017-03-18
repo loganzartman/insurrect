@@ -87,6 +87,16 @@ class Polygon {
         };
     }
 
+    getCentroid() {
+        let z = this.points;
+        let c = new Vector();
+        for (let i=0,j=z.length; i<j; i++) {
+            c.x += z[i].x/j;
+            c.y += z[i].y/j;
+        }
+        return c;
+    }
+
     clean() {
         const SCALE = 100;
         let path = this.toClipperPath();
