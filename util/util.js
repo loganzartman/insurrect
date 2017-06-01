@@ -1,4 +1,39 @@
 var Util = {
+	rand: function(a,b) {
+		if (typeof a === "undefined")
+			return Util.rand(0,1);
+		if (typeof b === "undefined")
+			return Util.rand(0,a);
+		return Math.random()*(b-a)+a;
+	},
+
+	color: {
+		rgb: function(r,g=r,b=r) {
+			const f = Util.color.clipScale;
+			return (f(r) << 16) | (f(g) << 8) | f(b);
+		},
+		rgba: function(r,g,b,a=1) {
+			const f = Util.color.clipScale;
+			return (f(r) << 24) | (f(g) << 16) | (f(b) << 8) | f(a);
+		},
+		unRgb: function(rgb) {
+			return {
+				b: (rgba) & 0xFF / 255,
+				g: (rgba >>= 8) & 0xFF / 255,
+				r: (rgba >>= 8) & 0xFF / 255
+			};
+		},
+		unRgba: function(rgba) {
+			return {
+				a: (rgba) & 0xFF / 255,
+				b: (rgba >>= 8) & 0xFF / 255,
+				g: (rgba >>= 8) & 0xFF / 255,
+				r: (rgba >>= 8) & 0xFF / 255
+			};
+		},
+		clipScale: c => Math.round(Math.max(0, Math.min(c, 1)) * 255)
+	},
+
 	geom: {
 		/**
 		 * Checks for an intersection between a circle of given radius and

@@ -27,4 +27,8 @@ class Graph {
 				this.edges.filter(e => e[0] === a).map(e => e[1]));
 		return this.neighborCache.get(a);
 	}
+	
+	aStar(start, goal) {
+		return [];
+	}
 }

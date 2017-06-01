@@ -48,7 +48,9 @@ class Polygon {
         let segsB = poly.getSegments();
         for (let i=0; i<segsA.length; i++) {
             for (let j=0; j<segsB.length; j++) {
-                if (segsA[i].inFront(segsB[j], 0.1) === 0)
+                let dirA = segsA[i].getDir();
+                let dirB = segsB[j].getDir();
+                if (segsA[i].getIntersection(segsB[j]) && dirA === dirB)
                     return true;
             }
         }
@@ -210,6 +212,17 @@ class Polygon {
         paths = ClipperLib.Clipper.SimplifyPolygons(paths, ClipperLib.PolyFillType.pftNonZero);
         ClipperLib.JS.ScaleDownPaths(paths, SCALE);
         return Polygon.fromClipperPaths(paths);
+    }
+
+    static clean(polys, delta=0.1) {
+        const SCALE = 100;
+        let paths = Polygon.toClipperPaths(polys);
+        ClipperLib.JS.ScaleUpPaths(paths, SCALE);
+        
+        let result = new ClipperLib.Clipper.CleanPolygons(paths, delta * SCALE);
+
+        ClipperLib.JS.ScaleDownPaths(result, SCALE);
+        return Polygon.fromClipperPaths(result);
     }
 
     static offset(polys, distance, miterLimit=2, arcTolerance=0.25) {

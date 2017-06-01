@@ -13,15 +13,21 @@ class NavMesh extends Emitter {
 	}
 
 	rebuild() {
-		this.triangulate();
+		let t0 = performance.now();
+		try {
+			this.triangulate();
+		} catch (e) {
+			console.log("Triangulation failed.");
+			return;
+		}
 		this.buildGraph();
+		console.log("NavMesh rebuild took %s ms.", (performance.now()-t0).toFixed(2));
 	}
 
 	triangulate() {
 		//invert world geometry (compute walkable areas)
 		let bounds = this.world.getBounds();
 		let polys = this.world.obstacles.map(obstacle => obstacle.poly);
-		polys = Polygon.offset(polys, 1);
 		let holes = Polygon.union(polys, polys);
 		holes = Polygon.simplify(holes);
 		holes.forEach(hole => bounds.addHole(hole));
@@ -48,66 +54,15 @@ class NavMesh extends Emitter {
 	findGlobalPath(pointA, pointB) {
 		let src = this.polys.find(poly => poly.contains(pointA));
 		let dst = this.polys.find(poly => poly.contains(pointB));
-		return this.aStar(src, dst);
+		if (typeof src === "undefined")
+			throw new Error("Source point not contained in navmesh.");
+		if (typeof dst === "undefined")
+			throw new Error("Destination point not contained in navmesh.")
+		return this.graph.aStar(src, dst);
 	}
 
 	findPath(pointA, pointB) {
 		return this.findGlobalPath(pointA, pointB);
-	}
-
-	aStar(start, goal) {
-		let closed = new Set();
-		let open = new Set();
-		open.add(start);
-
-		let cameFrom = new Map();
-		let gScore = new Map();
-		gScore.set(start, 0);
-		let fScore = new Map();
-		fScore.set(start, this.aStarDist(start, goal));
-
-		while (open.length > 0) {
-			let min = fScore.entries().next().key;
-			fScore.entries().forEach(kv => {
-				if (kv.value < fScore.get(min))
-					min = kv.key;
-			});
-			let current = min;
-
-			if (current === goal)
-				return this.aStarReconstruct(cameFrom, current);
-
-			open.delete(current);
-			closed.add(current);
-			this.graph.neighbors(current).forEach(neighbor => {
-				if (closed.has(neighbor))
-					return;
-				let newG = gScore.get(current) + this.aStarDist(current, neighbor);
-				if (!open.has(neighbor))
-					open.add(neighbor);
-				else if (newG >= gScore.get(neighbor))
-					return;
-
-				cameFrom.set(neighbor, current);
-				gScore.set(neighbor, newG);
-				fScore.set(gScore.get(neighbor) + this.aStarDist(neighbor, goal));
-			});
-		}
-
-		return null;
-	}
-
-	aStarDist(a, b) {
-		return b.getCentroid().sub(a.getCentroid()).len();
-	}
-
-	aStarReconstruct(cameFrom, current) {
-		let path = [current];
-		while (cameFrom.has(current)) {
-			current = cameFrom.get(current);
-			path.push(current);
-		}
-		return path;
 	}
 
 	drawDebug(gfx) {
@@ -115,13 +70,23 @@ class NavMesh extends Emitter {
 			return;
 
 		//render triangles
-		gfx.lineStyle(1, 0xFF0000, 0.5);
 		this.polys.forEach(poly => {
 			let n = poly.points[0].sub(GameScene.view).sub(GameScene.viewOffset);
+			gfx.lineStyle(1, 0xFF0000, 0.25);
 			gfx.moveTo(n.x, n.y);
 			for (let i=0,j=poly.points.length; i<j; i++) {
 				let m = poly.points[(i+1)%j].sub(GameScene.view).sub(GameScene.viewOffset);
 				gfx.lineTo(m.x, m.y);
+			}
+		});
+
+		this.polys.forEach(poly => {
+			let n = poly.points[0].sub(GameScene.view).sub(GameScene.viewOffset);
+			for (let i=0,j=poly.points.length; i<j; i++) {
+				let m = poly.points[(i+1)%j].sub(GameScene.view).sub(GameScene.viewOffset);
+				gfx.beginFill(0xFFFF00, 1);
+				gfx.drawRect(m.x,m.y,1,1);
+				gfx.endFill();
 			}
 		});
 

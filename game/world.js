@@ -87,7 +87,7 @@ class World extends Emitter {
         });
 
         this.caster.init();
-        // this.bsp = new BinarySpacePartition({segments: segments});
+        this.navmesh.rebuild();
     }
 
     /**
@@ -155,6 +155,8 @@ class World extends Emitter {
         this.obstacles.forEach(obs => {
             obs.poly.points.forEach(point => points.push(point));
         });
+        if (points.length === 0)
+            points.push(new Vector(0,0));
         
         //find min/max points
         let min = new Vector(points[0]);
