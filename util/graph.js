@@ -27,4 +27,45 @@ class Graph {
 				this.edges.filter(e => e[0] === a).map(e => e[1]));
 		return this.neighborCache.get(a);
 	}
+	
+	aStar(start, goal, dist, heuristic) {
+		let open = new TinyQueue([], (a,b) => a._f-b._f);
+		start._f = 0;
+		open.push(start);
+
+		let cameFrom = new Map();
+		cameFrom.set(start, null);
+		let currentCost = new Map();
+		currentCost.set(start, 0);
+
+		//perform search
+		while (open.length > 0) {
+		    let current = open.pop();
+		    if (current === goal)
+		    	break;
+
+		    for (let next of this.neighbors(current)) {
+		    	let newCost = currentCost.get(current) + dist(current, next);
+		    	if (!currentCost.has(next) || newCost < currentCost.get(next)) {
+		    		currentCost.set(next, newCost);
+		    		let priority = newCost + heuristic(goal, next);
+		    		next._f = priority;
+		    		open.push(next);
+		    		cameFrom.set(next, current);
+		    	}
+		    }
+		}
+
+		//reconstruct path
+		let path = [goal];
+		let node = goal;
+		while (node !== start) {
+			node = cameFrom.get(node);
+			path.unshift(node);
+			if (node === null)
+				throw new Error("bad path");
+		}
+
+		return path;
+	}
 }

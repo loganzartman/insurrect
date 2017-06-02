@@ -103,6 +103,11 @@ class Segment {
 		return this._normal;
 	}
 
+	getDir() {
+		return new Vector(Math.max(this.a.x, this.b.x), Math.max(this.a.y, this.b.y))
+			.sub(new Vector(Math.min(this.a.x, this.b.x), Math.min(this.a.y, this.b.y))).dir();
+	}
+
 	/**
 	 * Returns a Vector representing the midpoint of this segment.
 	 * @return the midpoint

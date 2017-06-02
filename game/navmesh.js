@@ -13,15 +13,21 @@ class NavMesh extends Emitter {
 	}
 
 	rebuild() {
-		this.triangulate();
+		let t0 = performance.now();
+		try {
+			this.triangulate();
+		} catch (e) {
+			console.log("Triangulation failed.");
+			return;
+		}
 		this.buildGraph();
+		console.log("NavMesh rebuild took %s ms.", (performance.now()-t0).toFixed(2));
 	}
 
 	triangulate() {
 		//invert world geometry (compute walkable areas)
 		let bounds = this.world.getBounds();
 		let polys = this.world.obstacles.map(obstacle => obstacle.poly);
-		polys = Polygon.offset(polys, 1);
 		let holes = Polygon.union(polys, polys);
 		holes = Polygon.simplify(holes);
 		holes.forEach(hole => bounds.addHole(hole));
@@ -45,14 +51,33 @@ class NavMesh extends Emitter {
 		});
 	}
 
+	findGlobalPath(pointA, pointB) {
+		//locate points
+		let src = this.polys.find(poly => poly.contains(pointA));
+		let dst = this.polys.find(poly => poly.contains(pointB));
+		if (typeof src === "undefined")
+			throw new Error("Source point not contained in navmesh.");
+		if (typeof dst === "undefined")
+			throw new Error("Destination point not contained in navmesh.");
+
+		//perform search
+		let dist = (a,b) => a.getCentroid().sub(b.getCentroid()).len();
+		let heuristic = dist;
+		return this.graph.aStar(src, dst, dist, heuristic); //output polygons
+	}
+
+	findPath(pointA, pointB) {
+		return this.findGlobalPath(pointA, pointB).map(poly => poly.getCentroid());
+	}
+
 	drawDebug(gfx) {
 		if (!this.polys || !this.DEBUG)
 			return;
 
 		//render triangles
-		gfx.lineStyle(1, 0xFF0000, 0.5);
 		this.polys.forEach(poly => {
 			let n = poly.points[0].sub(GameScene.view).sub(GameScene.viewOffset);
+			gfx.lineStyle(1, 0xFF0000, 0.25);
 			gfx.moveTo(n.x, n.y);
 			for (let i=0,j=poly.points.length; i<j; i++) {
 				let m = poly.points[(i+1)%j].sub(GameScene.view).sub(GameScene.viewOffset);
@@ -60,19 +85,22 @@ class NavMesh extends Emitter {
 			}
 		});
 
+		this.polys.forEach(poly => {
+			let n = poly.points[0].sub(GameScene.view).sub(GameScene.viewOffset);
+			for (let i=0,j=poly.points.length; i<j; i++) {
+				let m = poly.points[(i+1)%j].sub(GameScene.view).sub(GameScene.viewOffset);
+				gfx.beginFill(0xFFFF00, 1);
+				gfx.drawRect(m.x,m.y,1,1);
+				gfx.endFill();
+			}
+		});
+
 		//render connections
-		let center = (poly) => {
-			let z = poly.points;
-			return new Vector(
-				(z[0].x + z[1].x + z[2].x) / 3,
-				(z[0].y + z[1].y + z[2].y) / 3
-			);
-		};
 		gfx.lineStyle(1, 0x00FF00, 1);
 		for (let i=0,j=this.graph.edges.length; i<j; i+=1) {
 			let edge = this.graph.edges[i];
-			let cA = center(edge[0]).sub(GameScene.view).sub(GameScene.viewOffset);
-			let cB = center(edge[1]).sub(GameScene.view).sub(GameScene.viewOffset);
+			let cA = edge[0].getCentroid().sub(GameScene.view).sub(GameScene.viewOffset);
+			let cB = edge[1].getCentroid().sub(GameScene.view).sub(GameScene.viewOffset);
 			gfx.moveTo(cA.x, cA.y);
 			gfx.lineTo(cB.x, cB.y);
 		}

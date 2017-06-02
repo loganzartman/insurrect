@@ -60,6 +60,7 @@ var Input = {
 		var y = event.pageY - Input.displayElement.offsetTop;
 		Input.mouse.x = Math.max(0, Math.min(Input.displayElement.offsetWidth, x)) / Display.scale * window.devicePixelRatio;
 		Input.mouse.y = Math.max(0, Math.min(Input.displayElement.offsetHeight, y)) / Display.scale * window.devicePixelRatio;
+		Input.events.emit("mousemove");
 	},
 
 	handleMousedown: function(event){
@@ -69,6 +70,7 @@ var Input = {
 			Input.mouse.left = true;
 		if (event.target === Input.displayElement)
 			event.preventDefault();
+		Input.events.emit("mousedown");
 	},
 
 	handleMouseup: function(event){
@@ -78,5 +80,6 @@ var Input = {
 			Input.mouse.left = false;
 		if (event.target === Input.displayElement)
 			event.preventDefault();
+		Input.events.emit("mouseup");
 	}
 };
