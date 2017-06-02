@@ -21,6 +21,7 @@
 			"util/partitionedSpace.js",
 			"util/segmentSpace.js",
 			"util/binarySpacePartition.js",
+			"util/tinyqueue.js",
 			"scene/titlescene.js",
 			"scene/gamescene.js",
 			"scene/editscene.js",
@@ -32,7 +33,8 @@
 			"game/entity.js",
 			"game/controllable.js",
 			"game/projectile.js",
-			"game/player.js"
+			"game/player.js",
+			"game/pathTestEntity.js"
 		],
 		"init": "Game.init"
 	},

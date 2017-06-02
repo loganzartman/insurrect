@@ -52,17 +52,22 @@ class NavMesh extends Emitter {
 	}
 
 	findGlobalPath(pointA, pointB) {
+		//locate points
 		let src = this.polys.find(poly => poly.contains(pointA));
 		let dst = this.polys.find(poly => poly.contains(pointB));
 		if (typeof src === "undefined")
 			throw new Error("Source point not contained in navmesh.");
 		if (typeof dst === "undefined")
-			throw new Error("Destination point not contained in navmesh.")
-		return this.graph.aStar(src, dst);
+			throw new Error("Destination point not contained in navmesh.");
+
+		//perform search
+		let dist = (a,b) => a.getCentroid().sub(b.getCentroid()).len();
+		let heuristic = dist;
+		return this.graph.aStar(src, dst, dist, heuristic); //output polygons
 	}
 
 	findPath(pointA, pointB) {
-		return this.findGlobalPath(pointA, pointB);
+		return this.findGlobalPath(pointA, pointB).map(poly => poly.getCentroid());
 	}
 
 	drawDebug(gfx) {

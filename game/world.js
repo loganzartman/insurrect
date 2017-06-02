@@ -32,6 +32,11 @@ class World extends Emitter {
             world: this
 		});
 		this.addEntity(this.player);
+
+        this.addEntity(new PathTestEntity({
+            world: this,
+            position: new Vector(5,5)
+        }));
     }
 
     addEntity(ent) {
