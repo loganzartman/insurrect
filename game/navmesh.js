@@ -29,7 +29,12 @@ class NavMesh extends Emitter {
 		let bounds = this.world.getBounds();
 		let polys = this.world.obstacles.map(obstacle => obstacle.poly);
 		let holes = Polygon.union(polys, polys);
+		holes = Polygon.offset(holes, 4);
 		holes = Polygon.simplify(holes);
+
+		//this is REALLY bad--fix polygon adjacency test for vertical/horizontal segments
+		holes = holes.map(hole => new Polygon(hole.points.map(p => p.add(Vector.random()))))
+		
 		holes.forEach(hole => bounds.addHole(hole));
 		this.polys = holes;
 
@@ -67,7 +72,33 @@ class NavMesh extends Emitter {
 	}
 
 	findPath(pointA, pointB) {
-		return this.findGlobalPath(pointA, pointB).map(poly => poly.getCentroid());
+		let points = this.findGlobalPath(pointA, pointB)
+			.map(poly => poly.getCentroid());
+		points.unshift(pointA);
+		points.push(pointB);
+		
+		let out = [points[0]];
+		let prev = 0;
+		for (let i=1; i<points.length-1; i++) {
+			//do LoS testing
+			let lineOfSight = new Segment(points[prev], points[i+1]);
+			// let segments = this.world.segSpace.getIntersecting(lineOfSight);
+			let segments = this.world.obstacles.reduce((s, o) => s.concat(o.getSegments()), []);
+			let hit = false;
+			for (let segment of segments) {
+				if (Util.geom.segSegIntersect(lineOfSight, segment)) {
+					hit = true;
+					break;
+				}
+			}
+			if (!hit)
+				continue;
+			
+			out.push(points[i]);
+			prev = i;
+		}
+		out.push(points[points.length-1]);
+		return out;
 	}
 
 	drawDebug(gfx) {

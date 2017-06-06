@@ -189,6 +189,8 @@ var GameScene = {
 	 * Called when a scene regains focus.
 	 */
 	activate: function() {
+		Game.WALLHACKS = true;
+
 		//cleanup graphics
 		GameScene.objectContainer.removeChildren();
 

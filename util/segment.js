@@ -103,9 +103,13 @@ class Segment {
 		return this._normal;
 	}
 
-	getDir() {
+	dir() {
 		return new Vector(Math.max(this.a.x, this.b.x), Math.max(this.a.y, this.b.y))
 			.sub(new Vector(Math.min(this.a.x, this.b.x), Math.min(this.a.y, this.b.y))).dir();
+	}
+
+	len() {
+		return this.b.sub(this.a).len();
 	}
 
 	/**

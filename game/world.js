@@ -18,13 +18,15 @@ class World extends Emitter {
         this.entities = [];
         this.obstacles = [];
         this.prefabs = [];
-        this.rebuildStructures();
 
         this.listnrs.forEach(listener => listener.remove());
         this.listnrs = [];
 
         //build level
+        this.ready = false;
         this.buildLevel(this.levelName);
+        this.ready = true;
+        this.rebuildStructures();
 
         //create player
         this.player = new Player({
@@ -35,7 +37,10 @@ class World extends Emitter {
 
         this.addEntity(new PathTestEntity({
             world: this,
-            position: new Vector(5,5)
+            position: new Vector(5,5),
+            target: {get position(){
+                return GameScene.view.add(GameScene.viewOffset).add(Input.mouse)
+            }}
         }));
     }
 
@@ -82,6 +87,8 @@ class World extends Emitter {
     }
 
     rebuildStructures() {
+        if (!this.ready)
+            return false;
         this.segments = [];
         this.segSpace = new SegmentSpace({binSize: 24});
         this.obstacles.forEach(obstacle => {

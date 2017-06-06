@@ -195,6 +195,33 @@ var Util = {
 			);
 		},
 
+		lineLineIntersect: function(lineA, lineB) {
+			var a1 = lineA.a;
+			var a2 = lineA.b;
+			var b1 = lineB.a;
+			var b2 = lineB.b;
+			var x0 = a1.x, x1 = b1.x, x2 = a2.x, x3 = b2.x;
+			var y0 = a1.y, y1 = b1.y, y2 = a2.y, y3 = b2.y;
+
+			//solve for parameters t and u
+			//where t and u are the parameters of the parametric forms of lines
+			//A and B respectively
+			var fraction = 1/(x0*(y1-y3) - x1*(y0-y2) - x2*(y1-y3) + x3*(y0-y2));
+			var t = x0*(y1-y3) - x1*(y0-y3) + x3*(y0-y1);
+			t *= fraction;
+			var u = x0*(y1-y2) - x1*(y0-y2) + x2*(y0-y1);
+			u *= fraction;
+
+			// if (isNaN(t))
+			// 	return null;
+
+			//calculate intersection position using parametric forms
+			return new Vector(
+				x0 + t*(x2 - x0),
+				y0 + t*(y2 - y0)
+			);
+		},
+
 		/**
 		 * Finds all intersections between segments in list 1 and segments in
 		 * list 2.

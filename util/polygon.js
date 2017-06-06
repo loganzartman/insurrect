@@ -48,8 +48,8 @@ class Polygon {
         let segsB = poly.getSegments();
         for (let i=0; i<segsA.length; i++) {
             for (let j=0; j<segsB.length; j++) {
-                let dirA = segsA[i].getDir();
-                let dirB = segsB[j].getDir();
+                let dirA = segsA[i].dir();
+                let dirB = segsB[j].dir();
                 if (segsA[i].getIntersection(segsB[j]) && dirA === dirB)
                     return true;
             }
