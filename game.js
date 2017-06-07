@@ -36,11 +36,11 @@ var Game = {
 		});
 
 		//start game loop
-		var t0 = Date.now();
+		var t0 = performance.now();
 		var ticks = 0;
 		var frameFunc = function() {
 			//calculate time changes
-			var dt = -t0 + (t0 = Date.now());
+			var dt = -t0 + (t0 = performance.now());
 			Game.frametime = dt;
 			var timescale = dt / (1000 / Game.targetFps);
 			ticks += timescale*Game.TIMEWARP;

@@ -10,6 +10,7 @@ class NavMesh extends Emitter {
 
 		this.world = params.world;
 		this.DEBUG = params.DEBUG;
+		this.pathPolys = null;
 	}
 
 	rebuild() {
@@ -29,11 +30,11 @@ class NavMesh extends Emitter {
 		let bounds = this.world.getBounds();
 		let polys = this.world.obstacles.map(obstacle => obstacle.poly);
 		let holes = Polygon.union(polys, polys);
-		holes = Polygon.offset(holes, 4);
+		holes = Polygon.offset(holes, 3.5);
 		holes = Polygon.simplify(holes);
 
 		//this is REALLY bad--fix polygon adjacency test for vertical/horizontal segments
-		holes = holes.map(hole => new Polygon(hole.points.map(p => p.add(Vector.random()))))
+		holes = holes.map(hole => new Polygon(hole.points.map(p => p.add(Vector.random(-0.1,0.1)))))
 		
 		holes.forEach(hole => bounds.addHole(hole));
 		this.polys = holes;
@@ -68,7 +69,8 @@ class NavMesh extends Emitter {
 		//perform search
 		let dist = (a,b) => a.getCentroid().sub(b.getCentroid()).len();
 		let heuristic = dist;
-		return this.graph.aStar(src, dst, dist, heuristic); //output polygons
+		this.pathPolys = this.graph.aStar(src, dst, dist, heuristic); //output polygons
+		return this.pathPolys;
 	}
 
 	findPath(pointA, pointB) {
@@ -78,6 +80,7 @@ class NavMesh extends Emitter {
 		points.push(pointB);
 		
 		let out = [points[0]];
+		let polys = [this.pathPolys[0]];
 		let prev = 0;
 		for (let i=1; i<points.length-1; i++) {
 			//do LoS testing
@@ -95,9 +98,12 @@ class NavMesh extends Emitter {
 				continue;
 			
 			out.push(points[i]);
+			polys.push(this.pathPolys[i]);
 			prev = i;
 		}
 		out.push(points[points.length-1]);
+		polys.push(this.pathPolys[this.pathPolys.length-1]);
+		this.pathPolys = polys;
 		return out;
 	}
 

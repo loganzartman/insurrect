@@ -34,7 +34,9 @@
 			"game/controllable.js",
 			"game/projectile.js",
 			"game/player.js",
-			"game/pathTestEntity.js"
+			"game/pathTestEntity.js",
+			"game/agent.js",
+			"game/testAgent.js"
 		],
 		"init": "Game.init"
 	},

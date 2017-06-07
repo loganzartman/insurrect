@@ -35,12 +35,10 @@ class World extends Emitter {
 		});
 		this.addEntity(this.player);
 
-        this.addEntity(new PathTestEntity({
+        this.addEntity(new TestAgent({
             world: this,
             position: new Vector(5,5),
-            target: {get position(){
-                return GameScene.view.add(GameScene.viewOffset).add(Input.mouse)
-            }}
+            target: this.player
         }));
     }
 

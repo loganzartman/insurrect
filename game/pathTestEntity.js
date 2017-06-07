@@ -10,7 +10,7 @@ class PathTestEntity extends Entity {
 	}
 
 	draw() {
-		if (!this.gfxDirty || this.route.length === 0)
+		if (!this.gfxDirty || !(this.route instanceof Array) || this.route.length === 0)
 			return;
 		this.gfx.clear();
 		this.gfx.lineStyle(1, this.color, 1);

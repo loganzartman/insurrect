@@ -94,18 +94,14 @@ class Entity extends Emitter {
 	getAllCollisions() {
 		var entity = this;
 		var collisions = [];
-		this.world.obstacles.forEach(function(object) {
-			if (object instanceof Obstacle) {
-				object.getSegments().forEach(function(segment){
-					if (Util.geom.circleSegIntersect(entity.position, entity.radius, segment))
-						collisions.push(new Collision({
-							self: this,
-							type: Collision.SEGMENT,
-							object: segment,
-							point: null
-						}));
-				});
-			}
+		this.world.segSpace.getNearby(this, this.radius).forEach(function(segment) {
+			if (Util.geom.circleSegIntersect(entity.position, entity.radius, segment))
+				collisions.push(new Collision({
+					self: this,
+					type: Collision.SEGMENT,
+					object: segment,
+					point: null
+				}));
 		});
 		return collisions;
 	}
