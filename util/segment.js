@@ -6,6 +6,10 @@ class Segment {
 		this._normal = null;
 	}
 
+	add(v) {
+		return new Segment(this.a.add(v), this.b.add(v));
+	}
+
 	/**
 	 * Returns 2 to 4 segments that are the result of dividing this segment
 	 * and another across their intersection point.  If any of the resulting

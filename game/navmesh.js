@@ -5,11 +5,14 @@ class NavMesh extends Emitter {
 			throw new Error("Must specify world.");
 
 		params = Object.assign(params, {
+			agentRadius: 4,
 			DEBUG: false
 		});
 
 		this.world = params.world;
 		this.DEBUG = params.DEBUG;
+		this.agentRadius = params.agentRadius;
+		this._epsilon = 1e-4;
 		this.pathPolys = null;
 	}
 
@@ -30,11 +33,11 @@ class NavMesh extends Emitter {
 		let bounds = this.world.getBounds();
 		let polys = this.world.obstacles.map(obstacle => obstacle.poly);
 		let holes = Polygon.union(polys, polys);
-		holes = Polygon.offset(holes, 3.5);
+		holes = Polygon.offset(holes, this.agentRadius-this._epsilon*2);
 		holes = Polygon.simplify(holes);
 
 		//this is REALLY bad--fix polygon adjacency test for vertical/horizontal segments
-		holes = holes.map(hole => new Polygon(hole.points.map(p => p.add(Vector.random(-0.1,0.1)))))
+		holes = holes.map(hole => new Polygon(hole.points.map(p => p.add(Vector.random(-this._epsilon,this._epsilon)))))
 		
 		holes.forEach(hole => bounds.addHole(hole));
 		this.polys = holes;
@@ -45,6 +48,7 @@ class NavMesh extends Emitter {
 		let triangles = ctx.getTriangles();
 		let output = triangles.map(tri => Polygon.fromP2TTriangle(tri));
 		this.polys = output;
+		this.centers = this.polys.map(poly => poly.getCentroid());
 	}
 
 	buildGraph() {
@@ -78,20 +82,28 @@ class NavMesh extends Emitter {
 			.map(poly => poly.getCentroid());
 		points.unshift(pointA);
 		points.push(pointB);
-		
+
 		let out = [points[0]];
 		let polys = [this.pathPolys[0]];
 		let prev = 0;
 		for (let i=1; i<points.length-1; i++) {
 			//do LoS testing
 			let lineOfSight = new Segment(points[prev], points[i+1]);
-			// let segments = this.world.segSpace.getIntersecting(lineOfSight);
-			let segments = this.world.obstacles.reduce((s, o) => s.concat(o.getSegments()), []);
+			let offsets = [
+				new Vector(),
+				Vector.fromDir(lineOfSight.dir()-Math.PI*0.5, this.agentRadius*2),
+				Vector.fromDir(lineOfSight.dir()+Math.PI*0.5, this.agentRadius*2)
+			];
+
 			let hit = false;
-			for (let segment of segments) {
-				if (Util.geom.segSegIntersect(lineOfSight, segment)) {
-					hit = true;
-					break;
+			outer: for (let offset of offsets) {
+				// let segments = this.world.segSpace.getIntersecting(lineOfSight.add(offset));
+				let segments = this.world.obstacles.reduce((s, o) => s.concat(o.getSegments()), []);
+				for (let segment of segments) {
+					if (Util.geom.segSegIntersect(lineOfSight.add(offset), segment)) {
+						hit = true;
+						break outer;
+					}
 				}
 			}
 			if (!hit)

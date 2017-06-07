@@ -1,38 +1,23 @@
 class TestAgent extends Agent {
 	constructor(params) {
 		params = Object.assign({
-			color: 0x00FFFF,
-			maxSpeed: 0.8,
-			acceleration: 0.1,
-			deceleration: 0.1,
-			radius: 5
+			color: 0x007070,
+			maxSpeed: 1,
+			acceleration: 0.3,
+			deceleration: 0.05
 		}, params);
 		super(params);
 
-		//continuously follow target
-		this.listen("routeComplete", function(data){
-			this.state = Agent.state.FOLLOW;
-		});
 		this.state = Agent.state.FOLLOW;
 	}
 
 	frame(timescale, ticks) {
-		switch (this.state) {
-			case Agent.state.REST:
-				this.color = 0x906000;
-				break;
-			case Agent.state.FOLLOW:
-				this.gfxDirty = true;
-				this.color = 0x609000;
-				break;
-		}
-		super.frame.apply(this, arguments);
-	}
+		let dist = this.target.position.sub(this.position).len();
+		if (this.state === Agent.state.REST && dist > 20)
+			this.state = Agent.state.FOLLOW;
+		else if (this.state === Agent.state.FOLLOW && dist <= 20)
+			this.state = Agent.state.REST;
 
-	draw() {
-		this.gfxDirty = true;
-		PathTestEntity.prototype.draw.apply(this, arguments);
-		this.gfx.lineStyle(1, this.color, 1);
-		this.gfx.drawCircle(this.position.x,this.position.y,this.radius);
+		super.frame.apply(this, arguments);
 	}
 }

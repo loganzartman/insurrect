@@ -21,6 +21,22 @@ class Agent extends Controllable {
 				this.updateRoute();
 				this.doFollow();
 				break;
+			case Agent.state.RETURN:
+				this.doReturn();
+		}
+
+		if (Agent.DEBUG) {
+			switch (this.state) {
+				case Agent.state.REST:
+					this.color = 0x700040;
+					break;
+				case Agent.state.FOLLOW:
+					this.color = 0xA00000;
+					break;
+				case Agent.state.RETURN:
+					this.color = 0xA0A000;
+					break;
+			}
 		}
 
 		super.frame.apply(this, arguments);
@@ -31,6 +47,37 @@ class Agent extends Controllable {
 			move: new Vector(),
 			fire: false
 		});
+	}
+
+	doReturn() {
+		if (this.route === null) {
+			let nearest = this.world.navmesh.centers[0];
+			let minDist = Infinity;
+			this.world.navmesh.centers.forEach(point => {
+				let dist = point.sub(this.position).len();
+				if (dist < minDist) {
+					nearest = point;
+					minDist = dist;
+				}
+			});
+			this.route = [nearest];
+		}
+
+		let dx = this.route[0].sub(this.position);
+		
+		if (dx.len() > this.radius) {
+			let move = dx.unit();
+			let look = move;
+			this.emit("input", {
+				move: move,
+				look: look,
+				fire: false
+			});
+		}
+		else {
+			this.route = null;
+			this.state = Agent.state.FOLLOW;
+		}
 	}
 
 	doFollow() {
@@ -104,6 +151,7 @@ class Agent extends Controllable {
 			}
 			catch (e){
 				this.route = null;
+				this.state = Agent.state.RETURN;
 				this.emit("routeFail");
 			}
 		}
@@ -112,8 +160,22 @@ class Agent extends Controllable {
 			this.route[this.route.length-1] = this.target.position;
 		}
 	}
+
+	draw() {
+		if (Agent.DEBUG) {
+			this.gfxDirty = true;
+			this.gfx.clear();
+			PathTestEntity.prototype.draw.apply(this, arguments);
+			this.gfx.lineStyle(1, this.color, 1);
+			this.gfx.drawCircle(this.position.x,this.position.y,this.radius);
+		}
+		else
+			super.draw.apply(this, arguments);
+	}
 }
+Agent.DEBUG = false;
 Agent.state = {
 	REST: 0,
-	FOLLOW: 1
+	FOLLOW: 1,
+	RETURN: 2
 };

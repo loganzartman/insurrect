@@ -41,6 +41,11 @@ var GameScene = {
 			get debugNavMesh() {return this.x},
 			set debugNavMesh(z) {this.x = z; GameScene.world.navmesh.DEBUG = z;}
 		}, "debugNavMesh");
+		Display.gui.add({
+			x: false,
+			get debugAI() {return this.x},
+			set debugAI(z) {this.x = z; Agent.DEBUG = z;}
+		}, "debugAI");
 
 		//handle display resizes
 		Display.events.listen("resize", evt => {
