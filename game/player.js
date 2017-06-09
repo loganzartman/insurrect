@@ -1,6 +1,7 @@
 class Player extends Controllable {
 	constructor(params) {
 		super(params);
+		this.suspiciousness = 1;
 	}
 
 	frame(timescale, ticks) {
@@ -40,13 +41,10 @@ class Player extends Controllable {
 				elasticity: 0.3,
 				friction: 0.06,
 				life: 1,
-				radius: 2,
+				radius: 0.5,
 				world: this.world,
 				color: Core.color.acc1
 			});
-			ent.listen("collision", () => {
-				ent.radius /= 2;
-			})
 			this.world.addEntity(ent);
 		}
 	}

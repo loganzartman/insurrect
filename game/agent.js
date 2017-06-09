@@ -19,10 +19,15 @@ class Agent extends Controllable {
 				break;
 			case Agent.state.FOLLOW:
 				this.updateRoute();
-				this.doFollow();
+			case Agent.state.NAVIGATE:
+				this.doNavigate();
+				break;
+			case Agent.state.ATTACK:
+				this.doAttack();
 				break;
 			case Agent.state.RETURN:
 				this.doReturn();
+				break;
 		}
 
 		if (Agent.DEBUG) {
@@ -31,7 +36,11 @@ class Agent extends Controllable {
 					this.color = 0x700040;
 					break;
 				case Agent.state.FOLLOW:
+				case Agent.state.NAVIGATE:
 					this.color = 0xA00000;
+					break;
+				case Agent.state.ATTACK:
+					this.color = 0xFF0000;
 					break;
 				case Agent.state.RETURN:
 					this.color = 0xA0A000;
@@ -46,6 +55,14 @@ class Agent extends Controllable {
 		this.emit("input", {
 			move: new Vector(),
 			fire: false
+		});
+	}
+
+	doAttack() {
+		this.emit("input", {
+			move: new Vector(),
+			look: this.target.position.sub(this.position),
+			fire: true
 		});
 	}
 
@@ -65,34 +82,27 @@ class Agent extends Controllable {
 
 		let dx = this.route[0].sub(this.position);
 		
-		if (dx.len() > this.radius) {
-			let move = dx.unit();
-			let look = move;
-			this.emit("input", {
-				move: move,
-				look: look,
-				fire: false
-			});
+		if (!this.world.navmesh.polys.find(x => x.contains(this.position))) {
+			this.position = this.position.add(Vector.fromDir(dx.dir(), 2));
 		}
 		else {
 			this.route = null;
-			this.state = Agent.state.FOLLOW;
+			this.state = Agent.state.REST;
 		}
 	}
 
-	doFollow() {
-		if (this.target === null || this.route === null)
+	doNavigate() {
+		if (this.route === null)
 			return false;
-		console.log("following");
 		
 		let waypoint = this.route[0];
-		let waypoly = this.routePolys[0];
+		// let waypoly = this.routePolys[0];
 
 		//if the agent has been moved outside of its route, invalidate it.
-		if (false && !waypoly.contains(this.position)) {
-			this.route = null;
-			return;
-		}
+		// if (!waypoly.contains(this.position)) {
+		// 	this.route = null;
+		// 	return;
+		// }
 
 		//compute movement
 		let dx = waypoint.sub(this.position);
@@ -112,7 +122,7 @@ class Agent extends Controllable {
 		//waypoint move completed
 		else {
 			this.route.shift();
-			this.routePolys.shift();
+			// this.routePolys.shift();
 
 			//check route move completed
 			if (this.route.length === 0) {
@@ -131,6 +141,8 @@ class Agent extends Controllable {
 		if (this.target === null)
 			return true;
 		if (this.route === null)
+			return false;
+		if (this.destinationPoly === null)
 			return false;
 		if (this.destinationPoly.contains(this.target.position))
 			return true;
@@ -160,22 +172,12 @@ class Agent extends Controllable {
 			this.route[this.route.length-1] = this.target.position;
 		}
 	}
-
-	draw() {
-		if (Agent.DEBUG) {
-			this.gfxDirty = true;
-			this.gfx.clear();
-			PathTestEntity.prototype.draw.apply(this, arguments);
-			this.gfx.lineStyle(1, this.color, 1);
-			this.gfx.drawCircle(this.position.x,this.position.y,this.radius);
-		}
-		else
-			super.draw.apply(this, arguments);
-	}
 }
 Agent.DEBUG = false;
 Agent.state = {
 	REST: 0,
-	FOLLOW: 1,
-	RETURN: 2
+	RETURN: 1,
+	NAVIGATE: 2,
+	FOLLOW: 3,
+	ATTACK: 4
 };

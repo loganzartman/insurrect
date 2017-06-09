@@ -9,6 +9,8 @@ var Input = {
 	mouse: {x: 0, y: 0, left: false, right: false},
 
 	init: function(displayElement, bindingMap) {
+		console.log("Input init")
+
 		//register event listeners
 		document.addEventListener("keydown", Input.handleKeydown, false);
 		document.addEventListener("keyup", Input.handleKeyup, false);

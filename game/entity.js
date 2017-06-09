@@ -14,7 +14,8 @@ class Entity extends Emitter {
 			velocity: new Vector(0,0),
 			radius: 4,
 			color: Core.color.acc2,
-			world: null
+			world: null,
+			flocks: true
 		}, params);
 		super(params);
 
@@ -23,6 +24,7 @@ class Entity extends Emitter {
 		this.radius = params.radius;
 		this.world = params.world;
 		this.color = params.color;
+		this.flocks = params.flocks;
 		this.listen("collision", this.handleCollision);
 
 		this.t0 = this.world.time;
@@ -53,21 +55,24 @@ class Entity extends Emitter {
 	}
 
 	move(dx) {
-		var steps = Math.ceil(dx.len());
-		var step = dx.div(steps);
+		let steps = Math.ceil(dx.len()*4);
+		let step = dx.div(steps);
 		while (steps-- > 0) {
 			this.position = this.position.add(step);
-			var others = this.getAllCollisions();
-			if (others.length > 0) {
+			let others = this.getAllCollisions();
+			let walls = others.filter(x => x.type === Collision.SEGMENT).map(x => x.object);
+			if (walls.length > 0) {
 				this.position = this.position.sub(step);
-				var minstep = others[0].object.b.sub(others[0].object.a).project(step);
-				others.forEach(function(coll){
-					var nstep = coll.object.b.sub(coll.object.a).project(step);
-					if (nstep.len() < minstep.len())
-						minstep = nstep;
-				});
-				step = minstep.unit().mult(step.len());
-				this.emit("collision", others);
+				
+				let wall;
+				if (walls.length > 1)
+					wall = walls[Math.floor(Math.random()*walls.length)];
+				else
+					wall = walls[0];
+
+				let wallDir = wall.b.sub(wall.a);
+				let newStep = wallDir.unit().project(step.unit());
+				step = newStep.mult(step.len());
 			}
 		}
 	}
@@ -76,6 +81,18 @@ class Entity extends Emitter {
 		this.emit("frameStart");
 		if (!this.velocity.isZero())
 			this.move(this.velocity.mult(timescale));
+		if (this.flocks) {
+			this.world.entities.forEach(other => {
+				if (other !== this && other.flocks) {
+					let dx = other.position.sub(this.position);
+					let dist = dx.len();
+					if (dist < this.radius + other.radius) {
+						let overlap = (this.radius + other.radius) - dist;
+						this.velocity = this.velocity.sub(dx.unit().mult(overlap * 0.2));
+					}
+				}
+			})
+		}
 		this.emit("frameEnd");
 	}
 
@@ -86,8 +103,10 @@ class Entity extends Emitter {
 		if (!this.gfxDirty)
 			return;
 		this.gfx.clear();
+		this.gfx.beginFill(this.color, 0.5);
 		this.gfx.lineStyle(1, this.color, 1);
 		this.gfx.drawCircle(0, 0, this.radius);
+		this.gfx.endFill();
 		this.gfxDirty = false;
 	}
 

@@ -97,8 +97,8 @@ class NavMesh extends Emitter {
 
 			let hit = false;
 			outer: for (let offset of offsets) {
-				// let segments = this.world.segSpace.getIntersecting(lineOfSight.add(offset));
-				let segments = this.world.obstacles.reduce((s, o) => s.concat(o.getSegments()), []);
+				let segments = this.world.segSpace.getIntersecting(lineOfSight.add(offset));
+				// let segments = this.world.obstacles.reduce((s, o) => s.concat(o.getSegments()), []);
 				for (let segment of segments) {
 					if (Util.geom.segSegIntersect(lineOfSight.add(offset), segment)) {
 						hit = true;

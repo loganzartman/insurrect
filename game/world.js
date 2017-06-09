@@ -40,6 +40,15 @@ class World extends Emitter {
             position: new Vector(5,5),
             target: this.player
         }));
+
+        Input.events.listen("keydown", event => {
+            if (event.keyCode === Input.key.X)
+                this.addEntity(new Guard({
+                    world: this,
+                    position: GameScene.view.add(GameScene.viewOffset).add(Input.mouse),
+                    mode: Guard.mode.WANDER
+                }));
+        });
     }
 
     addEntity(ent) {

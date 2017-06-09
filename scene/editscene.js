@@ -13,6 +13,14 @@ var EditScene = {
 
     init: function(params) {
         EditScene.stage = new PIXI.Container();
+
+        GameScene.world.ready = false;
+        EditScene.gui = Core.gui.addFolder("Editor");
+        EditScene.gui.add({
+            "Rebuild NavMesh": function() {
+                GameScene.world.navmesh.rebuild();
+            }
+        }, "Rebuild NavMesh");
     },
 
     activate: function() {

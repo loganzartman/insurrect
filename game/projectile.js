@@ -1,11 +1,12 @@
 class Projectile extends Entity {
     constructor(params) {
-        super(params);
         params = Object.assign({
             friction: 0,
             elasticity: 0,
-            life: Infinity
+            life: Infinity,
+            flocks: false
         }, params);
+        super(params);
         this.friction = params.friction;
         this.elasticity = params.elasticity;
         this.life = params.life;

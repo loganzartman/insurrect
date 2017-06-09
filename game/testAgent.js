@@ -20,4 +20,12 @@ class TestAgent extends Agent {
 
 		super.frame.apply(this, arguments);
 	}
+
+	draw() {
+		this.gfxDirty = true;
+		this.gfx.clear();
+		PathTestEntity.prototype.draw.apply(this, arguments);
+		this.gfx.lineStyle(1, this.color, 1);
+		this.gfx.drawCircle(this.position.x,this.position.y,this.radius);
+	}
 }
