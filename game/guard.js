@@ -38,6 +38,21 @@ class Guard extends Agent {
 
 		let dist = this.world.player.position.sub(this.position).len();
 
+		//update suspicion
+		if (dist < this.suspectRange)
+			this.suspicion = Math.min(this.suspicion + this.world.player.suspiciousness/Game.targetFps, 1);
+		else
+			this.suspicion = Math.max(this.suspicion - ticks*0.1/Game.targetFps, 0);
+
+		if (this.suspicion >= 1) {
+			this.engaged = true;
+		}
+		if (this.engaged && this.suspicion < 0.1) {
+			this.engaged = false;
+			this.state = Agent.state.REST;
+		}
+
+		//engaged behaviour
 		if (this.engaged) {
 			this.target = this.world.player;
 			if (dist < this.targetRange) {
@@ -50,16 +65,8 @@ class Guard extends Agent {
 			else
 				this.state = Agent.state.FOLLOW;
 		}
+		//idle behavior
 		else {
-			if (dist < this.suspectRange)
-				this.suspicion += this.world.player.suspiciousness/Game.targetFps;
-			else
-				this.suspicion = Math.max(this.suspicion - ticks*0.1/Game.targetFps, 0);
-
-			if (this.suspicion >= 1) {
-				this.engaged = true;
-			}
-
 			switch (this.mode) {
 				case Guard.mode.WAIT:
 					this.state = Agent.state.REST;
