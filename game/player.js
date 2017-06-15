@@ -1,7 +1,7 @@
 class Player extends Controllable {
 	constructor(params) {
 		super(params);
-		this.suspiciousness = 1;
+		this.suspiciousness = 0;
 	}
 
 	frame(timescale, ticks) {

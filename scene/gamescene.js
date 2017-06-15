@@ -47,6 +47,13 @@ var GameScene = {
 			set debugAI(z) {this.x = z; Agent.DEBUG = z;}
 		}, "debugAI");
 
+		GameScene.gui = Core.gui.addFolder("Game");
+		GameScene.gui.add({
+			x: GameScene.world.player.suspiciousness,
+			get playerSuspicion() {return this.x},
+			set playerSuspicion(z) {this.x = z; GameScene.world.player.suspiciousness = z;}
+		}, "playerSuspicion").min(0).max(1).step(0.01);
+
 		//handle display resizes
 		Display.events.listen("resize", evt => {
 			GameScene.viewOffset = new Vector(-Display.w/2, - Display.h/2);

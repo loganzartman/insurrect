@@ -1,7 +1,7 @@
 class Guard extends Agent {
 	constructor(params) {
 		params = Object.assign({
-			color: 0x701000,
+			color: Core.color.acc1,
 			maxSpeed: Util.rand(0.9,1.1),
 			acceleration: Util.rand(0.25,0.35),
 			deceleration: 0.1,
@@ -52,9 +52,9 @@ class Guard extends Agent {
 		}
 		else {
 			if (dist < this.suspectRange)
-				this.suspicion += this.world.player.suspiciousness;
+				this.suspicion += this.world.player.suspiciousness/Game.targetFps;
 			else
-				this.suspicion = Math.max(this.suspicion - ticks*0.01, 0);
+				this.suspicion = Math.max(this.suspicion - ticks*0.1/Game.targetFps, 0);
 
 			if (this.suspicion >= 1) {
 				this.engaged = true;
@@ -93,6 +93,18 @@ class Guard extends Agent {
 		}
 
 		super.frame.apply(this, arguments);
+	}
+
+	draw() {
+		this.gfxDirty = true;
+		super.draw.apply(this, arguments);
+		
+		const min = 0.1;
+		if (this.suspicion > min) {
+			this.gfx.lineStyle(1, Core.color.acc1b, 1);
+			const start = 0.5*Math.PI;
+			this.gfx.arc(0,0,this.radius+2,start-Math.PI*this.suspicion,start+Math.PI*this.suspicion);
+		}
 	}
 
 	fire(lookVector) {
