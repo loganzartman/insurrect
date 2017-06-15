@@ -5,8 +5,9 @@ class Emitter {
 
 	listen(event, callback) {
 		if (!this.listeners.hasOwnProperty(event))
-			this.listeners[event] = [];
-		this.listeners[event].push(callback);
+			this.listeners[event] = new Set();
+
+		this.listeners[event].add(callback);
 		let that = this;
 		return {event: event, callback: callback, remove: function(){
 			that.unlisten(event, callback);
@@ -20,8 +21,8 @@ class Emitter {
 		}
 
 		if (this.listeners.hasOwnProperty(event)
-			&& this.listeners[event].includes(callback)) {
-			this.listeners[event].splice(this.listeners[event].indexOf(callback), 1);
+			&& this.listeners[event].has(callback)) {
+			this.listeners[event].delete(callback);
 			return true;
 		}
 		return false;
@@ -31,7 +32,7 @@ class Emitter {
 		if (typeof event === "undefined")
 			this.listeners = {};
 		else if (this.listeners.hasOwnProperty(event))
-			this.listeners[event] = [];
+			this.listeners[event] = new Set();
 	}
 
 	emit(event, data) {

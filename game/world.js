@@ -12,6 +12,9 @@ class World extends Emitter {
         this.reset();
     }
 
+    /**
+     * Resets entire world state.
+     */
     reset() {
         //reset state
         this.time = 0;
@@ -41,14 +44,17 @@ class World extends Emitter {
             target: this.player
         }));
 
-        Input.events.listen("keydown", event => {
-            if (event.keyCode === Input.key.X)
-                this.addEntity(new Guard({
-                    world: this,
-                    position: GameScene.view.add(GameScene.viewOffset).add(Input.mouse),
-                    mode: Guard.mode.WANDER
-                }));
-        });
+        this.listnrs.push(
+            Input.events.listen("keydown", this.eventKeyDown.bind(this)));
+    }
+
+    eventKeyDown(event) {
+        if (event.keyCode === Input.key.X)
+            this.addEntity(new Guard({
+                world: this,
+                position: GameScene.view.add(GameScene.viewOffset).add(Input.mouse),
+                mode: Guard.mode.WANDER
+            }));
     }
 
     addEntity(ent) {
