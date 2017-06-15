@@ -36,6 +36,23 @@ var GameScene = {
 			get debugCaster() {return this.x},
 			set debugCaster(z) {this.x = z; GameScene.world.caster.DEBUG = z;}
 		}, "debugCaster");
+		Display.gui.add({
+			x: false,
+			get debugNavMesh() {return this.x},
+			set debugNavMesh(z) {this.x = z; GameScene.world.navmesh.DEBUG = z;}
+		}, "debugNavMesh");
+		Display.gui.add({
+			x: false,
+			get debugAI() {return this.x},
+			set debugAI(z) {this.x = z; Agent.DEBUG = z;}
+		}, "debugAI");
+
+		GameScene.gui = Core.gui.addFolder("Game");
+		GameScene.gui.add({
+			x: GameScene.world.player.suspiciousness,
+			get playerSuspicion() {return this.x},
+			set playerSuspicion(z) {this.x = z; GameScene.world.player.suspiciousness = z;}
+		}, "playerSuspicion").min(0).max(1).step(0.01);
 
 		//handle display resizes
 		Display.events.listen("resize", evt => {
@@ -184,6 +201,8 @@ var GameScene = {
 	 * Called when a scene regains focus.
 	 */
 	activate: function() {
+		Game.WALLHACKS = true;
+
 		//cleanup graphics
 		GameScene.objectContainer.removeChildren();
 

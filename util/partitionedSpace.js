@@ -77,6 +77,13 @@ class PartitionedSpace {
 		return items;
 	}
 
+	getIntersecting(segment) {
+		let dx = segment.b.sub(segment.a);
+		let list = [];
+		this.getRaycast(segment.a.x, segment.a.y, dx.x, dx.y, dx.len(), x => list.push(x));
+		return list;
+	}
+
 	getRaycast(x0, y0, dx, dy, maxdist, callback) {
 		var len = Math.sqrt(dx*dx + dy*dy);
 		if (len !== 1) {

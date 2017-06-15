@@ -12,19 +12,24 @@ class World extends Emitter {
         this.reset();
     }
 
+    /**
+     * Resets entire world state.
+     */
     reset() {
         //reset state
         this.time = 0;
         this.entities = [];
         this.obstacles = [];
         this.prefabs = [];
-        this.rebuildStructures();
 
         this.listnrs.forEach(listener => listener.remove());
         this.listnrs = [];
 
         //build level
+        this.ready = false;
         this.buildLevel(this.levelName);
+        this.ready = true;
+        this.rebuildStructures();
 
         //create player
         this.player = new Player({
@@ -32,6 +37,24 @@ class World extends Emitter {
             world: this
 		});
 		this.addEntity(this.player);
+
+        this.addEntity(new TestAgent({
+            world: this,
+            position: new Vector(5,5),
+            target: this.player
+        }));
+
+        this.listnrs.push(
+            Input.events.listen("keydown", this.eventKeyDown.bind(this)));
+    }
+
+    eventKeyDown(event) {
+        if (event.keyCode === Input.key.X)
+            this.addEntity(new Guard({
+                world: this,
+                position: GameScene.view.add(GameScene.viewOffset).add(Input.mouse),
+                mode: Guard.mode.WANDER
+            }));
     }
 
     addEntity(ent) {
@@ -77,6 +100,8 @@ class World extends Emitter {
     }
 
     rebuildStructures() {
+        if (!this.ready)
+            return false;
         this.segments = [];
         this.segSpace = new SegmentSpace({binSize: 24});
         this.obstacles.forEach(obstacle => {
@@ -87,7 +112,7 @@ class World extends Emitter {
         });
 
         this.caster.init();
-        // this.bsp = new BinarySpacePartition({segments: segments});
+        this.navmesh.rebuild();
     }
 
     /**
@@ -155,6 +180,8 @@ class World extends Emitter {
         this.obstacles.forEach(obs => {
             obs.poly.points.forEach(point => points.push(point));
         });
+        if (points.length === 0)
+            points.push(new Vector(0,0));
         
         //find min/max points
         let min = new Vector(points[0]);

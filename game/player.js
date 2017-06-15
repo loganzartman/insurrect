@@ -1,6 +1,7 @@
 class Player extends Controllable {
 	constructor(params) {
 		super(params);
+		this.suspiciousness = 0;
 	}
 
 	frame(timescale, ticks) {
@@ -34,19 +35,16 @@ class Player extends Controllable {
 			let ent = new Projectile({
 				position: this.position.clone(),
 				velocity: Vector.fromDir(
-					lookVector.dir() + Math.random()*0.2 - 0.1,
-					16 + Math.random()*4
+					lookVector.dir() + Util.rand(0.1, -0.1),
+					Util.rand(16, 20)
 				),
 				elasticity: 0.3,
 				friction: 0.06,
 				life: 1,
-				radius: 2,
+				radius: 0.5,
 				world: this.world,
 				color: Core.color.acc1
 			});
-			ent.listen("collision", () => {
-				ent.radius /= 2;
-			})
 			this.world.addEntity(ent);
 		}
 	}

@@ -98,6 +98,10 @@ class Vector {
 		return new Vector(this.x, this.y);
 	}
 
+	round() {
+		return new Vector(Math.round(this.x), Math.round(this.y));
+	}
+
 	/**
 	 * A note about normalization:
 	 * Normalizing a zero vector results in a zero vector, which does not have

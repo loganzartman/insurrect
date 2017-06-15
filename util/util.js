@@ -1,4 +1,39 @@
 var Util = {
+	rand: function(a,b) {
+		if (typeof a === "undefined")
+			return Util.rand(0,1);
+		if (typeof b === "undefined")
+			return Util.rand(0,a);
+		return Math.random()*(b-a)+a;
+	},
+
+	color: {
+		rgb: function(r,g=r,b=r) {
+			const f = Util.color.clipScale;
+			return (f(r) << 16) | (f(g) << 8) | f(b);
+		},
+		rgba: function(r,g,b,a=1) {
+			const f = Util.color.clipScale;
+			return (f(r) << 24) | (f(g) << 16) | (f(b) << 8) | f(a);
+		},
+		unRgb: function(rgb) {
+			return {
+				b: (rgba) & 0xFF / 255,
+				g: (rgba >>= 8) & 0xFF / 255,
+				r: (rgba >>= 8) & 0xFF / 255
+			};
+		},
+		unRgba: function(rgba) {
+			return {
+				a: (rgba) & 0xFF / 255,
+				b: (rgba >>= 8) & 0xFF / 255,
+				g: (rgba >>= 8) & 0xFF / 255,
+				r: (rgba >>= 8) & 0xFF / 255
+			};
+		},
+		clipScale: c => Math.round(Math.max(0, Math.min(c, 1)) * 255)
+	},
+
 	geom: {
 		/**
 		 * Checks for an intersection between a circle of given radius and
@@ -152,6 +187,33 @@ var Util = {
 			//parameters out of the bounds [0,1] indicates no intersection
 			if (isNaN(t) || t < 0 || t > 1)
 				return null;
+
+			//calculate intersection position using parametric forms
+			return new Vector(
+				x0 + t*(x2 - x0),
+				y0 + t*(y2 - y0)
+			);
+		},
+
+		lineLineIntersect: function(lineA, lineB) {
+			var a1 = lineA.a;
+			var a2 = lineA.b;
+			var b1 = lineB.a;
+			var b2 = lineB.b;
+			var x0 = a1.x, x1 = b1.x, x2 = a2.x, x3 = b2.x;
+			var y0 = a1.y, y1 = b1.y, y2 = a2.y, y3 = b2.y;
+
+			//solve for parameters t and u
+			//where t and u are the parameters of the parametric forms of lines
+			//A and B respectively
+			var fraction = 1/(x0*(y1-y3) - x1*(y0-y2) - x2*(y1-y3) + x3*(y0-y2));
+			var t = x0*(y1-y3) - x1*(y0-y3) + x3*(y0-y1);
+			t *= fraction;
+			var u = x0*(y1-y2) - x1*(y0-y2) + x2*(y0-y1);
+			u *= fraction;
+
+			// if (isNaN(t))
+			// 	return null;
 
 			//calculate intersection position using parametric forms
 			return new Vector(

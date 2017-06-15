@@ -43,6 +43,20 @@ class Polygon {
         return inside;
     }
 
+    adjacentTo(poly) {
+        let segsA = this.getSegments();
+        let segsB = poly.getSegments();
+        for (let i=0; i<segsA.length; i++) {
+            for (let j=0; j<segsB.length; j++) {
+                let dirA = segsA[i].dir();
+                let dirB = segsB[j].dir();
+                if (segsA[i].getIntersection(segsB[j]) && dirA === dirB)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Generates an array of all segments in this Polygon.
      * Each segment is represented by an array containing two Vectors.
@@ -73,6 +87,16 @@ class Polygon {
             max: max,
             min: min
         };
+    }
+
+    getCentroid() {
+        let z = this.points;
+        let c = new Vector();
+        for (let i=0,j=z.length; i<j; i++) {
+            c.x += z[i].x/j;
+            c.y += z[i].y/j;
+        }
+        return c;
     }
 
     clean() {
@@ -188,6 +212,17 @@ class Polygon {
         paths = ClipperLib.Clipper.SimplifyPolygons(paths, ClipperLib.PolyFillType.pftNonZero);
         ClipperLib.JS.ScaleDownPaths(paths, SCALE);
         return Polygon.fromClipperPaths(paths);
+    }
+
+    static clean(polys, delta=0.1) {
+        const SCALE = 100;
+        let paths = Polygon.toClipperPaths(polys);
+        ClipperLib.JS.ScaleUpPaths(paths, SCALE);
+        
+        let result = new ClipperLib.Clipper.CleanPolygons(paths, delta * SCALE);
+
+        ClipperLib.JS.ScaleDownPaths(result, SCALE);
+        return Polygon.fromClipperPaths(result);
     }
 
     static offset(polys, distance, miterLimit=2, arcTolerance=0.25) {

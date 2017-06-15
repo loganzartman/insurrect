@@ -13,12 +13,15 @@ class Controllable extends Entity {
 		params = Object.assign({
 			maxSpeed: 1.7,
 			acceleration: 0.4,
-			deceleration: 0.4
+			deceleration: 0.2,
+			fireInterval: 0,
 		}, params);
 		super(params);
 		this.acceleration = params.acceleration;
 		this.deceleration = params.deceleration;
 		this.maxSpeed = params.maxSpeed;
+		this.fireInterval = params.fireInterval;
+		this.fireTimer = 0;
 		this.input = {
 			move: new Vector(0,0),
 			look: new Vector(0,0),
@@ -28,6 +31,9 @@ class Controllable extends Entity {
 	}
 
 	frame(timescale, ticks) {
+		//handle fire timer
+		this.fireTimer = Math.max(0, this.fireTimer - ticks);
+
 		//handle movement input
 		var controlled = false;
 		if (!this.input.move.isZero()) {
@@ -48,9 +54,10 @@ class Controllable extends Entity {
 		this.velocity = this.velocity.unit().mult(speed);
 
 		//handle click input
-		if (this.input.fire) {
+		if (this.input.fire && this.fireTimer === 0) {
 			for (let i=0; i<ticks; i++)
 				this.fire(this.input.look);
+			this.fireTimer = this.fireInterval;
 		}
 
 		super.frame(timescale, ticks);

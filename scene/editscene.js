@@ -13,6 +13,14 @@ var EditScene = {
 
     init: function(params) {
         EditScene.stage = new PIXI.Container();
+
+        GameScene.world.ready = false;
+        EditScene.gui = Core.gui.addFolder("Editor");
+        EditScene.gui.add({
+            "Rebuild NavMesh": function() {
+                GameScene.world.navmesh.rebuild();
+            }
+        }, "Rebuild NavMesh");
     },
 
     activate: function() {
@@ -274,7 +282,6 @@ var EditScene = {
         EditScene.stage.removeChild(GameScene.stage);
         GameScene.world.unlisten("addObstacle", this.handleAddObstacle);
         EditScene.inputListeners.forEach(l => Input.events.unlisten(l.event, l.callback));
-        Game.WALLHACKS = false;
         GameScene.LOOK_INTENSITY = 0.4;
     },
 
