@@ -35,8 +35,8 @@ class Player extends Controllable {
 			let ent = new Projectile({
 				position: this.position.clone(),
 				velocity: Vector.fromDir(
-					lookVector.dir() + Math.random()*0.2 - 0.1,
-					16 + Math.random()*4
+					lookVector.dir() + Util.rand(0.1, -0.1),
+					Util.rand(16, 20)
 				),
 				elasticity: 0.3,
 				friction: 0.06,

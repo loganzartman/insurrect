@@ -1,4 +1,9 @@
 class NavMesh extends Emitter {
+	/**
+	 * Params:
+	 * agentRadius: the minimum radius of agents using the NavMesh. Used to offset walkable area.
+	 * DEBUG: whether to render debug view
+	 */
 	constructor(params) {
 		super(params);
 		if (!("world" in params))
@@ -16,6 +21,9 @@ class NavMesh extends Emitter {
 		this.pathPolys = null;
 	}
 
+	/**
+	 * Updates the NavMesh to account for modified level geometry.
+	 */
 	rebuild() {
 		let t0 = performance.now();
 		try {
@@ -28,6 +36,10 @@ class NavMesh extends Emitter {
 		console.log("NavMesh rebuild took %s ms.", (performance.now()-t0).toFixed(2));
 	}
 
+	/**
+	 * Computes walkable area and triangulates it.
+	 * This updates the internal list of walkable polygons.
+	 */
 	triangulate() {
 		//invert world geometry (compute walkable areas)
 		let bounds = this.world.getBounds();
@@ -37,8 +49,10 @@ class NavMesh extends Emitter {
 		holes = Polygon.simplify(holes);
 
 		//this is REALLY bad--fix polygon adjacency test for vertical/horizontal segments
+		//it works by adding a small random value to every vertex
 		holes = holes.map(hole => new Polygon(hole.points.map(p => p.add(Vector.random(-this._epsilon,this._epsilon)))))
 		
+		//subtract offset obstacle geometry from world bounds (invert) 
 		holes.forEach(hole => bounds.addHole(hole));
 		this.polys = holes;
 
@@ -51,6 +65,11 @@ class NavMesh extends Emitter {
 		this.centers = this.polys.map(poly => poly.getCentroid());
 	}
 
+	/**
+	 * Builds a graph of adjacent walkable polygons.
+	 * Should call triangulate() first.
+	 * This updates the internal adjacency graph.
+	 */
 	buildGraph() {
 		this.graph = new Graph();
 		this.polys.forEach(poly => {
@@ -61,8 +80,15 @@ class NavMesh extends Emitter {
 		});
 	}
 
+	/**
+	 * Finds a list of polygons that connect pointA and pointB.
+	 * Both points must be contained by a polygon in this NavMesh.
+	 * This method will THROW if pathfinding fails.
+	 * @param pointA the source point
+	 * @param pointB the destination point
+	 */
 	findGlobalPath(pointA, pointB) {
-		//locate points
+		//locate points in walkability polygons
 		let src = this.polys.find(poly => poly.contains(pointA));
 		let dst = this.polys.find(poly => poly.contains(pointB));
 		if (typeof src === "undefined")
@@ -77,28 +103,42 @@ class NavMesh extends Emitter {
 		return this.pathPolys;
 	}
 
+	/**
+	 * Computes a list of waypoints from pointA to pointB.
+	 * This is the function that should generally be used to compute paths.
+	 * Depends on findGlobalPath(); see its documentation.
+	 * @param pointA the source point
+	 * @param pointB the destination point
+	 */
 	findPath(pointA, pointB) {
+		//find path and map polygons to their centroids.
 		let points = this.findGlobalPath(pointA, pointB)
 			.map(poly => poly.getCentroid());
+
+		//include source and destination points
+		//caveat: A* is not aware of this information; paths may be unoptimal
 		points.unshift(pointA);
 		points.push(pointB);
 
+		//begin line of sight testing to reduce path complexity
 		let out = [points[0]];
 		let polys = [this.pathPolys[0]];
 		let prev = 0;
 		for (let i=1; i<points.length-1; i++) {
-			//do LoS testing
 			let lineOfSight = new Segment(points[prev], points[i+1]);
+
+			//offsets help to reduce collisions with corners
+			//effectively raycasts from center and both sides of entities
 			let offsets = [
 				new Vector(),
 				Vector.fromDir(lineOfSight.dir()-Math.PI*0.5, this.agentRadius*2),
 				Vector.fromDir(lineOfSight.dir()+Math.PI*0.5, this.agentRadius*2)
 			];
 
+			//do LoS testing
 			let hit = false;
 			outer: for (let offset of offsets) {
 				let segments = this.world.segSpace.getIntersecting(lineOfSight.add(offset));
-				// let segments = this.world.obstacles.reduce((s, o) => s.concat(o.getSegments()), []);
 				for (let segment of segments) {
 					if (Util.geom.segSegIntersect(lineOfSight.add(offset), segment)) {
 						hit = true;
@@ -106,13 +146,18 @@ class NavMesh extends Emitter {
 					}
 				}
 			}
+
+			//if there is a clear LoS, this point is unnecessary.
 			if (!hit)
 				continue;
 			
+			//otherwise, add the point to the output
 			out.push(points[i]);
 			polys.push(this.pathPolys[i]);
 			prev = i;
 		}
+
+		//add the final point
 		out.push(points[points.length-1]);
 		polys.push(this.pathPolys[this.pathPolys.length-1]);
 		this.pathPolys = polys;
