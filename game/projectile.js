@@ -108,4 +108,15 @@ class Projectile extends Entity {
                 .mult(this.elasticity);
         }
     }
+
+    serialize() {
+        let data = super.serialize.apply(this, arguments);
+        return Object.assign(data, {
+            _constructor: "Projectile",
+            friction: this.friction,
+            elasticity: this.elasticity,
+            life: this.life
+        });
+    }
 }
+Core.classMap.Projectile = Projectile;

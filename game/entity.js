@@ -19,8 +19,8 @@ class Entity extends Emitter {
 		}, params);
 		super(params);
 
-		this.position = params.position;
-		this.velocity = params.velocity;
+		this.position = new Vector(params.position);
+		this.velocity = new Vector(params.velocity);
 		this.radius = params.radius;
 		this.world = params.world;
 		this.color = params.color;
@@ -128,4 +128,16 @@ class Entity extends Emitter {
 	handleCollision() {
 
 	}
+
+	serialize() {
+		return {
+			_constructor: "Entity",
+			position: this.position.serialize(),
+			velocity: this.velocity.serialize(),
+			color: this.color,
+			radius: this.radius,
+			flocks: this.flocks
+		};
+	}
 }
+Core.classMap.Entity = Entity;

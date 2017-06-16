@@ -172,6 +172,13 @@ class Agent extends Controllable {
 			this.route[this.route.length-1] = this.target.position;
 		}
 	}
+
+    serialize() {
+        let data = super.serialize.apply(this, arguments);
+        return Object.assign(data, {
+            _constructor: "Agent"
+        });
+    }
 }
 Agent.DEBUG = false;
 Agent.state = {
@@ -181,3 +188,4 @@ Agent.state = {
 	FOLLOW: 3,
 	ATTACK: 4
 };
+Core.classMap.Agent = Agent;

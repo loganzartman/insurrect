@@ -15,7 +15,7 @@ class Guard extends Agent {
 		super(params);
 
 		this.basePos = this.position.clone();
-		this.patrolRoute = params.patrolRoute;
+		this.patrolRoute = params.patrolRoute.map(x => new Vector(x));
 		this.patrolFlip = false;
 		this.wanderRange = params.wanderRange;
 		this.suspectRange = params.suspectRange;
@@ -136,9 +136,22 @@ class Guard extends Agent {
 
 		super.fire.apply(this, arguments);
 	}
+
+	serialize() {
+        let data = super.serialize.apply(this, arguments);
+        return Object.assign(data, {
+            _constructor: "Guard",
+			mode: this.mode,
+			patrolRoute: this.patrolRoute.map(x => x.serialize()),
+			wanderRange: this.wanderRange,
+			suspectRange: this.suspectRange,
+			targetRange: this.targetRange
+        });
+    }
 }
 Guard.mode = {
 	WAIT: 0,
 	WANDER: 1,
 	PATROL: 2
 };
+Core.classMap.Guard = Guard;

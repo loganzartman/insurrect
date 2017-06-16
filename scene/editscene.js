@@ -8,23 +8,27 @@ var EditScene = {
     mergeMode: false,
     mergedObstacles: [],
     mergeRemoveEnabled: true,
-    UNION: 1,
-    DIFFERENCE: 2,
+    NONE: "Off",
+    UNION: "Add",
+    DIFFERENCE: "Subtract",
 
     init: function(params) {
         EditScene.stage = new PIXI.Container();
 
-        GameScene.world.ready = false;
         EditScene.gui = Core.gui.addFolder("Editor");
         EditScene.gui.add({
             "Rebuild NavMesh": function() {
                 GameScene.world.navmesh.rebuild();
             }
         }, "Rebuild NavMesh");
+        EditScene.gui.add({"Export Level": EditScene.doExport}, "Export Level");
+        EditScene.gui.add({"Import Level": EditScene.doImport}, "Import Level");
+        EditScene.gui.add(EditScene, "mergeMode", [EditScene.NONE, EditScene.UNION, EditScene.DIFFERENCE]);
     },
 
     activate: function() {
         GameScene.activate();
+        GameScene.world.ready = false;
         GameScene.world.listen("addObstacle", this.handleAddObstacle);
         GameScene.world.obstacles.forEach(this.handleAddObstacle);
 
@@ -53,7 +57,7 @@ var EditScene = {
                 });
 
                 //if geometry merge mode is enabled, remove it and reinsert a merged obstacle
-                if (EditScene.mergeMode) {
+                if (EditScene.mergeMode !== EditScene.NONE) {
                     EditScene.mergeRemoveEnabled = false;
                     GameScene.world.removeObstacle(obs); //remove the new obstacle
                     EditScene.mergeRemoveEnabled = true;
@@ -151,29 +155,29 @@ var EditScene = {
         //create graphics overlay
         EditScene.overlayGfx = new PIXI.Graphics();
 
-        //create export button
-        var exportBtn = Display.makeButton("Export", Core.color.acc3,
-            Core.color.acc1, EditScene.doExport);
-        exportBtn.position.x = Display.w - exportBtn.width - 8;
-        exportBtn.position.y = 8;
-
-        //create merge button
-        EditScene.mergeBtn = Display.makeButton("Merge (OFF)", Core.color.acc3,
-            Core.color.acc1, EditScene.toggleMerge);
-        EditScene.mergeBtn.position.x = Display.w - EditScene.mergeBtn.width - 8;
-        EditScene.mergeBtn.position.y = 10 + exportBtn.height;
-
         EditScene.stage.addChild(EditScene.overlayGfx);
-        EditScene.stage.addChild(exportBtn);
-        EditScene.stage.addChild(EditScene.mergeBtn);
     },
 
     doExport: function() {
         var data = GameScene.world.serialize();
         var str = JSON.stringify(data);
-        var url = "data:text/plain;base64,";
+        var url = "data:;base64,";
         url += btoa(str);
         window.open(url);
+    },
+
+    doImport: function() {
+        let text = prompt("Paste level data:");
+        if (!text)
+            return;
+
+        try {
+            let data = JSON.parse(text);
+            GameScene.world.reset(data);
+        }
+        catch (e) {
+            alert("Bad level data.");
+        }
     },
 
     doMerge: function(obstacle) {
@@ -182,15 +186,6 @@ var EditScene = {
         GameScene.world.removeAllObstacles();
         result.forEach(poly => GameScene.world.addObstacle(new Obstacle({vertices: poly.points})));
         GameScene.world.rebuildStructures();
-    },
-
-    toggleMerge: function() {
-        EditScene.mergeMode = (EditScene.mergeMode+1)%3;
-        if (EditScene.mergeMode) {
-            EditScene.mergedObstacles = [];
-        }
-        var strings = ["Merge (OFF)", "Merge (ADD)", "Merge (SUB)"];
-        EditScene.mergeBtn.setText(strings[EditScene.mergeMode]);
     },
 
     /**

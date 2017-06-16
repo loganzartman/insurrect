@@ -50,4 +50,12 @@ class Player extends Controllable {
 		});
 		this.world.addEntity(ent);
 	}
+
+	serialize() {
+		let data = super.serialize.apply(this, arguments);
+		return Object.assign(data, {
+			_constructor: "Player"
+		});
+	}
 }
+Core.classMap.Player = Player;

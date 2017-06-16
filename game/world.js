@@ -7,19 +7,20 @@ class World extends Emitter {
         this.scene = null;
         this.levelName = params.levelName;
         this.listnrs = [];
+        this.entities = [];
+        this.obstacles = [];
         this.caster = new Caster({world: this});
         this.navmesh = new NavMesh({world: this});
-        this.reset();
     }
 
     /**
      * Resets entire world state.
      */
-    reset() {
+    reset(levelData) {
         //reset state
         this.time = 0;
-        this.entities = [];
-        this.obstacles = [];
+        this.removeAllEntities();
+        this.removeAllObstacles();
         this.prefabs = [];
 
         this.listnrs.forEach(listener => listener.remove());
@@ -27,22 +28,10 @@ class World extends Emitter {
 
         //build level
         this.ready = false;
-        this.buildLevel(this.levelName);
+        let data = levelData ? levelData : Core.data.levels[this.levelName];
+        this.buildLevel(data);
         this.ready = true;
         this.rebuildStructures();
-
-        //create player
-        this.player = new Player({
-			position: new Vector(-10,-10),
-            world: this
-		});
-		this.addEntity(this.player);
-
-        this.addEntity(new TestAgent({
-            world: this,
-            position: new Vector(5,5),
-            target: this.player
-        }));
 
         this.listnrs.push(
             Input.events.listen("keydown", this.eventKeyDown.bind(this)));
@@ -69,6 +58,20 @@ class World extends Emitter {
 		this.entities.splice(idx, 1);
 		this.emit("removeEntity", ent);
         return true;
+	}
+
+    removeAllEntities() {
+        this.entities.forEach(ent => {
+            this.emit("removeEntity", ent);
+        });
+        this.entities = [];
+        return true;
+    }
+
+	deserializeEntity(data) {
+		let type = Core.classMap[data._constructor];
+		let ent = new type(Object.assign(data, {world: this}));
+		return ent;
 	}
 
     addObstacle(obs) {
@@ -119,14 +122,23 @@ class World extends Emitter {
 	 * Constructs an entire level and adds it to the game world.
 	 * @param name name of the level as defined in game.json
 	 */
-    buildLevel(name) {
-        var data = Core.data.levels[name];
-		data.objects.forEach(object => {
-			if (object.type === "obstacle")
-				this.buildObstacle(object);
-            else if (object.type === "prefab")
-                this.buildPrefab(object);
-		});
+    buildLevel(data) {
+		if ("objects" in data) {
+			data.objects.forEach(object => {
+				if (object.type === "obstacle")
+					this.buildObstacle(object);
+	            else if (object.type === "prefab")
+	                this.buildPrefab(object);
+			});
+		}
+		if ("entities" in data) {
+			data.entities.forEach(entity => {
+				let obj = this.deserializeEntity(entity);
+                if (obj instanceof Player)
+                    this.player = obj;
+				this.addEntity(obj);
+			});
+		}
     }
 
     /**
@@ -205,15 +217,11 @@ class World extends Emitter {
     }
 
     serializeObstacles(data) {
-    	if (!data.hasOwnProperty("obstacles"))
-    		data.objects = [];
-    	this.obstacles.forEach(obstacle => {
-    		data.objects.push(obstacle.serialize());
-    	});
+    	data.objects = this.obstacles.map(x => x.serialize());
     }
 
     serializeEntities(data) {
-
+    	data.entities = this.entities.map(x => x.serialize());
     }
 
     serialize() {

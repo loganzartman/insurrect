@@ -37,4 +37,12 @@ class PathTestEntity extends Entity {
 		this.gfxDirty = true;
 		super.frame.apply(this, arguments);
 	}
+
+	serialize() {
+        let data = super.serialize.apply(this, arguments);
+        return Object.assign(data, {
+            _constructor: "PathTestEntity"
+        });
+    }
 }
+Core.classMap.PathTestEntity = PathTestEntity;

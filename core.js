@@ -1,6 +1,7 @@
 var Core = {
 	data: null,
 	image: {},
+	classMap: {},
 	init: function() {
 		if (!Core.sanityCheck())
 			return;

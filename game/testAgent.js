@@ -28,4 +28,12 @@ class TestAgent extends Agent {
 		this.gfx.lineStyle(1, this.color, 1);
 		this.gfx.drawCircle(this.position.x,this.position.y,this.radius);
 	}
+
+	serialize() {
+        let data = super.serialize.apply(this, arguments);
+        return Object.assign(data, {
+            _constructor: "TestAgent"
+        });
+    }
 }
+Core.classMap.TestAgent = TestAgent;

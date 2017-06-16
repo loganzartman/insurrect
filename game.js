@@ -1,7 +1,7 @@
 var Game = {
 	targetFps: 60,
 	activeScene: null,
-	WALLHACKS: true,
+	WALLHACKS: false,
 	TIMEWARP: 1,
 
 	init: function() {

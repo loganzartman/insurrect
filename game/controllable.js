@@ -97,4 +97,17 @@ class Controllable extends Entity {
 	handleInputs(inputs) {
 		this.input = Object.assign(this.input, inputs);
 	}
+
+	serialize() {
+		let data = super.serialize.apply(this, arguments);
+		return Object.assign(data, {
+			_constructor: "Controllable",
+			maxSpeed: this.maxSpeed,
+			acceleration: this.acceleration,
+			deceleration: this.deceleration,
+			fireInterval: this.fireInterval,
+			fireCount: this.fireCount
+		});
+	}
 }
+Core.classMap.Controllable = Controllable;

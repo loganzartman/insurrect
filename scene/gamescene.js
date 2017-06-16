@@ -31,6 +31,7 @@ var GameScene = {
 		});
 
 		GameScene.initGfx();
+		Display.gui.add(Game, "WALLHACKS");
 		Display.gui.add({
 			x: false,
 			get debugCaster() {return this.x},
@@ -49,7 +50,7 @@ var GameScene = {
 
 		GameScene.gui = Core.gui.addFolder("Game");
 		GameScene.gui.add({
-			x: GameScene.world.player.suspiciousness,
+			x: 0,
 			get playerSuspicion() {return this.x},
 			set playerSuspicion(z) {this.x = z; GameScene.world.player.suspiciousness = z;}
 		}, "playerSuspicion").min(0).max(1).step(0.01);
@@ -201,7 +202,7 @@ var GameScene = {
 	 * Called when a scene regains focus.
 	 */
 	activate: function() {
-		Game.WALLHACKS = true;
+		Game.WALLHACKS = false;
 
 		//cleanup graphics
 		GameScene.objectContainer.removeChildren();
