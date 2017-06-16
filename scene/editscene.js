@@ -5,7 +5,7 @@ var EditScene = {
     phantomObstacle: null,
     allowPlayerFire: false,
     gridScale: 1,
-    mergeMode: false,
+    mergeMode: "Off",
     mergedObstacles: [],
     mergeRemoveEnabled: true,
     NONE: "Off",
@@ -23,7 +23,9 @@ var EditScene = {
         }, "Rebuild NavMesh");
         EditScene.gui.add({"Export Level": EditScene.doExport}, "Export Level");
         EditScene.gui.add({"Import Level": EditScene.doImport}, "Import Level");
-        EditScene.gui.add(EditScene, "mergeMode", [EditScene.NONE, EditScene.UNION, EditScene.DIFFERENCE]);
+        EditScene.gui.add(EditScene, "mergeMode", [EditScene.NONE, EditScene.UNION, EditScene.DIFFERENCE]).listen(function(){
+            EditScene.mergedObstacles = [];
+        });
     },
 
     activate: function() {

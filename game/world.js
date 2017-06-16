@@ -103,8 +103,6 @@ class World extends Emitter {
     }
 
     rebuildStructures() {
-        if (!this.ready)
-            return false;
         this.segments = [];
         this.segSpace = new SegmentSpace({binSize: 24});
         this.obstacles.forEach(obstacle => {
@@ -115,6 +113,9 @@ class World extends Emitter {
         });
 
         this.caster.init();
+
+        if (!this.ready)
+            return false;
         this.navmesh.rebuild();
     }
 
