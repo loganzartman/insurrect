@@ -10,7 +10,7 @@ class NavMesh extends Emitter {
 			throw new Error("Must specify world.");
 
 		params = Object.assign(params, {
-			agentRadius: 4,
+			agentRadius: 5,
 			DEBUG: false
 		});
 

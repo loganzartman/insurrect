@@ -15,12 +15,14 @@ class Controllable extends Entity {
 			acceleration: 0.4,
 			deceleration: 0.2,
 			fireInterval: 0,
+			fireCount: 1
 		}, params);
 		super(params);
 		this.acceleration = params.acceleration;
 		this.deceleration = params.deceleration;
 		this.maxSpeed = params.maxSpeed;
 		this.fireInterval = params.fireInterval;
+		this.fireCount = params.fireCount;
 		this.fireTimer = 0;
 		this.input = {
 			move: new Vector(0,0),
@@ -28,6 +30,8 @@ class Controllable extends Entity {
 			fire: false
 		};
 		this.listen("input", this.handleInputs);
+		this.indicatorGfx = new PIXI.Graphics();
+		this.gfx.addChild(this.indicatorGfx);
 	}
 
 	frame(timescale, ticks) {
@@ -55,7 +59,7 @@ class Controllable extends Entity {
 
 		//handle click input
 		if (this.input.fire && this.fireTimer === 0) {
-			for (let i=0; i<ticks; i++)
+			for (let i=0; i<ticks*this.fireCount; i++)
 				this.fire(this.input.look);
 			this.fireTimer = this.fireInterval;
 		}
@@ -70,6 +74,19 @@ class Controllable extends Entity {
 	 */
 	fire(lookVector) {
 
+	}
+
+	draw() {
+		this.indicatorGfx.rotation = this.input.look.dir();
+		
+		let dirty = this.gfxDirty;
+		super.draw.apply(this, arguments);
+		if (dirty) {
+			this.indicatorGfx.clear();
+			this.indicatorGfx.lineStyle(2, this.color, 1);
+			this.indicatorGfx.moveTo(this.radius*0.2,0);
+			this.indicatorGfx.lineTo(this.radius*0.8,0);
+		}
 	}
 
 	/**

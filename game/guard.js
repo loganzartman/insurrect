@@ -39,8 +39,12 @@ class Guard extends Agent {
 		let dist = this.world.player.position.sub(this.position).len();
 
 		//update suspicion
-		if (dist < this.suspectRange)
-			this.suspicion = Math.min(this.suspicion + this.world.player.suspiciousness/Game.targetFps, 1);
+		if (dist < this.suspectRange) {
+			if (this.engaged)
+				this.suspicion = 1;
+			else
+				this.suspicion = Math.min(this.suspicion + this.world.player.suspiciousness/Game.targetFps, 1);
+		}
 		else
 			this.suspicion = Math.max(this.suspicion - ticks*0.1/Game.targetFps, 0);
 
@@ -108,9 +112,9 @@ class Guard extends Agent {
 		
 		const min = 0.1;
 		if (this.suspicion > min) {
-			this.gfx.lineStyle(1, Core.color.acc1b, 1);
+			this.gfx.lineStyle(2, Core.color.acc1, 0.7);
 			const start = 0.5*Math.PI;
-			this.gfx.arc(0,0,this.radius+2,start-Math.PI*this.suspicion,start+Math.PI*this.suspicion);
+			this.gfx.arc(0,0,this.radius+1,start-Math.PI*this.suspicion,start+Math.PI*this.suspicion);
 		}
 	}
 

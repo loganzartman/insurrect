@@ -1,5 +1,9 @@
 class Player extends Controllable {
 	constructor(params) {
+		params = Object.assign(params, {
+			fireInterval: 0,
+			fireCount: 1
+		});
 		super(params);
 		this.suspiciousness = 0;
 	}
@@ -31,21 +35,19 @@ class Player extends Controllable {
 	}
 
 	fire(lookVector) {
-		for (let i=0; i<2; i++) {
-			let ent = new Projectile({
-				position: this.position.clone(),
-				velocity: Vector.fromDir(
-					lookVector.dir() + Util.rand(0.1, -0.1),
-					Util.rand(16, 20)
-				),
-				elasticity: 0.3,
-				friction: 0.06,
-				life: 1,
-				radius: 0.5,
-				world: this.world,
-				color: Core.color.acc1
-			});
-			this.world.addEntity(ent);
-		}
+		let ent = new Projectile({
+			position: this.position.clone(),
+			velocity: Vector.fromDir(
+				lookVector.dir() + Util.rand(0.1, -0.1),
+				Util.rand(16, 20)
+			),
+			elasticity: 0.3,
+			friction: 0.06,
+			life: 1,
+			radius: 0.5,
+			world: this.world,
+			color: Core.color.acc1
+		});
+		this.world.addEntity(ent);
 	}
 }
