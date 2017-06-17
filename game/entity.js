@@ -15,7 +15,7 @@ class Entity extends Emitter {
 			radius: 5,
 			color: Core.color.acc2,
 			world: null,
-			flocks: true
+			flocks: false
 		}, params);
 		super(params);
 

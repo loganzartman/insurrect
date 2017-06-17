@@ -30,6 +30,22 @@ var GameScene = {
 			GameScene.objectContainer.removeChild(obs.gfx);
 		});
 
+		Input.events.listen("keydown", event => {
+			switch (event.keyCode) {
+				case Input.key.QUICKSAVE:
+				var data = GameScene.world.serialize();
+				localStorage.setItem("quicksave", JSON.stringify(data));
+				break;
+
+				case Input.key.QUICKLOAD:
+				var data = localStorage.getItem("quicksave");
+				if (data) {
+					GameScene.world.reset(JSON.parse(data));
+				}
+				break;
+			}
+		});
+
 		GameScene.initGfx();
 		Display.gui.add(Game, "WALLHACKS");
 		Display.gui.add({

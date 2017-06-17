@@ -1,9 +1,9 @@
 class Player extends Controllable {
 	constructor(params) {
-		params = Object.assign(params, {
+		params = Object.assign({
 			fireInterval: 0,
-			fireCount: 1
-		});
+			fireCount: 2
+		}, params);
 		super(params);
 		this.suspiciousness = 0;
 	}

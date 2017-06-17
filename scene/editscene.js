@@ -23,6 +23,20 @@ var EditScene = {
         }, "Rebuild NavMesh");
         EditScene.gui.add({"Export Level": EditScene.doExport}, "Export Level");
         EditScene.gui.add({"Import Level": EditScene.doImport}, "Import Level");
+        EditScene.gui.add({"Spawn Entity": function(){
+            let ctor = prompt("Class name: \n" + Object.keys(Core.classMap).join(", "));
+            let params = JSON.parse(prompt("Params:", "{\"position\": [0,0]}"));
+            if (ctor) {
+                try {
+                    let ent = GameScene.world.deserializeEntity(Object.assign(params, {_constructor: ctor}));
+                    GameScene.world.addEntity(ent);
+                }
+                catch (e) {
+                    alert(e);
+                    console.log(e);
+                }
+            }
+        }}, "Spawn Entity");
         EditScene.gui.add(EditScene, "mergeMode", [EditScene.NONE, EditScene.UNION, EditScene.DIFFERENCE]).listen(function(){
             EditScene.mergedObstacles = [];
         });

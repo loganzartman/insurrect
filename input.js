@@ -9,12 +9,10 @@ var Input = {
 	mouse: {x: 0, y: 0, left: false, right: false},
 
 	init: function(displayElement, bindingMap) {
-		console.log("Input init")
-
 		//register event listeners
 		document.addEventListener("keydown", Input.handleKeydown, false);
 		document.addEventListener("keyup", Input.handleKeyup, false);
-		document.addEventListener("mousemove", Input.handleMousemove, false);
+		displayElement.addEventListener("mousemove", Input.handleMousemove, false);
 		displayElement.addEventListener("mousedown", Input.handleMousedown, false);
 		document.addEventListener("mouseup", Input.handleMouseup, false);
 		document.addEventListener("contextmenu", function(e){e.preventDefault();}, false);

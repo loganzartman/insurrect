@@ -15,7 +15,8 @@ class Controllable extends Entity {
 			acceleration: 0.4,
 			deceleration: 0.2,
 			fireInterval: 0,
-			fireCount: 1
+			fireCount: 1,
+			flocks: true
 		}, params);
 		super(params);
 		this.acceleration = params.acceleration;
