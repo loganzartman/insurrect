@@ -22,6 +22,7 @@
 			"util/segmentSpace.js",
 			"util/binarySpacePartition.js",
 			"util/tinyqueue.js",
+			"util/fsm.js",
 			"scene/titlescene.js",
 			"scene/gamescene.js",
 			"scene/editscene.js",
