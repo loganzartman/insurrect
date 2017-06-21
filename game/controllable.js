@@ -11,9 +11,9 @@ class Controllable extends Entity {
 	 */
 	constructor(params) {
 		params = Object.assign({
-			maxSpeed: 1.7,
-			acceleration: 0.4,
-			deceleration: 0.2,
+			maxSpeed: 3.4,
+			acceleration: 0.8,
+			deceleration: 0.4,
 			fireInterval: 0,
 			fireCount: 1,
 			flocks: true

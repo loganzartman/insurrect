@@ -6,6 +6,7 @@ class Display {
 	 */
 	static init(element) {
 		Display.padding = 4;
+		Display.margin = 8;
 		Display.stage = null;
 		Display.events = new Emitter();
 
@@ -75,7 +76,7 @@ class Display {
 	static calculateDimensions() {
 		var w = window.innerWidth * window.devicePixelRatio;
 		var h = window.innerHeight * window.devicePixelRatio;
-		var scale = w / 480;
+		var scale = Math.sqrt(w*w+h*h) / 720;
 		Display.scale = Math.floor(scale);
 		Display.w = Math.floor(w / Display.scale);
 		Display.h = Math.floor(h / Display.scale);

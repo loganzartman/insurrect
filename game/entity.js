@@ -12,7 +12,7 @@ class Entity extends Emitter {
 			throw new Error("Entity must have position");
 		params = Object.assign({
 			velocity: new Vector(0,0),
-			radius: 5,
+			radius: 10,
 			color: Core.color.acc2,
 			world: null,
 			flocks: false

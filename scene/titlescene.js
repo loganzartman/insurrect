@@ -14,6 +14,7 @@ var TitleScene = {
 			Game.start();
 			Game.setScene(GameScene);
 		});
+		TitleScene.playbtn._y = TitleScene.title.height + Display.margin;
 		Display.centerObj(TitleScene.playbtn, true, false);
 		TitleScene.stage.addChild(TitleScene.playbtn);
 
@@ -21,6 +22,7 @@ var TitleScene = {
 			Game.start();
 			Game.setScene(EditScene);
 		});
+		TitleScene.editbtn._y = TitleScene.playbtn._y + TitleScene.playbtn.height + Display.margin;
 		Display.centerObj(TitleScene.editbtn, true, false);
 		TitleScene.stage.addChild(TitleScene.editbtn);
 	},
@@ -46,9 +48,9 @@ var TitleScene = {
 		TitleScene.title.position.y = Math.floor(-f * 30 + 40);
 		TitleScene.title.alpha = f;
 
-		TitleScene.playbtn.position.y = Math.floor(Display.h - 80 + f*20);
+		TitleScene.playbtn.position.y = Math.floor(TitleScene.playbtn._y - 25 + f*25);
 		TitleScene.playbtn.alpha = f;
-		TitleScene.editbtn.position.y = Math.floor(Display.h - 80 + f*45);
+		TitleScene.editbtn.position.y = Math.floor(TitleScene.editbtn._y - 50 + f*50);
 		TitleScene.editbtn.alpha = f;
 
 		//draw background
