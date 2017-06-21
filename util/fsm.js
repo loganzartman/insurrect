@@ -12,13 +12,14 @@ class StateMachine extends Emitter {
 		if (this._state !== null)
 			console.warn("Assigned state without transitioning");
 		this._state = x;
+		this._state.emit("enter");
 	}
 
 	get state() {
 		return this._state;
 	}
 
-	get stateName() {
+	get name() {
 		return this._state.name;
 	}
 
@@ -32,6 +33,10 @@ class StateMachine extends Emitter {
 		return null;
 	}
 
+	update() {
+		this.state.update();
+	}
+
 	/**
 	 * @param state a State to add
 	 * @return whether the state was added
@@ -41,6 +46,10 @@ class StateMachine extends Emitter {
 			return false;
 		this.states.add(state);
 		return true;
+	}
+
+	addStates(states) {
+		states.forEach(s => this.addState(s));
 	}
 
 	/**
@@ -61,6 +70,14 @@ class StateMachine extends Emitter {
 		return true;
 	}
 
+	addTransitions(map) {
+		Object.keys(map).forEach(k => {
+			map[k].forEach(v => {
+				this.addTransition(k, v);
+			});
+		});
+	}
+
 	/**
 	 * See if it is possible to make a transition
 	 * @param to the destination State (NOT its name)
@@ -78,14 +95,14 @@ class StateMachine extends Emitter {
 
 	/**
 	 * Move from current state to another if transition exists
+	 * THROWS if the transition does not exist.
 	 * @param to name of destination State
-	 * @return whether the transition was made
 	 */
 	transition(to) {
 		to = this.stateByName(to);
 
 		if (!this.canTransition(to))
-			return false;
+			throw new Error(`Transition from ${this.name} to ${to.name} does not exist.`);
 		this.state.exit();
 		this._state = to;
 		this.state.enter();
@@ -102,8 +119,16 @@ class State extends Emitter {
 	constructor(params) {
 		if (!("name" in params))
 			throw new Error("State must have name parameter.");
+		params = Object.assign({
+			onEnter: function(){},
+			onExit: function(){},
+			update: function(){}
+		}, params);
 		super(params);
 		this.name = params.name;
+		this._onenter = this.listen("enter", params.onEnter.bind(this));
+		this._onexit = this.listen("exit", params.onExit.bind(this));
+		this.update = params.update;
 	}
 	enter() {
 		this.emit("enter", this);

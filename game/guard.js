@@ -9,8 +9,9 @@ class Guard extends Agent {
 			mode: Guard.mode.WAIT,
 			patrolRoute: [],
 			wanderRange: 64,
-			suspectRange: 64,
-			targetRange: Util.rand(80,140)
+			suspectRange: 110,
+			targetRange: Util.rand(70,110),
+			target: null
 		}, params);
 		super(params);
 
@@ -20,6 +21,7 @@ class Guard extends Agent {
 		this.wanderRange = params.wanderRange;
 		this.suspectRange = params.suspectRange;
 		this.targetRange = params.targetRange;
+		this.target = params.target;
 		this.mode = params.mode;
 		this.engaged = false;
 		this.timer = 0;
@@ -27,83 +29,93 @@ class Guard extends Agent {
 	}
 
 	frame(timescale, ticks) {
+		if (this.target === null)
+			this.target = this.world.player;
+
+		//update decision timer
 		this.timer -= ticks;
 		if (this.timer < 0)
 			this.timer = 0;
 
-		if (this.state === Agent.state.RETURN) {
-			super.frame.apply(this, arguments);
-			return;
-		}
+		//update suspicion value
+		this.updateSuspicion(timescale, ticks);
 
-		let dist = this.world.player.position.sub(this.position).len();
+		//engaged behaviour
+		if (this.engaged)
+			this.doEngage();
+		//idle behavior
+		else
+			this.doIdle();
+
+		super.frame.apply(this, arguments);
+	}
+
+	doEngage() {
+		let dist = this.target.position.sub(this.position).len();
+		let los = new Segment(this.position, this.target.position);
+
+		if (dist < this.targetRange && !Segment.hitsAny(los, this.world.segSpace.getIntersecting(los))) {
+			this.stopMoving();
+			this.attack(this.target);
+		}
+		else if (!this.isMoving()) {
+			this.stopAction();
+			this.setRoute([this.target.position]);
+		}
+	}
+
+	doIdle() {
+		switch (this.mode) {
+			case Guard.mode.WAIT:
+				this.stopMoving();
+			break;
+
+			case Guard.mode.WANDER:
+				if (!this.isMoving() && this.timer <= 0) {
+					//find nearby NavMesh points
+					let points = this.world.navmesh.centers
+						.filter(c => c.sub(this.basePos).len() <= this.wanderRange);
+					
+					//if there are any points, choose one and move to it.
+					if (points.length > 0) {
+						this.setTarget(points.random());
+					}
+					this.timer = Math.floor(Util.rand(20,120));
+				}
+			break;
+
+			case Guard.mode.PATROL:
+				if (!this.isMoving()) {
+					//restart patrol route in opposite direction
+					let route = this.patrolRoute.map(x => x);
+					this.route = this.patrolFlip ? route.reverse() : route;
+					this.patrolFlip = !this.patrolFlip;
+				}
+			break;
+		}
+	}
+
+	updateSuspicion(timescale, ticks) {
+		let dist = this.target.position.sub(this.position).len();
 
 		//update suspicion
 		if (dist < this.suspectRange) {
 			if (this.engaged)
 				this.suspicion = 1;
 			else
-				this.suspicion = Math.min(this.suspicion + this.world.player.suspiciousness/Game.targetFps, 1);
+				this.suspicion = Math.min(this.suspicion + this.target.suspiciousness/Game.targetFps, 1);
 		}
 		else
 			this.suspicion = Math.max(this.suspicion - ticks*0.1/Game.targetFps, 0);
 
+		//toggle engagement based on suspicion level
 		if (this.suspicion >= 1) {
 			this.engaged = true;
 		}
 		if (this.engaged && this.suspicion < 0.1) {
 			this.engaged = false;
-			this.state = Agent.state.REST;
+			this.route = [];
 		}
-
-		//engaged behaviour
-		if (this.engaged) {
-			this.target = this.world.player;
-			if (dist < this.targetRange) {
-				let los = new Segment(this.position, this.target.position);
-				if (!Segment.hitsAny(los, this.world.segSpace.getIntersecting(los)))
-					this.state = Agent.state.ATTACK;
-				else
-					this.state = Agent.state.FOLLOW;
-			}
-			else
-				this.state = Agent.state.FOLLOW;
-		}
-		//idle behavior
-		else {
-			switch (this.mode) {
-				case Guard.mode.WAIT:
-					this.state = Agent.state.REST;
-					break;
-
-				case Guard.mode.WANDER:
-					if (this.state === Agent.state.REST && this.timer === 0) {
-						let points = this.world.navmesh.centers
-							.filter(c => c.sub(this.basePos).len() <= this.wanderRange)
-							.filter(c => {
-								let los = new Segment(this.position, c);
-								let segs = this.world.segSpace.getIntersecting(los);
-								return !Segment.hitsAny(los, segs);
-							});
-						if (points.length > 0) {
-							this.route = [points[Math.floor(Math.random()*points.length)]];
-							this.state = Agent.state.NAVIGATE;
-						}
-						this.timer = Math.floor(Util.rand(20,120));
-					}
-					break;
-
-				case Guard.mode.PATROL:
-					if (this.state === Agent.state.REST) {
-						let route = this.patrolRoute.map(x => x);
-						this.route = this.patrolFlip ? route.reverse() : route;
-						this.state = Agent.state.NAVIGATE;
-					}
-					break;
-			}
-		}
-
-		super.frame.apply(this, arguments);
 	}
 
 	draw() {

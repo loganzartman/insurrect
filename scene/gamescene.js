@@ -325,6 +325,13 @@ var GameScene = {
 			GameScene.maskGfx.endFill();
 		});
 
+		GameScene.maskGfx.lineStyle(0);
+		GameScene.maskGfx.beginFill(0xFFFFFF, 0.1);
+		for (let i=0; i<6; i++) {
+			let center = GameScene.world.player.position.sub(GameScene.view).sub(GameScene.viewOffset);
+			GameScene.maskGfx.drawCircle(center.x, center.y, i*8);
+		}
+
 		if (Game.WALLHACKS) {
 			GameScene.maskGfx.beginFill(0xFFFFFF, 0.7);
 			GameScene.maskGfx.lineStyle(0);

@@ -87,7 +87,7 @@ class NavMesh extends Emitter {
 	 * @param pointA the source point
 	 * @param pointB the destination point
 	 */
-	findGlobalPath(pointA, pointB) {
+	_findGlobalPath(pointA, pointB) {
 		//locate points in walkability polygons
 		let src = this.polys.find(poly => poly.contains(pointA));
 		let dst = this.polys.find(poly => poly.contains(pointB));
@@ -103,16 +103,9 @@ class NavMesh extends Emitter {
 		return this.pathPolys;
 	}
 
-	/**
-	 * Computes a list of waypoints from pointA to pointB.
-	 * This is the function that should generally be used to compute paths.
-	 * Depends on findGlobalPath(); see its documentation.
-	 * @param pointA the source point
-	 * @param pointB the destination point
-	 */
-	findPath(pointA, pointB) {
+	_findPath(pointA, pointB) {
 		//find path and map polygons to their centroids.
-		let points = this.findGlobalPath(pointA, pointB)
+		let points = this._findGlobalPath(pointA, pointB)
 			.map(poly => poly.getCentroid());
 
 		//include source and destination points
@@ -162,6 +155,25 @@ class NavMesh extends Emitter {
 		polys.push(this.pathPolys[this.pathPolys.length-1]);
 		this.pathPolys = polys;
 		return out;
+	}
+
+	/**
+	 * Computes a list of waypoints from pointA to pointB.
+	 * This is the function that should generally be used to compute paths.
+	 * Depends on findGlobalPath(); see its documentation.
+	 * @param pointA the source point
+	 * @param pointB the destination point
+	 */
+	findPath(pointA, pointB) {
+		return new Promise((resolve, reject) => {
+			try {
+				let path = this._findPath(pointA, pointB);
+				resolve(path);
+			}
+			catch (e) {
+				resolve(null);
+			}
+		});
 	}
 
 	drawDebug(gfx) {

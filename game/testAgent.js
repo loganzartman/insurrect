@@ -7,16 +7,15 @@ class TestAgent extends Agent {
 			deceleration: 0.05
 		}, params);
 		super(params);
-
-		this.state = Agent.state.FOLLOW;
+		this.target = this.world.player;
 	}
 
 	frame(timescale, ticks) {
 		let dist = this.target.position.sub(this.position).len();
-		if (this.state === Agent.state.REST && dist > 20)
-			this.state = Agent.state.FOLLOW;
-		else if (this.state === Agent.state.FOLLOW && dist <= 20)
-			this.state = Agent.state.REST;
+		if (!this.isMoving() && dist > 20)
+			this.setTarget(this.target);
+		else if (this.isMoving() && dist < 20)
+			this.stopMoving();
 
 		super.frame.apply(this, arguments);
 	}

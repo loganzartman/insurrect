@@ -51,7 +51,7 @@
 		"AndinaBold": "resource/andina_bold.fnt"
 	},
 
-	"colors": {
+	"colors-old": {
 		"bg1": "0xD9CEBA",
 		"bg2": "0x263145",
 		"acc1": "0xD9559D",
@@ -62,37 +62,15 @@
 		"acc3b": "0xFFE559"
 	},
 
-	"colors1": {
-		"bg1": "0x263145",
-		"bg2": "0x0E1219",
-		"acc1": "0xD9559D",
-		"acc1b": "0xFF8DD4",
-		"acc2": "0x465D8C",
-		"acc2b": "0x8EA2D6",
-		"acc3": "0xD9A404",
-		"acc3b": "0xFFE559"
-	},
-
-	"colors2": {
-		"bg1": "0xF2EBC7",
-		"bg2": "0x343642",
-		"acc1": "0x962D3E",
-		"acc1b": "0xE87680",
-		"acc2": "0x348899",
-		"acc2b": "0x78C7D9",
-		"acc3": "0x979C9C",
-		"acc3b": "0xD0D5D5"
-	},
-
-	"colors3": {
-		"bg1": "0xEEEFF7",
-		"bg2": "0x1C1D21",
-		"acc1": "0x445878",
-		"acc1b": "0x7184A7",
-		"acc2": "0x92CDCF",
-		"acc2b": "0xC0FCFD",
-		"acc3": "0x31353D",
-		"acc3b": "0x51555E"
+	"colors": {
+		"bg1": "0xECEFF1",
+		"bg2": "0x263238",
+		"acc1": "0xD50000",
+		"acc1b": "0xFF8A80",
+		"acc2": "0x2962FF",
+		"acc2b": "0x82B1FF",
+		"acc3": "0x6200EA",
+		"acc3b": "0xB388FF"
 	},
 	
 	"inputBindings": {
@@ -106,7 +84,7 @@
 		"MORE": 222,
 		"X": 88,
 		"R": 82,
-		"QUICKSAVE": 116,
+		"QUICKSAVE": 117,
 		"QUICKLOAD": 118
 	},
 

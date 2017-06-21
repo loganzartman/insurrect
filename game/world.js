@@ -42,7 +42,8 @@ class World extends Emitter {
             this.addEntity(new Guard({
                 world: this,
                 position: GameScene.view.add(GameScene.viewOffset).add(Input.mouse),
-                mode: Guard.mode.WANDER
+                mode: Guard.mode.WANDER,
+                target: this.player
             }));
     }
 
