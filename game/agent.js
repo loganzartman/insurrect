@@ -111,37 +111,38 @@ class Agent extends Controllable {
 				if (Agent.DEBUG)
 					this.color = rerouteColor;
 
+				const baseHandler = (path) => {
+					if (path !== null) {
+						let routePolys = this.world.navmesh.pathPolys;
+						this.destinationPoly = routePolys[routePolys.length-1];
+						this.emit("routeSuccess");
+						this.motionState.transition("navigate");
+					}
+					else {
+						this.route = null;
+						this.emit("routeFail");
+						this.motionState.transition("return");
+					}
+				};
+
 				if (this.motionTarget) {
 					this.world.navmesh.findPath(this.position, this.motionTarget.position).then(path => {
-						if (path !== null) {
+						if (path !== null)
 							this.route = path;
-							let routePolys = this.world.navmesh.pathPolys;
-							this.destinationPoly = routePolys[routePolys.length-1];
-							this.emit("routeSuccess");
-							this.motionState.transition("navigate");
-						}
-						else {
-							this.route = null;
-							this.emit("routeFail");
-							this.motionState.transition("return");
-						}
+						baseHandler(path);
 					});
 				}
 				else if (this.route) {
 					this.world.navmesh.findPath(this.position, this.route[0]).then(path => {
 						if (path !== null) {
-							this.route.shift();
-							this.route = path.concat(this.route);
-							let routePolys = this.world.navmesh.pathPolys;
-							this.destinationPoly = routePolys[routePolys.length-1];
-							this.emit("routeSuccess");
-							this.motionState.transition("navigate");
+							if (this.route) {
+								this.route.shift();
+								this.route = path.concat(this.route);
+							}
+							else
+								this.route = path;
 						}
-						else {
-							this.route = null;
-							this.emit("routeFail");
-							this.motionState.transition("return");
-						}
+						baseHandler(path);
 					});
 				}
 				else {

@@ -19,6 +19,7 @@ class NavMesh extends Emitter {
 		this.agentRadius = params.agentRadius;
 		this._epsilon = 1e-4;
 		this.pathPolys = null;
+		this.jobs = [];
 	}
 
 	/**
@@ -166,14 +167,23 @@ class NavMesh extends Emitter {
 	 */
 	findPath(pointA, pointB) {
 		return new Promise((resolve, reject) => {
-			try {
-				let path = this._findPath(pointA, pointB);
-				resolve(path);
-			}
-			catch (e) {
-				resolve(null);
-			}
+			this.jobs.push(() => {
+				try {
+					let path = this._findPath(pointA, pointB);
+					resolve(path);
+				}
+				catch (e) {
+					resolve(null);
+				}
+			});
 		});
+	}
+
+	processJobs() {
+		if (this.jobs.length > 0) {
+			let job = this.jobs.shift();
+			job.call(this);
+		}
 	}
 
 	drawDebug(gfx) {

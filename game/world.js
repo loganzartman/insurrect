@@ -176,6 +176,9 @@ class World extends Emitter {
     frame(timescale, ticks) {
         this.time += timescale / Game.targetFps;
 
+        //process navmesh jobs
+        this.navmesh.processJobs();
+
         //update obstacles
 		this.obstacles.forEach(function(obstacle){
 			obstacle.draw(timescale);
