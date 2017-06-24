@@ -208,7 +208,7 @@ class Agent extends Controllable {
 		let attackState = new State({
 			name: "attack",
 			update: this.actionAttack.bind(this),
-			onEnter: () => {this.color = 0xFFFFFF},
+			onEnter: () => {},
 			onExit: () => {
 				this.emit("input", {
 					fire: false
@@ -246,7 +246,7 @@ class Agent extends Controllable {
 	}
 
 	motionReturn() {
-		if (this.route === null) {
+		if (!this.checkRoute()) {
 			let nearest = this.world.navmesh.centers[0];
 			let minDist = Infinity;
 			this.world.navmesh.centers.forEach(point => {

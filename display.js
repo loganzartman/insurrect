@@ -76,7 +76,7 @@ class Display {
 	static calculateDimensions() {
 		var w = window.innerWidth * window.devicePixelRatio;
 		var h = window.innerHeight * window.devicePixelRatio;
-		var scale = Math.sqrt(w*w+h*h) / 720;
+		var scale = Math.sqrt(w*w+h*h) / 960;
 		Display.scale = Math.floor(scale);
 		Display.w = Math.floor(w / Display.scale);
 		Display.h = Math.floor(h / Display.scale);
