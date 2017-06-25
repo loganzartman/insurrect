@@ -29,8 +29,8 @@ class TestAgent extends Agent {
 
 		let polys = this.world.getFoS({
 			from: this.position,
-			range: 64,
-			lookAngle: this.target.input.look.dir(),
+			range: 128,
+			lookAngle: this.input.look.dir(),
 			fov: Math.PI*0.25
 		});
 		let contains = polys.find(x => x.contains(this.target.position));
@@ -38,9 +38,13 @@ class TestAgent extends Agent {
 		polys.forEach(poly => {
 			let colors = Util.color.hueGenerator(poly.points.length, Util.color.rgb);
 			for (let i=0; i<poly.points.length; i++) {
-				this.gfx.lineStyle(contains ? 4 : 2, colors.next().value, 1);
 				let point0 = poly.points[i];
 				let point1 = poly.points[(i+1)%poly.points.length];
+				
+				// this.gfx.beginFill(colors.next().value, 1);
+				// this.gfx.drawRect(point0.x-1, point0.y-1, 3, 3);
+				// this.gfx.endFill();
+				this.gfx.lineStyle(contains ? 3 : 2, colors.next().value, 1);
 				this.gfx.moveTo(point0.x, point0.y);
 				this.gfx.lineTo(point1.x, point1.y);
 			}

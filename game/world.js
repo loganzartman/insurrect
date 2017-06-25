@@ -71,12 +71,7 @@ class World extends Emitter {
      * Returns a Polygon representing the visible area.
      */
     getFoS({from, lookAngle=0, range=128, fov=Math.PI*2}) {
-        let viewport = new Polygon([
-            from.add(new Vector(-range, -range)),
-            from.add(new Vector(range, -range)),
-            from.add(new Vector(range, range)),
-            from.add(new Vector(-range, range))
-        ]);
+        let viewport = Polygon.circle(from, range, 15);
 
         let result = this.caster.cast({
             viewpoint: from,

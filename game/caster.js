@@ -173,11 +173,12 @@ class Caster extends Emitter {
 		});
 
 		points.sort(function(a,b){
-			return b.angle - a.angle;
+			return Util.signedAngleDiff(a.angle, b.angle);
 		});
 
-		if (fov < Math.PI*2)
+		if (fov < Math.PI*2) {
 			points.push(viewpoint);
+		}
 
 		let out = [];
 		out.push(new Polygon(points));

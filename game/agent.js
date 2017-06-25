@@ -293,7 +293,7 @@ class Agent extends Controllable {
 		//move to waypoint
 		if (dx.len() > this.radius) {
 			let move = dx.unit();
-			let look = move;
+			let look = this.velocity.isZero() ? move : this.velocity;
 			
 			this.emit("input", {
 				move: move,

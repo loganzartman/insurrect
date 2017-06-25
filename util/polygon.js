@@ -124,6 +124,15 @@ class Polygon {
         return ctx;
     }
 
+    static circle(center,radius,sides=11) {
+        let points = [];
+        for (let i=0.5; i<sides+1; i++) {
+            let dir = (i/(sides+1)) * Math.PI*2;
+            points.push(center.add(Vector.fromDir(dir, radius)));
+        }
+        return new Polygon(points);
+    }
+
     static fromClipperPath(path) {
         return new Polygon(path.map(point => new Vector(point.X, point.Y)));
     }
