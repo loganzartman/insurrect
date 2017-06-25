@@ -54,7 +54,7 @@ class Caster extends Emitter {
 	 * Performs preprocessing for a cast.
 	 * Geometry cannot change after the preprocess.
 	 */
-	preprocess({viewpoint, viewport, angle, fov, range=Infinity}) {
+	preprocess({viewpoint, viewport, lookAngle=0, fov=Math.PI*2}) {
 		//add viewport intersections
 		Util.geom.segIntersections(viewport.getSegments(), this.segments)
 			.forEach(isect => {
@@ -84,11 +84,20 @@ class Caster extends Emitter {
 		this.points.forEach(item => {
 			if (!viewport.contains(item.point) && !("VIEWPORT_GEOM" in item))
 				return;
+			
 			let angle = item.point.sub(viewpoint).dir();
-			this.angles.push(angle-epsilon);
-			// this.angles.push(angle);
-			this.angles.push(angle+epsilon);
+			if (fov >= Math.PI*2 || Math.abs(Util.signedAngleDiff(angle, lookAngle)) < fov/2) {
+				this.angles.push(angle-epsilon);
+				// this.angles.push(angle);
+				this.angles.push(angle+epsilon);
+			}
 		});
+
+		if (fov < Math.PI*2)
+			[lookAngle-fov/2, lookAngle+fov/2].forEach(angle => {
+				this.angles.push(angle-epsilon);
+				this.angles.push(angle+epsilon);
+			});
 	}
 
 	postprocess({viewpoint}) {
@@ -101,11 +110,11 @@ class Caster extends Emitter {
 	 * Computes visible area
 	 * @return a list of Polygons representing visibility from viewpoint
 	 */
-	cast({viewpoint, viewport, notDirty=false, toggleVis=false, includeStructure=false, angle=0, fov=Math.PI*2}) {
+	cast({viewpoint, viewport, notDirty=false, toggleVis=false, includeStructure=false, lookAngle=0, fov=Math.PI*2}) {
 		if (!notDirty) {
 			this.debugSegments = [];
-			this.postprocess.apply(this, arguments);
-			this.preprocess.apply(this, arguments);
+			this.postprocess(arguments[0]);
+			this.preprocess(arguments[0]);
 		}
 
 		let points = [];
@@ -166,6 +175,9 @@ class Caster extends Emitter {
 		points.sort(function(a,b){
 			return b.angle - a.angle;
 		});
+
+		if (fov < Math.PI*2)
+			points.push(viewpoint);
 
 		let out = [];
 		out.push(new Polygon(points));
