@@ -26,6 +26,19 @@ class TestAgent extends Agent {
 		PathTestEntity.prototype.draw.apply(this, arguments);
 		this.gfx.lineStyle(1, this.color, 1);
 		this.gfx.drawCircle(this.position.x,this.position.y,this.radius);
+
+		let polys = this.world.getFoS({from: this.position, range: 64});
+
+		polys.forEach(poly => {
+			let colors = Util.color.hueGenerator(poly.points.length, Util.color.rgb);
+			for (let i=0; i<poly.points.length; i++) {
+				this.gfx.lineStyle(2, colors.next().value, 1);
+				let point0 = poly.points[i];
+				let point1 = poly.points[(i+1)%poly.points.length];
+				this.gfx.moveTo(point0.x, point0.y);
+				this.gfx.lineTo(point1.x, point1.y);
+			}
+		});
 	}
 
 	serialize() {

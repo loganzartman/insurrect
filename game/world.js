@@ -67,11 +67,24 @@ class World extends Emitter {
     }
 
     /**
-     * Gets the "Field of Sight" from a given point in a particular direction.
+     * Gets the "field of sight" from a given point in a particular direction.
      * Returns a Polygon representing the visible area.
      */
-    getFoS(from, angle=new Vector(), fov=Math.PI*2) {
-    	throw new Error("Not yet implemented.");
+    getFoS({from, angle=0, range=128, fov=Math.PI*2}) {
+        let viewport = new Polygon([
+            from.add(new Vector(-range, -range)),
+            from.add(new Vector(range, -range)),
+            from.add(new Vector(range, range)),
+            from.add(new Vector(-range, range))
+        ]);
+
+        let result = this.caster.cast({
+            viewpoint: from,
+            viewport: viewport,
+            angle: angle,
+            fov: fov
+        });
+        return result;
     }
 
     /**

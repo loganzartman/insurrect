@@ -54,7 +54,7 @@ class Caster extends Emitter {
 	 * Performs preprocessing for a cast.
 	 * Geometry cannot change after the preprocess.
 	 */
-	preprocess(viewpoint, viewport) {
+	preprocess({viewpoint, viewport, angle, fov, range=Infinity}) {
 		//add viewport intersections
 		Util.geom.segIntersections(viewport.getSegments(), this.segments)
 			.forEach(isect => {
@@ -91,7 +91,7 @@ class Caster extends Emitter {
 		});
 	}
 
-	postprocess(viewpoint) {
+	postprocess({viewpoint}) {
 		//remove viewport geometry
 		this.segments = this.segments.filter(s => !("VIEWPORT_GEOM" in s));
 		this.points = this.points.filter(p => !("VIEWPORT_GEOM" in p));
@@ -101,11 +101,11 @@ class Caster extends Emitter {
 	 * Computes visible area
 	 * @return a list of Polygons representing visibility from viewpoint
 	 */
-	cast(viewpoint, viewport, includeStructure=false, notDirty=false, toggleVis=false) {
+	cast({viewpoint, viewport, notDirty=false, toggleVis=false, includeStructure=false, angle=0, fov=Math.PI*2}) {
 		if (!notDirty) {
 			this.debugSegments = [];
-			this.postprocess(viewpoint, viewport);
-			this.preprocess(viewpoint, viewport);
+			this.postprocess.apply(this, arguments);
+			this.preprocess.apply(this, arguments);
 		}
 
 		let points = [];

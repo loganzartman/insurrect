@@ -300,13 +300,12 @@ var GameScene = {
 		GameScene.maskGfx.endFill();
 
 		//calculate visible polygons
-		var polys = GameScene.world.caster.cast(
-			GameScene.world.player.position.add(new Vector(0.0001,0.0001)),
-			GameScene.getViewRect(),
-			true,
-			false,
-			true
-		);
+		var polys = GameScene.world.caster.cast({
+			viewpoint: GameScene.world.player.position.add(new Vector(0.0001,0.0001)),
+			viewport: GameScene.getViewRect(),
+			includeStructure: true,
+			toggleVis: true
+		});
 
 		GameScene.debugGfx.clear();
 		GameScene.world.caster.drawDebug(GameScene.debugGfx);

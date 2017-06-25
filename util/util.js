@@ -7,6 +7,17 @@ var Util = {
 		return Math.random()*(b-a)+a;
 	},
 
+	range: function*(lo,hi) {
+		for (let i=lo; i<hi; i++)
+			yield i;
+	},
+
+	signedAngleDiff: function(a, b) {
+		//a-b
+		let diff = a-b;
+		return Math.atan2(Math.sin(diff), Math.cos(diff));
+	},
+
 	color: {
 		rgb: function(r,g=r,b=r) {
 			const f = Util.color.clipScale;
@@ -55,9 +66,9 @@ var Util = {
 			}
 			return [r,g,b,a];
 		},
-		hueGenerator: function*(n, f=()=>arguments) {
+		hueGenerator: function*(n, f=Util.color.rgb) {
 			for (let i=0; i<n; i++)
-				yield f.apply(this, Util.color.hslaToRgba((i+0.5)/n, 1, 0.5));
+				yield f.apply(this, Util.color.hslaToRgba(i/n, 1, 0.5));
 		}
 	},
 
