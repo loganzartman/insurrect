@@ -47,11 +47,47 @@ class World extends Emitter {
             }));
     }
 
+    /**
+     * Check one or more lines of sight from a single point.
+     * @param from the source Vector
+     * @param angle a unit vector representing look direction
+     * @param maxlen an optional maximum look distance. If this distance is
+     * exceeded, then the line of sight is considered to be clear.
+     * @return whether there is a clear line of sight
+     */
+    checkLoS(from, to) {
+    	if (!(from instanceof Vector))
+    		throw new Error("Source point must be Vector.");
+    	if (!(to instanceof Vector))
+    		throw new Error("Angle must be a Vector.");
+    	
+    	let los = new Segment(from, to);
+		let candidates = this.segSpace.getIntersecting(los);
+		return !Segment.hitsAny(los, candidates);
+    }
+
+    /**
+     * Gets the "Field of Sight" from a given point in a particular direction.
+     * Returns a Polygon representing the visible area.
+     */
+    getFoS(from, angle=new Vector(), fov=Math.PI*2) {
+    	throw new Error("Not yet implemented.");
+    }
+
+    /**
+     * Adds a given entity to this World.
+     * @param ent the entity
+     */
     addEntity(ent) {
 		this.entities.push(ent);
 		this.emit("addEntity", ent);
 	}
 
+	/**
+	 * Removes a given entity from this World.
+	 * @param ent the entity to find and remove
+	 * @return whether the entity was found and removed
+	 */
 	removeEntity(ent) {
 		var idx = this.entities.indexOf(ent);
 		if (idx < 0)
@@ -61,6 +97,10 @@ class World extends Emitter {
         return true;
 	}
 
+	/**
+	 * Removes all entities from this World.
+	 * @return true
+	 */
     removeAllEntities() {
         this.entities.forEach(ent => {
             this.emit("removeEntity", ent);
@@ -69,12 +109,23 @@ class World extends Emitter {
         return true;
     }
 
+    /**
+     * Accepts a serialized entity and reconstructs it for this World.
+     * The Entity is NOT added to the World; it is only returned.
+     * See addEntity() to add it to the World.
+     * @param data an object containing serialized entity data
+     * @return a new Entity
+     */
 	deserializeEntity(data) {
 		let type = Core.classMap[data._constructor];
 		let ent = new type(Object.assign(data, {world: this}));
 		return ent;
 	}
 
+	/**
+	 * Adds an Obstacle to this World.
+	 * @param obs the Obstacle.
+	 */
     addObstacle(obs) {
         this.obstacles.push(obs);
         this.listnrs.push(obs.listen("verticesChanged", () => this.rebuildStructures()));
@@ -82,6 +133,11 @@ class World extends Emitter {
         this.rebuildStructures();
     }
 
+    /**
+	 * Removes a given Obstacle from this World.
+	 * @param obs the Obstacle to find and remove
+	 * @return whether the Obstacle was found and removed
+	 */
     removeObstacle(obs) {
         var idx = this.obstacles.indexOf(obs);
         if (idx < 0)
@@ -93,6 +149,10 @@ class World extends Emitter {
         return true;
     }
 
+    /**
+	 * Removes all Obstacles from this World.
+	 * @return true
+	 */
     removeAllObstacles() {
         this.obstacles.forEach(obs => {
             obs.gfx.destroy();
@@ -103,7 +163,12 @@ class World extends Emitter {
         return true;
     }
 
+    /**
+     * Updates internal structures when World geometry changes.
+     * This is slow.
+     */
     rebuildStructures() {
+    	//rebuild space-partitioning structures for Obstacle segments
         this.segments = [];
         this.segSpace = new SegmentSpace({binSize: 24});
         this.obstacles.forEach(obstacle => {
@@ -113,10 +178,12 @@ class World extends Emitter {
             });
         });
 
+        //prepare Caster for new geometry
         this.caster.init();
 
         if (!this.ready)
             return false;
+        //rebuild navmesh (VERY slow)
         this.navmesh.rebuild();
     }
 
@@ -191,6 +258,12 @@ class World extends Emitter {
 		});
     }
 
+    /**
+     * Generates a Polygon representing a bounding box for this World.
+     * The bounds will be arbitrarily larger than the tightest-fitted bounding box
+     * that could be generated.
+     * @return a Polygon representing World bounds
+     */
     getBounds() {
         //collect points
         let points = [];

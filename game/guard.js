@@ -52,9 +52,8 @@ class Guard extends Agent {
 
 	doEngage() {
 		let dist = this.target.position.sub(this.position).len();
-		let los = new Segment(this.position, this.target.position);
 
-		if (dist < this.targetRange && !Segment.hitsAny(los, this.world.segSpace.getIntersecting(los))) {
+		if (dist < this.targetRange && this.world.checkLoS(this.position, this.target.position)) {
 			this.stopMoving();
 			this.attack(this.target);
 		}

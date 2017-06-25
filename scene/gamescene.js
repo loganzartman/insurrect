@@ -303,6 +303,8 @@ var GameScene = {
 		var polys = GameScene.world.caster.cast(
 			GameScene.world.player.position.add(new Vector(0.0001,0.0001)),
 			GameScene.getViewRect(),
+			true,
+			false,
 			true
 		);
 

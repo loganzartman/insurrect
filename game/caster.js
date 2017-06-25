@@ -101,7 +101,7 @@ class Caster extends Emitter {
 	 * Computes visible area
 	 * @return a list of Polygons representing visibility from viewpoint
 	 */
-	cast(viewpoint, viewport, includeStructure, notDirty) {
+	cast(viewpoint, viewport, includeStructure=false, notDirty=false, toggleVis=false) {
 		if (!notDirty) {
 			this.debugSegments = [];
 			this.postprocess(viewpoint, viewport);
@@ -110,6 +110,9 @@ class Caster extends Emitter {
 
 		let points = [];
 		let polys = new Set();
+
+		if (toggleVis)
+			this.world.obstacles.forEach(o => o.gfx.visible = false);
 
 		//iterate over casting directions
 		this.angles.forEach(angle => {
@@ -152,8 +155,11 @@ class Caster extends Emitter {
 					this.debugSegments.push(new Segment(viewpoint, point));
 				points.push(point);
 
-				if (includeStructure && !("VIEWPORT_GEOM" in hitSegment))
+				if (includeStructure && !("VIEWPORT_GEOM" in hitSegment)) {
+					if (toggleVis)
+						hitSegment.parentPolygon.parentObstacle.gfx.visible = true;
 					polys.add(hitSegment.parentPolygon);
+				}
 			}
 		});
 
