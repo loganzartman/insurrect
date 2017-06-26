@@ -70,14 +70,17 @@ class World extends Emitter {
      * Gets the "field of sight" from a given point in a particular direction.
      * Returns a Polygon representing the visible area.
      */
-    getFoS({from, lookAngle=0, range=128, fov=Math.PI*2}) {
-        let viewport = Polygon.circle(from, range, 15);
+    getFoS({from, viewport, lookAngle=0, range=128, fov=Math.PI*2, includeStructure, toggleVis}) {
+        if (typeof viewport === "undefined")
+            viewport = Polygon.circle(from, range, 15);
 
         let result = this.caster.cast({
             viewpoint: from,
             viewport: viewport,
             lookAngle: lookAngle,
-            fov: fov
+            fov: fov,
+            includeStructure: includeStructure,
+            toggleVis: toggleVis
         });
         return result;
     }
