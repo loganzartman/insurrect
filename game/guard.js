@@ -2,15 +2,15 @@ class Guard extends Agent {
 	constructor(params) {
 		params = Object.assign({
 			color: Core.color.acc1,
-			maxSpeed: Util.rand(0.9,1.1),
-			acceleration: Util.rand(0.25,0.35),
-			deceleration: 0.1,
+			maxSpeed: Util.rand(1.8,2.2),
+			acceleration: Util.rand(0.5,0.7),
+			deceleration: 0.2,
 			fireInterval: 10,
 			mode: Guard.mode.WAIT,
 			patrolRoute: [],
-			wanderRange: 64,
-			suspectRange: 110,
-			targetRange: Util.rand(70,110),
+			wanderRange: 128,
+			suspectRange: 220,
+			targetRange: Util.rand(140,200),
 			target: null
 		}, params);
 		super(params);
@@ -134,10 +134,10 @@ class Guard extends Agent {
 			position: this.position.clone(),
 			velocity: Vector.fromDir(
 				lookVector.dir() + Math.random()*0.2 - 0.1,
-				23 + Math.random()*5
+				46 + Math.random()*10
 			),
 			elasticity: 0.3,
-			friction: 0.2,
+			friction: 0.4,
 			life: 0.6,
 			radius: 0.5,
 			world: this.world,

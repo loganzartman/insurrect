@@ -108,6 +108,12 @@ var GameScene = {
 		GameScene.maskedContainer.mask = GameScene.mask;
 		GameScene.gameStage.addChild(GameScene.maskedContainer);
 
+		//creates vision around player
+		GameScene.viewGlowSprite = new PIXI.Sprite(Core.resource.glow.texture);
+		GameScene.viewGlowSprite.anchor = new PIXI.Point(0.5, 0.5);
+		GameScene.viewGlowSprite.blendMode = PIXI.BLEND_MODES.SCREEN;
+		GameScene.maskGfx.addChild(GameScene.viewGlowSprite);
+
 		//background
 		GameScene.bg = new PIXI.Graphics();
 		GameScene.bgtex2 = new PIXI.extras.TilingSprite(Core.resource.floor.texture, Display.w, Display.h);
@@ -315,7 +321,7 @@ var GameScene = {
 		polys.forEach(function(poly){
 			var points = poly.points.map(p =>
 				p.sub(GameScene.view).sub(GameScene.viewOffset));
-			GameScene.maskGfx.lineStyle(1, 0xFFFFFF, 1);
+			GameScene.maskGfx.lineStyle(2, 0xFFFFFF, 1);
 			GameScene.maskGfx.beginFill(0xFFFFFF, 1);
 			GameScene.maskGfx.moveTo(
 				(points[points.length-1].x),
@@ -326,12 +332,8 @@ var GameScene = {
 			GameScene.maskGfx.endFill();
 		});
 
-		GameScene.maskGfx.lineStyle(0);
-		GameScene.maskGfx.beginFill(0xFFFFFF, 0.1);
-		for (let i=0; i<6; i++) {
-			let center = GameScene.world.player.position.sub(GameScene.view).sub(GameScene.viewOffset);
-			GameScene.maskGfx.drawCircle(center.x, center.y, i*8);
-		}
+		GameScene.viewGlowSprite.position = GameScene.world.player.position
+			.sub(GameScene.view).sub(GameScene.viewOffset);
 
 		if (Game.WALLHACKS) {
 			GameScene.maskGfx.beginFill(0xFFFFFF, 0.7);

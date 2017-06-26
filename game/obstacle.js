@@ -67,7 +67,7 @@ class Obstacle extends Emitter {
 		if (!this.gfxDirty)
 			return;
 		this.gfx.clear();
-		this.gfx.lineStyle(1, Core.color.acc2b, 1);
+		this.gfx.lineStyle(2, Core.color.acc2b, 1);
 		this.gfx.beginFill(Core.color.acc2, 1);
 		this.gfx.moveTo(this.vertices[0].x, this.vertices[0].y);
 		for (var i=1; i<this.vertices.length; i++)
