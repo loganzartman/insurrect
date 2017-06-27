@@ -310,7 +310,7 @@ var GameScene = {
 			viewpoint: GameScene.world.player.position.add(new Vector(0.0001,0.0001)),
 			viewport: GameScene.getViewRect(),
 			includeStructure: true,
-			toggleVis: !GameScene.WALLHACKS
+			toggleVis: !Game.WALLHACKS
 		});
 
 		GameScene.debugGfx.clear();
@@ -336,7 +336,7 @@ var GameScene = {
 			.sub(GameScene.view).sub(GameScene.viewOffset);
 
 		if (Game.WALLHACKS) {
-			GameScene.maskGfx.beginFill(0xFFFFFF, 0.7);
+			GameScene.maskGfx.beginFill(0xFFFFFF, 1.0);
 			GameScene.maskGfx.lineStyle(0);
 			GameScene.maskGfx.drawRect(0,0,Display.w,Display.h);
 			GameScene.maskGfx.endFill();

@@ -2,8 +2,8 @@ class Guard extends Agent {
 	constructor(params) {
 		params = Object.assign({
 			color: Core.color.acc1,
-			maxSpeed: Util.rand(1.8,2.2),
-			acceleration: Util.rand(0.5,0.7),
+			maxSpeed: Util.rand(1.6,1.8),
+			acceleration: Util.rand(0.1,0.25),
 			deceleration: 0.2,
 			fireInterval: 10,
 			mode: Guard.mode.WAIT,
@@ -26,6 +26,12 @@ class Guard extends Agent {
 		this.engaged = false;
 		this.timer = 0;
 		this.suspicion = 0;
+
+		this.fov = Math.PI*0.33;
+		this.fos = null;
+
+		this.fovGfx = new PIXI.Graphics();
+		this.gfx.addChild(this.fovGfx);
 	}
 
 	frame(timescale, ticks) {
@@ -36,6 +42,15 @@ class Guard extends Agent {
 		this.timer -= ticks;
 		if (this.timer < 0)
 			this.timer = 0;
+
+		//recompute what this Guard can see
+		this.fos = this.world.getFoS({
+			from: this.position,
+			range: this.suspectRange,
+			lookAngle: this.input.look.dir(),
+			fov: this.fov
+		});
+		let contains = this.fos.find(x => x.contains(this.target.position));
 
 		//update suspicion value
 		this.updateSuspicion(timescale, ticks);
@@ -127,6 +142,34 @@ class Guard extends Agent {
 			const start = 0.5*Math.PI;
 			this.gfx.arc(0,0,this.radius+1,start-Math.PI*this.suspicion,start+Math.PI*this.suspicion);
 		}
+
+		this.drawFoV();
+	}
+
+	drawFoV() {
+		const bg = Core.color.acc2;
+		const fg = Core.color.acc2b;
+
+		this.fovGfx.clear();
+		this.fos.forEach(poly => {
+			let point0 = poly.points[0].sub(this.position);
+			this.fovGfx.beginFill(bg, 0.25);
+			this.fovGfx.moveTo(point0.x, point0.y);
+			for (let i=1; i<poly.points.length; i++) {
+				let point = poly.points[i].sub(this.position);
+				this.fovGfx.lineTo(point.x, point.y);
+			}
+			this.fovGfx.endFill();
+
+			for (let i=0; i<poly.points.length; i++) {
+				let pointA = poly.points[i].sub(this.position);
+				let pointB = poly.points[(i+1)%poly.points.length].sub(this.position);
+				
+				this.fovGfx.lineStyle(1, fg, 1);
+				this.fovGfx.moveTo(pointA.x, pointA.y);
+				this.fovGfx.lineTo(pointB.x, pointB.y);
+			}
+		});
 	}
 
 	fire(lookVector) {
@@ -146,6 +189,11 @@ class Guard extends Agent {
 		this.world.addEntity(ent);
 
 		super.fire.apply(this, arguments);
+	}
+
+	destroy() {
+		super.destroy.apply(this, arguments);
+		this.fovGfx.destroy();
 	}
 
 	serialize() {

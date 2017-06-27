@@ -129,6 +129,14 @@ class Entity extends Emitter {
 
 	}
 
+	/**
+	 * Called upon deciding that this Entity will no longer be used.
+	 * Should free resources that will not be GC'd.
+	 */
+	destroy() {
+		this.gfx.destroy();
+	}
+
 	serialize() {
 		return {
 			_constructor: "Entity",

@@ -121,8 +121,7 @@ class Caster extends Emitter {
 		let points = [];
 		let polys = new Set();
 
-		if (toggleVis)
-			this.world.obstacles.forEach(o => o.gfx.visible = false);
+		this.world.obstacles.forEach(o => o.gfx.visible = !toggleVis);
 
 		//iterate over casting directions
 		this.angles.forEach(angle => {
