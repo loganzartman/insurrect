@@ -1,7 +1,7 @@
 var EditScene = {
     stage: null,
     selectIndex: 0,
-    selectedObstacle: null,
+    selectedPrefab: null,
     phantomObstacle: null,
     allowPlayerFire: false,
     gridScale: 1,
@@ -40,6 +40,11 @@ var EditScene = {
         EditScene.gui.add(EditScene, "mergeMode", [EditScene.NONE, EditScene.UNION, EditScene.DIFFERENCE]).listen(function(){
             EditScene.mergedObstacles = [];
         });
+        EditScene.gui.add(EditScene, "selectedPrefab", Object.keys(Core.data.prefabs))
+            .onFinishChange(value => {
+                EditScene.selectPrefab(value);
+            })
+            .listen();
     },
 
     activate: function() {
@@ -63,11 +68,11 @@ var EditScene = {
 
         //Set up editor interaction
         GameScene.stage.on("click", function(){
-            if (EditScene.selectedObstacle !== null) {
+            if (EditScene.selectedPrefab !== null) {
                 //construct the selected prefab
                 var obs = GameScene.world.buildPrefab({
                     type: "prefab",
-                    name: EditScene.selectedObstacle,
+                    name: EditScene.selectedPrefab,
                     position: EditScene.calculatePlaceLocation(new Vector(Input.mouse), EditScene.phantomObstacle),
                     rotation: EditScene.phantomObstacle.rotation
                 });
@@ -100,14 +105,14 @@ var EditScene = {
             }
         });
 
-        EditScene.selectObstacle(Object.keys(Core.data.prefabs)[0]);
+        EditScene.selectPrefab(Object.keys(Core.data.prefabs)[0]);
 
         Game.WALLHACKS = true;
         GameScene.LOOK_INTENSITY = 0;
     },
 
-    selectObstacle: function(name) {
-        EditScene.selectedObstacle = name;
+    selectPrefab: function(name) {
+        EditScene.selectedPrefab = name;
         var data = Core.data.prefabs[name];
 
         //remove old phantom object graphics if any
@@ -146,7 +151,7 @@ var EditScene = {
             if (EditScene.selectIndex < 0)
                 EditScene.selectIndex += N;
 
-            EditScene.selectObstacle(prefabKeys[EditScene.selectIndex]);
+            EditScene.selectPrefab(prefabKeys[EditScene.selectIndex]);
         }));
 
         //changes grid scale

@@ -1,131 +1,158 @@
- {
-	"scripts": {
-		"sources": [
-			"lib/pixi.js",
-			"lib/bloom.js",
-			"lib/rgbsplit.js",
-			"lib/threshold.js",
-			"lib/clipper.js",
-			"lib/poly2tri.js",
-			"lib/dat.gui.min.js",
-			"emitter.js",
-			"game.js",
-			"display.js",
-			"input.js",
-			"util/util.js",
-			"util/intSet.js",
-			"util/vector.js",
-			"util/segment.js",
-			"util/polygon.js",
-			"util/graph.js",
-			"util/partitionedSpace.js",
-			"util/segmentSpace.js",
-			"util/binarySpacePartition.js",
-			"util/tinyqueue.js",
-			"util/fsm.js",
-			"scene/titlescene.js",
-			"scene/gamescene.js",
-			"scene/editscene.js",
-			"game/world.js",
-			"game/navmesh.js",
-			"game/caster.js",
-			"game/obstacle.js",
-			"game/collision.js",
-			"game/entity.js",
-			"game/controllable.js",
-			"game/projectile.js",
-			"game/player.js",
-			"game/pathTestEntity.js",
-			"game/agent.js",
-			"game/testAgent.js",
-			"game/guard.js"
-		],
-		"init": "Game.init"
-	},
-
-	"resources": {
-		"title": "resource/title.png",
-		"floor": "resource/floor2.png",
-		"qmtex": "resource/qmtex2.png",
-		"Andina": "resource/andina.fnt",
-		"AndinaBold": "resource/andina_bold.fnt",
-		"glow": "resource/glow.png"
-	},
-
-	"colors-old": {
-		"bg1": "0xD9CEBA",
-		"bg2": "0x263145",
-		"acc1": "0xD9559D",
-		"acc1b": "0xFF8DD4",
-		"acc2": "0x465D8C",
-		"acc2b": "0x8EA2D6",
-		"acc3": "0xD9A404",
-		"acc3b": "0xFFE559"
-	},
-
-	"colors": {
-		"bg1": "0xECEFF1",
-		"bg2": "0x263238",
-		"acc1": "0xD50000",
-		"acc1b": "0xFF8A80",
-		"acc2": "0x2962FF",
-		"acc2b": "0x82B1FF",
-		"acc3": "0x6200EA",
-		"acc3b": "0xB388FF"
-	},
-	
-	"inputBindings": {
-		"LEFT": 65,
-		"RIGHT": 68,
-		"UP": 87,
-		"DOWN": 83,
-		"PREV": 219,
-		"NEXT": 221,
-		"LESS": 186,
-		"MORE": 222,
-		"X": 88,
-		"R": 82,
-		"QUICKSAVE": 117,
-		"QUICKLOAD": 118
-	},
-
-	"prefabs": {
-		"square": {
-			"type": "obstacle",
-			"vertices": [[0,0], [16,0], [16,16], [0,16]]
-		},
-		"cell": {
-			"type": "obstacle",
-			"vertices": [
-				[0,0], [96,0], [96,18], [92,18], [92,4], [4,4], [4,52],
-				[92,52], [92,40], [96,40], [96,56], [0,56]
-			]
-		},
-		"circle": {
-			"type": "obstacle",
-			"vertices": [[30.68323447, 56.16528396], [53.85414303, 34.57934758], [63.83967914, 4.527180907], [58.19503532, -26.63339754], [38.30221722, -51.2731914], [9.031680516, -63.35951978], [-22.45012657, -59.93322799], [-48.4353597, -41.83319174], [-62.56192753, -13.49093116], [-61.37115358, 18.15437987], [-45.15458084, 45.35486555], [-17.88259188, 61.45089835]]
-		},
-		"wall": {
-			"type": "obstacle",
-			"vertices": [[0,0], [128,0], [128,4], [0,4]]
-		}
-	},
-
-	"levels": {
-		"demo0": {
-			"objects": [
-				{
-					"type": "obstacle",
-					"vertices": [[0,0],[96,0]],
-					"position": [0,0]
-				},
-				{
-					"type": "obstacle",
-					"vertices": [[128,-32],[128,32]],
-					"position": [0,0]
-				}
-			]
-		},
-		"demo": {"objects":[{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[144,168],[24,168],[24,144],[120,144],[120,24],[144,24]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-84,72],[84,72],[84,96],[-108,96],[-108,48],[-84,48]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[204,96],[180,96],[180,-12],[120,-12],[120,-108],[144,-108],[144,-36],[180,-36],[180,-168],[204,-168]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[84,36],[60,36],[60,-108],[84,-108]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-84,12],[-108,12],[-108,-84],[-84,-84]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[144,-168],[144,-144],[0,-144],[0,-120],[-24,-120],[-24,-144],[-96,-144],[-96,-168],[24,-168],[24,-228],[48,-228],[48,-168]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[204,-204],[108,-204],[108,-228],[204,-228]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-144,144],[-24,144],[-24,168],[-168,168],[-168,-84],[-144,-84]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[204,168],[144,168],[144,144],[180,144],[180,96],[204,96]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-264,144],[-288,144],[-288,120],[-264,120]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-307.03499999999997,108],[-324,124.965],[-340.96500000000003,108],[-324,91.035]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-211.035,84],[-228,100.965],[-244.965,84],[-228,67.035]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-360,84],[-384,84],[-384,60],[-360,60]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-276,72],[-300,72],[-300,48],[-276,48]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-199.035,24],[-216,40.965],[-232.965,24],[-216,7.035]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-266.55,-148.905],[-236.70000000000002,-111.945],[-228.24,-65.205],[-243.22500000000002,-20.13],[-277.98,12.254999999999999],[-350.82,20.175],[-391.72499999999997,-3.9749999999999996],[-416.055,-44.775000000000006],[-417.84000000000003,-92.235],[-396.65999999999997,-134.745],[-357.675,-161.895],[-310.455,-167.04]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-12,-204],[-144,-204],[-144,-132],[-168,-132],[-168,-228],[-12,-228]]},{"position":[-480,-156],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[-516,-24],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[108,228],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[-216,240],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[252,-156],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[-96,-288],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-48,36],[-48,-72],[24,-72],[24,-48],[-24,-48],[-24,36]]}],"entities":[{"_constructor":"Player","position":[16.216273486707234,-2.409177193794858],"velocity":[0,0],"color":4611468,"radius":7.5,"flocks":true,"maxSpeed":2.55,"acceleration":0.6000000000000001,"deceleration":0.30000000000000004,"fireInterval":0,"fireCount":2}]}
- 	}
-}
+ {
+	"scripts": {
+		"sources": [
+			"lib/pixi.js",
+			"lib/bloom.js",
+			"lib/rgbsplit.js",
+			"lib/threshold.js",
+			"lib/clipper.js",
+			"lib/poly2tri.js",
+			"lib/dat.gui.min.js",
+			"emitter.js",
+			"game.js",
+			"display.js",
+			"input.js",
+			"util/util.js",
+			"util/intSet.js",
+			"util/vector.js",
+			"util/segment.js",
+			"util/polygon.js",
+			"util/graph.js",
+			"util/partitionedSpace.js",
+			"util/segmentSpace.js",
+			"util/binarySpacePartition.js",
+			"util/tinyqueue.js",
+			"util/fsm.js",
+			"scene/titlescene.js",
+			"scene/gamescene.js",
+			"scene/editscene.js",
+			"game/world.js",
+			"game/navmesh.js",
+			"game/caster.js",
+			"game/obstacle.js",
+			"game/collision.js",
+			"game/entity.js",
+			"game/controllable.js",
+			"game/projectile.js",
+			"game/player.js",
+			"game/pathTestEntity.js",
+			"game/agent.js",
+			"game/testAgent.js",
+			"game/guard.js"
+		],
+		"init": "Game.init"
+	},
+	"resources": {
+		"title": "resource/title.png",
+		"floor": "resource/floor2.png",
+		"qmtex": "resource/qmtex2.png",
+		"Andina": "resource/andina.fnt",
+		"AndinaBold": "resource/andina_bold.fnt",
+		"glow": "resource/glow.png"
+	},
+	"colors-old": {
+		"bg1": "0xD9CEBA",
+		"bg2": "0x263145",
+		"acc1": "0xD9559D",
+		"acc1b": "0xFF8DD4",
+		"acc2": "0x465D8C",
+		"acc2b": "0x8EA2D6",
+		"acc3": "0xD9A404",
+		"acc3b": "0xFFE559"
+	},
+	"colors": {
+		"bg1": "0xECEFF1",
+		"bg2": "0x263238",
+		"acc1": "0xD50000",
+		"acc1b": "0xFF8A80",
+		"acc2": "0x2962FF",
+		"acc2b": "0x82B1FF",
+		"acc3": "0x6200EA",
+		"acc3b": "0xB388FF"
+	},
+	
+	"inputBindings": {
+		"LEFT": 65,
+		"RIGHT": 68,
+		"UP": 87,
+		"DOWN": 83,
+		"PREV": 219,
+		"NEXT": 221,
+		"LESS": 186,
+		"MORE": 222,
+		"X": 88,
+		"R": 82,
+		"QUICKSAVE": 117,
+		"QUICKLOAD": 118
+	},
+	"prefabs": {
+		"square": {
+			"type": "obstacle",
+			"vertices": [[0,0], [16,0], [16,16], [0,16]]
+		},
+		"cell": {
+			"type": "obstacle",
+			"vertices": [
+				[0,0], [96,0], [96,18], [92,18], [92,4], [4,4], [4,52],
+				[92,52], [92,40], [96,40], [96,56], [0,56]
+			]
+		},
+		"circle": {
+			"type": "obstacle",
+			"vertices": [[30.68323447, 56.16528396], [53.85414303, 34.57934758], [63.83967914, 4.527180907], [58.19503532, -26.63339754], [38.30221722, -51.2731914], [9.031680516, -63.35951978], [-22.45012657, -59.93322799], [-48.4353597, -41.83319174], [-62.56192753, -13.49093116], [-61.37115358, 18.15437987], [-45.15458084, 45.35486555], [-17.88259188, 61.45089835]]
+		},
+		"wall": {
+			"type": "obstacle",
+			"vertices": [[0,0], [128,0], [128,4], [0,4]]
+		},
+		"block-1-1": {
+			"type": "obstacle",
+			"vertices": [[0,0], [8,0], [8,8], [0,8]]
+		},
+		"block-2-1": {
+			"type": "obstacle",
+			"vertices": [[0,0], [16,0], [16,8], [0,8]]
+		},
+		"block-4-1": {
+			"type": "obstacle",
+			"vertices": [[0,0], [32,0], [32,8], [0,8]]
+		},
+		"block-8-1": {
+			"type": "obstacle",
+			"vertices": [[0,0], [64,0], [64,8], [0,8]]
+		},
+		"block-16-1": {
+			"type": "obstacle",
+			"vertices": [[0,0], [128,0], [128,8], [0,8]]
+		},
+		"block-32-1": {
+			"type": "obstacle",
+			"vertices": [[0,0], [128,0], [128,8], [0,8]]
+		},
+		"wedge-1-1": {
+			"type": "obstacle",
+			"vertices": [[0,0], [8,0], [0,8]]
+		},
+		"wedge-2-2": {
+			"type": "obstacle",
+			"vertices": [[0,8], [8,0], [16,0], [8,8], [0,16]]
+		}
+	},
+	"levels": {
+		"demo0": {
+			"objects": [
+				{
+					"type": "obstacle",
+					"vertices": [[0,0],[96,0]],
+					"position": [0,0]
+				},
+				{
+					"type": "obstacle",
+					"vertices": [[128,-32],[128,32]],
+					"position": [0,0]
+				}
+			]
+		},
+		"demo": {"objects":[{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[144,168],[24,168],[24,144],[120,144],[120,24],[144,24]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-84,72],[84,72],[84,96],[-108,96],[-108,48],[-84,48]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[204,96],[180,96],[180,-12],[120,-12],[120,-108],[144,-108],[144,-36],[180,-36],[180,-168],[204,-168]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[84,36],[60,36],[60,-108],[84,-108]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-84,12],[-108,12],[-108,-84],[-84,-84]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[144,-168],[144,-144],[0,-144],[0,-120],[-24,-120],[-24,-144],[-96,-144],[-96,-168],[24,-168],[24,-228],[48,-228],[48,-168]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[204,-204],[108,-204],[108,-228],[204,-228]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-144,144],[-24,144],[-24,168],[-168,168],[-168,-84],[-144,-84]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[204,168],[144,168],[144,144],[180,144],[180,96],[204,96]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-264,144],[-288,144],[-288,120],[-264,120]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-307.03499999999997,108],[-324,124.965],[-340.96500000000003,108],[-324,91.035]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-211.035,84],[-228,100.965],[-244.965,84],[-228,67.035]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-360,84],[-384,84],[-384,60],[-360,60]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-276,72],[-300,72],[-300,48],[-276,48]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-199.035,24],[-216,40.965],[-232.965,24],[-216,7.035]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-266.55,-148.905],[-236.70000000000002,-111.945],[-228.24,-65.205],[-243.22500000000002,-20.13],[-277.98,12.254999999999999],[-350.82,20.175],[-391.72499999999997,-3.9749999999999996],[-416.055,-44.775000000000006],[-417.84000000000003,-92.235],[-396.65999999999997,-134.745],[-357.675,-161.895],[-310.455,-167.04]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-12,-204],[-144,-204],[-144,-132],[-168,-132],[-168,-228],[-12,-228]]},{"position":[-480,-156],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[-516,-24],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[108,228],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[-216,240],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[252,-156],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[-96,-288],"rotation":0,"type":"obstacle","vertices":[[0,0],[24,0],[24,24],[0,24]]},{"position":[0,0],"rotation":0,"type":"obstacle","vertices":[[-48,36],[-48,-72],[24,-72],[24,-48],[-24,-48],[-24,36]]}],"entities":[{"_constructor":"Player","position":[16.216273486707234,-2.409177193794858],"velocity":[0,0],"color":4611468,"radius":7.5,"flocks":true,"maxSpeed":2.55,"acceleration":0.6000000000000001,"deceleration":0.30000000000000004,"fireInterval":0,"fireCount":2}]}
+ 	}
+}

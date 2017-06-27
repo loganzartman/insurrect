@@ -2,8 +2,8 @@ class Guard extends Agent {
 	constructor(params) {
 		params = Object.assign({
 			color: Core.color.acc1,
-			maxSpeed: Util.rand(1.6,1.8),
-			acceleration: Util.rand(0.1,0.25),
+			maxSpeed: Util.rand(1.5,1.6),
+			acceleration: Util.rand(0.2,0.21),
 			deceleration: 0.2,
 			fireInterval: 10,
 			mode: Guard.mode.WAIT,
