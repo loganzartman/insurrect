@@ -306,11 +306,11 @@ var GameScene = {
 		GameScene.maskGfx.endFill();
 
 		//calculate visible polygons
-		var polys = GameScene.world.getFoS({
-			from: GameScene.world.player.position.add(new Vector(0.0001,0.0001)),
+		var polys = GameScene.world.caster.cast({
+			viewpoint: GameScene.world.player.position.add(new Vector(0.0001,0.0001)),
 			viewport: GameScene.getViewRect(),
 			includeStructure: true,
-			toggleVis: true
+			toggleVis: !GameScene.WALLHACKS
 		});
 
 		GameScene.debugGfx.clear();
@@ -321,7 +321,7 @@ var GameScene = {
 		polys.forEach(function(poly){
 			var points = poly.points.map(p =>
 				p.sub(GameScene.view).sub(GameScene.viewOffset));
-			GameScene.maskGfx.lineStyle(2, 0xFFFFFF, 1);
+			GameScene.maskGfx.lineStyle(1, 0xFFFFFF, 1);
 			GameScene.maskGfx.beginFill(0xFFFFFF, 1);
 			GameScene.maskGfx.moveTo(
 				(points[points.length-1].x),

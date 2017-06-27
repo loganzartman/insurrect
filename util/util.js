@@ -13,9 +13,8 @@ var Util = {
 	},
 
 	signedAngleDiff: function(a, b) {
-		//a-b
-		let diff = a-b;
-		return Math.atan2(Math.sin(diff), Math.cos(diff));
+		const mod = (x, y) => x - Math.floor(x/y) * y;
+		return mod(a - b + Math.PI, Math.PI*2) - Math.PI;
 	},
 
 	color: {

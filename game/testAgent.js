@@ -28,9 +28,9 @@ class TestAgent extends Agent {
 		this.gfx.drawCircle(this.position.x,this.position.y,this.radius);
 
 		let polys = this.world.getFoS({
-			from: this.position,
+			from: this.target.position,
 			range: 128,
-			lookAngle: this.input.look.dir(),
+			lookAngle: this.target.input.look.dir(),
 			fov: Math.PI*0.25
 		});
 		let contains = polys.find(x => x.contains(this.target.position));
