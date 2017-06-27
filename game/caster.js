@@ -74,6 +74,7 @@ class Caster extends Emitter {
 			s._dist = s.distanceFrom(viewpoint);
 			s._maxdist = Math.max(s.a.sub(viewpoint).len(), s.b.sub(viewpoint).len());
 		});
+		
 		this.segments.sort((a,b) => {
 			return a._dist - b._dist;
 		});
@@ -172,9 +173,10 @@ class Caster extends Emitter {
 			}
 		});
 
-		points.sort(function(a,b){
-			return Util.signedAngleDiff(a.angle, b.angle);
-		});
+		if (fov < Math.PI*2)
+			points.sort((a,b) => Util.signedAngleDiff(a.angle, b.angle));
+		else
+			points.sort((a,b) => a.angle - b.angle);
 
 		if (fov < Math.PI*2) {
 			points.push(viewpoint);
