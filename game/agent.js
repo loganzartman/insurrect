@@ -288,7 +288,8 @@ class Agent extends Controllable {
 		let waypoint = this.route[0];
 
 		//compute movement
-		let dx = waypoint.sub(this.position);
+		let dx = waypoint.sub(this.position)
+			.sub(this.velocity.div(this.acceleration));
 		
 		//move to waypoint
 		if (dx.len() > this.radius) {

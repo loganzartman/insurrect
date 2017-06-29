@@ -90,6 +90,8 @@ class World extends Emitter {
      * @param ent the entity
      */
     addEntity(ent) {
+        if (ent instanceof Player)
+            this.player = ent;
 		this.entities.push(ent);
 		this.emit("addEntity", ent);
 	}
@@ -214,8 +216,6 @@ class World extends Emitter {
 		if ("entities" in data) {
 			data.entities.forEach(entity => {
 				let obj = this.deserializeEntity(entity);
-                if (obj instanceof Player)
-                    this.player = obj;
 				this.addEntity(obj);
 			});
 		}
