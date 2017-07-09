@@ -22,7 +22,7 @@ class Player extends Controllable {
 		
 		//calculate look direction
 		var look = new Vector(Input.mouse.x, Input.mouse.y)
-			.add(GameScene.viewOffset);
+			.add(GameScene.viewOffset).sub(GameScene.viewTarget).add(GameScene.view);
 
 		//apply inputs
 		this.emit("input", {
