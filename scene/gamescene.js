@@ -160,7 +160,8 @@ var GameScene = {
 		GameScene.rgbsplit.red = new PIXI.Point(0,1);
 		GameScene.rgbsplit.blue = new PIXI.Point(0,-1);
 		GameScene.rgbsplit.green = new PIXI.Point(0,0);
-		GameScene.gameStage.filters = [GameScene.bloom, GameScene.rgbsplit];
+		GameScene.fxaa = new PIXI.filters.FXAAFilter();
+		GameScene.gameStage.filters = [GameScene.bloom, GameScene.rgbsplit, GameScene.fxaa];
 
 		var filterOptions = {
 			bloom: true,

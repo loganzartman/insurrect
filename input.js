@@ -43,7 +43,10 @@ var Input = {
 		if (Input.vkList.indexOf(event.keyCode) >= 0)
 			event.preventDefault();
 		Input.events.emit("keydown", {
-			keyCode: event.keyCode
+			keyCode: event.keyCode,
+			altKey: event.altKey,
+			ctrlKey: event.ctrlKey,
+			shiftKey: event.shiftKey
 		});
 	},
 
@@ -51,7 +54,10 @@ var Input = {
 	handleKeyup: function(event){
 		Input.keys[event.keyCode] = false;
 		Input.events.emit("keyup", {
-			keyCode: event.keyCode
+			keyCode: event.keyCode,
+			altKey: event.altKey,
+			ctrlKey: event.ctrlKey,
+			shiftKey: event.shiftKey
 		});
 	},
 

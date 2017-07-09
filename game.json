@@ -23,6 +23,7 @@
 			"util/binarySpacePartition.js",
 			"util/tinyqueue.js",
 			"util/fsm.js",
+			"scene/historyComponent.js",
 			"scene/titlescene.js",
 			"scene/gamescene.js",
 			"scene/editscene.js",
@@ -83,7 +84,9 @@
 		"X": 88,
 		"R": 82,
 		"QUICKSAVE": 117,
-		"QUICKLOAD": 118
+		"QUICKLOAD": 118,
+		"UNDO": 90,
+		"REDO": 89
 	},
 	"prefabs": {
 		"square": {
@@ -127,7 +130,7 @@
 		},
 		"block-32-1": {
 			"type": "obstacle",
-			"vertices": [[0,0], [128,0], [128,8], [0,8]]
+			"vertices": [[0,0], [256,0], [256,8], [0,8]]
 		},
 		"wedge-1-1": {
 			"type": "obstacle",

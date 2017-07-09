@@ -16,11 +16,6 @@ var EditScene = {
         EditScene.stage = new PIXI.Container();
 
         EditScene.gui = Core.gui.addFolder("Editor");
-        EditScene.gui.add({
-            "Rebuild NavMesh": function() {
-                GameScene.world.navmesh.rebuild();
-            }
-        }, "Rebuild NavMesh");
         EditScene.gui.add({"Export Level": EditScene.doExport}, "Export Level");
         EditScene.gui.add({"Import Level": EditScene.doImport}, "Import Level");
         EditScene.gui.add({"Spawn Entity": function(){
@@ -37,19 +32,30 @@ var EditScene = {
                 }
             }
         }}, "Spawn Entity");
-        EditScene.gui.add(EditScene, "mergeMode", [EditScene.NONE, EditScene.UNION, EditScene.DIFFERENCE]).listen(function(){
+
+        let obsTools = EditScene.gui.addFolder("Obstacles");
+        obsTools.add({
+            "Rebuild NavMesh": function() {
+                GameScene.world.navmesh.rebuild();
+            }
+        }, "Rebuild NavMesh");
+        obsTools.add(EditScene, "mergeMode", [EditScene.NONE, EditScene.UNION, EditScene.DIFFERENCE]).listen(function(){
             EditScene.mergedObstacles = [];
         });
-        EditScene.gui.add(EditScene, "selectedPrefab", Object.keys(Core.data.prefabs))
+        obsTools.add(EditScene, "selectedPrefab", Object.keys(Core.data.prefabs))
             .onFinishChange(value => {
                 EditScene.selectPrefab(value);
             })
             .listen();
+
+        EditScene.gui.domElement.visible = false;
     },
 
     activate: function() {
+        //listeners
+        EditScene.listeners = [];
+
         GameScene.activate();
-        GameScene.world.ready = false;
         GameScene.world.listen("addObstacle", this.handleAddObstacle);
         GameScene.world.obstacles.forEach(this.handleAddObstacle);
 
@@ -64,6 +70,7 @@ var EditScene = {
                 playerFire.apply(GameScene.world.player, arguments);
         };
 
+        EditScene.gui.domElement.hidden = false;
         EditScene.initUI();
 
         //Set up editor interaction
@@ -107,6 +114,30 @@ var EditScene = {
 
         EditScene.selectPrefab(Object.keys(Core.data.prefabs)[0]);
 
+        //set up history
+        EditScene.history = new HistoryComponent({world: GameScene.world});
+        EditScene.listeners.push(GameScene.world.listen("preAddObstacle", obs => {
+            EditScene.history.pushState();
+        }));
+        EditScene.listeners.push(GameScene.world.listen("preRemoveObstacle", obs => {
+            EditScene.history.pushState();
+        }));
+
+        EditScene.listeners.push(Input.events.listen("keydown", event => {
+            if (!event.ctrlKey)
+                return;
+
+            switch (event.keyCode) {
+                case Input.key.UNDO:
+                EditScene.history.undo();
+                break;
+
+                case Input.key.REDO:
+                EditScene.history.redo();
+                break;
+            }
+        }));
+
         Game.WALLHACKS = true;
         GameScene.LOOK_INTENSITY = 0;
     },
@@ -131,11 +162,9 @@ var EditScene = {
     },
 
     initUI: function() {
-        //listeners
-        EditScene.inputListeners = [];
 
         //cycles through prefabs that can be placed in level
-        EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
+        EditScene.listeners.push(Input.events.listen("keydown", function(event){
             //increment or decrement selected prefab index           
             if (event.keyCode === Input.key.NEXT)
                 EditScene.selectIndex++;
@@ -155,7 +184,7 @@ var EditScene = {
         }));
 
         //changes grid scale
-        EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
+        EditScene.listeners.push(Input.events.listen("keydown", function(event){
             if (event.keyCode === Input.key.LESS)
                 EditScene.gridScale/=2;
             else if (event.keyCode === Input.key.MORE)
@@ -164,7 +193,7 @@ var EditScene = {
         }));
 
         //rotates object
-        EditScene.inputListeners.push(Input.events.listen("keydown", function(event){
+        EditScene.listeners.push(Input.events.listen("keydown", function(event){
             if (event.keyCode === Input.key.R) {
                 EditScene.phantomObstacle.rotation = (EditScene.phantomObstacle.rotation + 45) % 360;
                 EditScene.phantomObstacle.updateTransform();
@@ -280,6 +309,7 @@ var EditScene = {
      * Attaches necessary event handlers to the obstacle.
      */
     handleAddObstacle: function(obs) {
+        GameScene.world.ready = false; //prevent navmesh rebuild
         obs.gfx.on("mouseover", function(){
             obs.gfx.tint = 0xFF0000;
         });
@@ -295,9 +325,10 @@ var EditScene = {
 
     deactivate: function() {
         GameScene.deactivate();
+        EditScene.gui.domElement.hidden = true;
         EditScene.stage.removeChild(GameScene.stage);
         GameScene.world.unlisten("addObstacle", this.handleAddObstacle);
-        EditScene.inputListeners.forEach(l => Input.events.unlisten(l.event, l.callback));
+        EditScene.listeners.forEach(l => Input.events.unlisten(l.event, l.callback));
         GameScene.LOOK_INTENSITY = 0.4;
     },
 

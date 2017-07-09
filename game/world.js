@@ -140,10 +140,11 @@ class World extends Emitter {
 	 * @param obs the Obstacle.
 	 */
     addObstacle(obs) {
+        this.emit("preAddObstacle", obs);
         this.obstacles.push(obs);
         this.listnrs.push(obs.listen("verticesChanged", () => this.rebuildStructures()));
-        this.emit("addObstacle", obs);
         this.rebuildStructures();
+        this.emit("addObstacle", obs);
     }
 
     /**
@@ -155,6 +156,7 @@ class World extends Emitter {
         var idx = this.obstacles.indexOf(obs);
         if (idx < 0)
             return false;
+        this.emit("preRemoveObstacle", obs);
         this.obstacles.splice(idx, 1);
         obs.gfx.destroy();
         this.rebuildStructures();

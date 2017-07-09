@@ -153,7 +153,7 @@ class Guard extends Agent {
 		this.fovGfx.clear();
 		this.fos.forEach(poly => {
 			let point0 = poly.points[0].sub(this.position);
-			this.fovGfx.beginFill(bg, 0.25);
+			this.fovGfx.beginFill(bg, 0.1);
 			this.fovGfx.moveTo(point0.x, point0.y);
 			for (let i=1; i<poly.points.length; i++) {
 				let point = poly.points[i].sub(this.position);
