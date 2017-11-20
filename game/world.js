@@ -6,9 +6,11 @@ class World extends Emitter {
         super(params);
         this.scene = null;
         this.levelName = params.levelName;
-        this.listnrs = [];
+        this.listeners = [];
         this.entities = [];
         this.obstacles = [];
+        this.segments = [];
+        this.segSpace = null;
         this.caster = new Caster({world: this});
         this.navmesh = new NavMesh({world: this});
     }
@@ -23,8 +25,8 @@ class World extends Emitter {
         this.removeAllObstacles();
         this.prefabs = [];
 
-        this.listnrs.forEach(listener => listener.remove());
-        this.listnrs = [];
+        this.listeners.forEach(listener => listener.remove());
+        this.listeners = [];
 
         //build level
         this.ready = false;
@@ -33,11 +35,11 @@ class World extends Emitter {
         this.ready = true;
         this.rebuildStructures();
 
-        this.listnrs.push(
-            Input.events.listen("keydown", this.eventKeyDown.bind(this)));
+        this.listeners.push(
+            Input.events.listen("keydown", this.handleKeyDown.bind(this)));
     }
 
-    eventKeyDown(event) {
+    handleKeyDown(event) {
         if (event.keyCode === Input.key.X)
             this.addEntity(new Guard({
                 world: this,
@@ -142,7 +144,7 @@ class World extends Emitter {
     addObstacle(obs) {
         this.emit("preAddObstacle", obs);
         this.obstacles.push(obs);
-        this.listnrs.push(obs.listen("verticesChanged", () => this.rebuildStructures()));
+        this.listeners.push(obs.listen("verticesChanged", () => this.rebuildStructures()));
         this.rebuildStructures();
         this.emit("addObstacle", obs);
     }

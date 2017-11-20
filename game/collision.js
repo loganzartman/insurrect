@@ -24,3 +24,4 @@ class Collision {
 Collision.NONE = 0;
 Collision.POINT = 1;
 Collision.SEGMENT = 2;
+Collision.ENTITY = 3;

@@ -56,7 +56,7 @@ class Projectile extends Entity {
         //find nearest collision
         var nearest = null;
         var nearestDist = 0;
-        collisions.forEach(collision => {
+        collisions.filter(c => c.type === Collision.SEGMENT).forEach(collision => {
             if (collision.point === null)
                 return;
             var dist = collision.point.sub(this.position).len();
@@ -75,19 +75,22 @@ class Projectile extends Entity {
             this.emit("collision", [nearest]);
         }
     }
-    
-    getAllCollisions(dx) {
-        //calculate a segment representing the path of this object
-        var radius = dx.unit().mult(this.radius);
-        var pointA = this.position.add(dx).add(radius);
-        var pointB = this.position.sub(radius);
-        var selfSeg = new Segment(pointA, pointB);
 
-        //find any collisions
-        var collisions = [];
-        var segments = this.world.segSpace.getNearby(this, dx.len());
+    getMotionSegment(dx) {
+    	//calculate a segment representing the path of this object
+        let radius = dx.unit().mult(this.radius);
+        let pointA = this.position.add(dx).add(radius);
+        let pointB = this.position.sub(radius);
+        let selfSeg = new Segment(pointA, pointB);
+        return selfSeg;
+    }
+
+    getObstacleCollisions(dx) {
+    	let selfSeg = this.getMotionSegment(dx);
+    	let collisions = [];
+        let segments = this.world.segSpace.getNearby(this, dx.len());
         segments.forEach(segment => {
-            var point = Util.geom.segSegIntersect(selfSeg, segment);
+            let point = Util.geom.segSegIntersect(selfSeg, segment);
             if (point)
                 collisions.push(new Collision({
                     self: this,
@@ -99,15 +102,43 @@ class Projectile extends Entity {
         return collisions;
     }
 
+    getEntityCollisions(dx) {
+    	let selfSeg = this.getMotionSegment(dx);
+    	return this.world.entities
+    		.filter(entity => !(entity instanceof Projectile))
+    		.filter(entity => selfSeg.distanceFrom(entity.position) <= entity.radius)
+    		.map(entity => new Collision({
+    			self: this,
+    			type: Collision.ENTITY,
+    			object: entity,
+    			point: selfSeg.nearestPoint(entity.position)
+    		}));
+    }
+    
+    getAllCollisions(dx) {
+        //find any collisions
+        let cObstacle = this.getObstacleCollisions(dx);
+        let cEntity = this.getEntityCollisions(dx);
+        return [...cObstacle, ...cEntity];
+    }
+
     handleCollision(others) {
         super.handleCollision(others);
         
         var other = others[0];
-        if (other && other.type === Collision.SEGMENT) {
+        if (!other)
+        	return;
+
+        if (other.type === Collision.SEGMENT) {
             this.velocity = this.velocity.reflectOver(other.object.b.sub(other.object.a))
                 .mult(this.elasticity);
         }
+        else if (other.type === Collision.ENTITY) {
+        	this.handleEntityCollision(other.object, other);
+        }
     }
+
+    handleEntityCollision(entity, coll) {}
 
     serialize() {
         let data = super.serialize.apply(this, arguments);

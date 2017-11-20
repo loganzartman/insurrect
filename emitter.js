@@ -1,6 +1,10 @@
 class Emitter {
 	constructor(params) {
-		this._listeners = {};
+		let listeners = {};
+		this.listen = Emitter.listen.bind(this, listeners);
+		this.unlisten = Emitter.unlisten.bind(this, listeners);
+		this.removeAllListeners = Emitter.removeAllListeners.bind(this, listeners);
+		this.emit = Emitter.emit.bind(this, listeners);
 	}
 
 	/**
@@ -9,14 +13,13 @@ class Emitter {
 	 * @param callback the event handler
 	 * @returns an object with event, callback, and a remove function
 	 */
-	listen(event, callback) {
-		if (!this._listeners.hasOwnProperty(event))
-			this._listeners[event] = new Set();
+	static listen(listeners, event, callback) {
+		if (!listeners.hasOwnProperty(event))
+			listeners[event] = new Set();
 
-		this._listeners[event].add(callback);
-		let that = this;
-		return {event: event, callback: callback, remove: function(){
-			that.unlisten(event, callback);
+		listeners[event].add(callback);
+		return {event: event, callback: callback, remove: () => {
+			this.unlisten(event, callback);
 		}};
 	}
 
@@ -27,15 +30,15 @@ class Emitter {
 	 * @param callback a reference to the listener to remove
 	 * @return whether the listener was removed
 	 */
-	unlisten(event, callback) {
+	static unlisten(listeners, event, callback) {
 		if (typeof event === "object") {
 			callback = event.callback;
 			event = event.event;
 		}
 
-		if (this._listeners.hasOwnProperty(event)
-			&& this._listeners[event].has(callback)) {
-			this._listeners[event].delete(callback);
+		if (listeners.hasOwnProperty(event)
+			&& listeners[event].has(callback)) {
+			listeners[event].delete(callback);
 			return true;
 		}
 		return false;
@@ -45,11 +48,11 @@ class Emitter {
 	 * Removes all listeners for a given event.
 	 * @param event the name of the event
 	 */
-	removeAllListeners(event) {
+	static removeAllListeners(listeners, event) {
 		if (typeof event === "undefined")
-			this._listeners = {};
-		else if (this._listeners.hasOwnProperty(event))
-			this._listeners[event] = new Set();
+			listeners = {};
+		else if (listeners.hasOwnProperty(event))
+			listeners[event] = new Set();
 	}
 
 	/**
@@ -58,8 +61,8 @@ class Emitter {
 	 * @param event the event name
 	 * @param data arbitrary data to pass as first argument to listeners
 	 */
-	emit(event, data) {
-		if (this._listeners.hasOwnProperty(event))
-			this._listeners[event].forEach(l => l.call(this, data));
+	static emit(listeners, event, data) {
+		if (listeners.hasOwnProperty(event))
+			listeners[event].forEach(l => l.call(this, data));
 	}
 }
