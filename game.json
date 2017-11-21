@@ -1,4 +1,4 @@
- {
+{
 	"scripts": {
 		"sources": [
 			"lib/pixi.js",
@@ -32,14 +32,15 @@
 			"game/caster.js",
 			"game/obstacle.js",
 			"game/collision.js",
-			"game/entity.js",
-			"game/controllable.js",
-			"game/projectile.js",
-			"game/player.js",
-			"game/pathTestEntity.js",
-			"game/agent.js",
-			"game/testAgent.js",
-			"game/guard.js"
+			"game/entity/entity.js",
+			"game/entity/controllable.js",
+			"game/entity/projectile.js",
+			"game/entity/bullet.js",
+			"game/entity/player.js",
+			"game/entity/pathTestEntity.js",
+			"game/entity/agent.js",
+			"game/entity/testAgent.js",
+			"game/entity/guard.js"
 		],
 		"init": "Game.init"
 	},
