@@ -19,14 +19,14 @@ var Core = {
 				Core.color[key] = parseInt(Core.data.colors[key], 16);
 			});
 
-			Core.loaderGfx.progress(0.1);
+			Core.loaderGfx.progress(0.1, "core");
 
 			//load scripts sequentially
 			var loaded = 0;
 			for (var i=0, j=data.scripts.sources.length; i<j; i++) {
-				Core.load.script(data.scripts.sources[i]).then(function(){
+				Core.load.script(data.scripts.sources[i]).then(function(src){
 					loaded++;
-					Core.loaderGfx.progress(0.1 + loaded/j*0.9);
+					Core.loaderGfx.progress(0.1 + loaded/j*0.9, src);
 					if (loaded === j)
 						Core.scriptsLoaded();
 				}).catch(function(err){
@@ -65,7 +65,7 @@ var Core = {
 		var loader = PIXI.loader;
 		Object.keys(Core.data.resources).forEach(function(n){loader.add(n, Core.data.resources[n])});
 		loader.on("complete", function(){
-			Core.loaderGfx.progress(1);
+			Core.loaderGfx.progress(1, "assets");
 			Core.resource = loader.resources; //alias
 			Core.loaderGfx.destroy();
 
@@ -85,13 +85,14 @@ var Core = {
 		barHeight: 12,
 		prog: 0,
 		progTgt: 0,
+		lastItem: "",
 		init: function() {
 			Core.loaderGfx.canv = document.createElement("canvas");
 			Core.loaderGfx.canv.width = window.innerWidth;
 			Core.loaderGfx.canv.height = window.innerHeight;
 			Core.loaderGfx.ctx = Core.loaderGfx.canv.getContext("2d");
 			document.getElementById("container").appendChild(Core.loaderGfx.canv);
-			Core.loaderGfx.timer = setInterval(Core.loaderGfx.redraw, 16);
+			Core.loaderGfx.timer = setInterval(Core.loaderGfx.redraw, 32);
 		},
 		color: function(packed, alpha) {
 			if (typeof alpha === "undefined")
@@ -117,7 +118,7 @@ var Core = {
 			c.save();
 			c.fillStyle = Core.loaderGfx.color(Core.color.bg1);
 			c.fillRect(0,0,w,h);
-			var col = Core.loaderGfx.color(Core.color.acc1, val);
+			var col = Core.loaderGfx.color(Core.color.acc1, 1);
 			c.strokeStyle = col;
 			c.fillStyle = col;
 			c.lineWidth = 1;
@@ -128,10 +129,15 @@ var Core = {
 			);
 			c.strokeRect(0,0,Core.loaderGfx.barWidth,Core.loaderGfx.barHeight);
 			c.fillRect(0,0,Core.loaderGfx.barWidth*val,Core.loaderGfx.barHeight);
+			
+			c.font = "10px monospace";
+			c.textBaseline = "top";
+			c.fillText("loaded " + Core.loaderGfx.lastItem, 0, Core.loaderGfx.barHeight+2);
 			c.restore();
 		},
-		progress: function(val) {
+		progress: function(val, src) {
 			Core.loaderGfx.progTgt = val;
+			Core.loaderGfx.lastItem = src;
 		},
 		destroy: function() {
 			document.getElementById("container").removeChild(Core.loaderGfx.canv);
@@ -191,7 +197,7 @@ var Core = {
 			return new Promise(function(resolve, reject){
 				var script = document.createElement("script");
 				script.onload = function(){
-					resolve(true);
+					resolve(src);
 				};
 				script.src = src;
 				script.async = false;

@@ -1,8 +1,8 @@
 class Player extends Controllable {
 	constructor(params) {
 		params = Object.assign({
-			fireInterval: 0,
-			fireCount: 2
+			fireInterval: 16,
+			fireCount: 8
 		}, params);
 		super(params);
 		this.suspiciousness = 0;
@@ -37,12 +37,9 @@ class Player extends Controllable {
 	fire(lookVector) {
 		let ent = new Bullet({
 			position: this.position.clone(),
-			velocity: Vector.fromDir(
-				lookVector.dir() + Util.rand(0.1, -0.1),
-				Util.rand(32, 40)
-			),
-			elasticity: 0.3,
-			friction: 0.12,
+			velocity: Vector.fromDir(lookVector.dir() + Util.rand(-0.05,0.05), 40),
+			elasticity: 0.5,
+			friction: 0.02,
 			life: 1,
 			radius: 0.5,
 			world: this.world,

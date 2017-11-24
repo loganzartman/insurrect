@@ -17,10 +17,7 @@ class Projectile extends Entity {
     draw(timescale) {
     	this.gfx.position.x = this.position.x;
         this.gfx.position.y = this.position.y;
-        if (!this.gfxDirty)
-            return;
 
-        this.gfxDirty = false;
         var dx = this.oldPos.sub(this.position);
         this.gfx.clear();
         this.gfx.lineStyle(1, this.color, 1);
@@ -46,13 +43,6 @@ class Projectile extends Entity {
             this.world.removeEntity(this);
         if (this.age > this.life)
             this.world.removeEntity(this);
-
-        //only redraw when speed changes significantly
-        //this tolerance can be adjusted and significantly improves performance.
-        if (this.velocity.sub(this.oldVel).len() > 0.5) {
-            this.gfxDirty = true;
-            this.oldVel = this.velocity.clone();
-        }
     }
 
     move(dx) {
@@ -77,6 +67,7 @@ class Projectile extends Entity {
         else {
             dx = dx.unit().mult(nearest.point.sub(this.position).len() - this.radius*2);
             this.position = this.position.add(dx);
+            this._nearestSeg = nearest.object;
             this.emit("collision", [nearest]);
         }
     }
@@ -121,8 +112,6 @@ class Projectile extends Entity {
     }
 
     handleObstacleCollision(other) {
-        if (!this._nearestSeg)
-            this._nearestSeg = other.object;
     }
 
     handleEntityCollision(other) {}

@@ -60,7 +60,7 @@ class Controllable extends Entity {
 
 		//handle click input
 		if (this.input.fire && this.fireTimer === 0) {
-			for (let i=0; i<ticks*this.fireCount; i++)
+			for (let i=0; i<this.fireCount; i++)
 				this.fire(this.input.look);
 			this.fireTimer = this.fireInterval;
 		}
@@ -107,7 +107,8 @@ class Controllable extends Entity {
 			acceleration: this.acceleration,
 			deceleration: this.deceleration,
 			fireInterval: this.fireInterval,
-			fireCount: this.fireCount
+			fireCount: this.fireCount,
+			fireAuto: this.fireAuto
 		});
 	}
 }

@@ -131,7 +131,8 @@ class Entity extends Emitter {
 	 */
 	getEntityCollisions(dx) {
 		return this.world.entities
-			.filter(ent => ent.position.sub(this.position).len() <= this.radius)
+			.filter(ent => ent !== this)
+			.filter(ent => ent.position.sub(this.position).len() <= this.radius + ent.radius)
 			.map(ent => new Collision({
 				self: this,
 				type: Collision.ENTITY,
@@ -157,10 +158,9 @@ class Entity extends Emitter {
 	}
 
 	handleDamage(amount=0, source=null) {
-		this.color = Math.floor(Math.random()*0xFFFFFF);
 		this.health -= amount;
-		// if (this.health < 0)
-		// 	this.die();
+		if (this.health <= 0)
+			this.die();
 	}
 
 	/**
@@ -178,6 +178,7 @@ class Entity extends Emitter {
 	}
 
 	die() {
+		this.destroy();
 	}
 
 	/**
