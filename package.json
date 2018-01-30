@@ -1,0 +1,26 @@
+{
+  "name": "insurrect",
+  "version": "0.1.0",
+  "description": "a game about sneaking around",
+  "main": "index.html",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node serve.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loganzartman/insurrect.git"
+  },
+  "author": "Logan Zartman",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/loganzartman/insurrect/issues"
+  },
+  "homepage": "https://github.com/loganzartman/insurrect#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
